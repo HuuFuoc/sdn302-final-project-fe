@@ -1,6 +1,13 @@
 import { BaseService } from "../../app/api/base.service";
 import type { ResponseSuccess } from "../../app/interface";
-import type { LoginRequest, RegisterRequest, ConfirmEmailRequest, RequestPasswordResetRequest, ResetPasswordRequest, ChangePasswordRequest } from "../../types/user/User.req.type";
+import type {
+  LoginRequest,
+  RegisterRequest,
+  ConfirmEmailRequest,
+  RequestPasswordResetRequest,
+  ResetPasswordRequest,
+  ChangePasswordRequest,
+} from "../../types/user/User.req.type";
 import type { UserResponse } from "../../types/user/User.res.type";
 import { API_PATH } from "../../consts/api.path.const";
 
@@ -37,8 +44,8 @@ export const AuthService = {
   },
   changePassword(params: ChangePasswordRequest) {
     return BaseService.put<any>({
-      url: API_PATH.USER.CHANGE_PASSWORD,
+      url: API_PATH.AUTH.CHANGE_PASSWORD,
       payload: params,
     });
   },
-}
+};

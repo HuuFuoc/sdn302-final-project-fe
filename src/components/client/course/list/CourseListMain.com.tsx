@@ -49,7 +49,7 @@ const CourseList = () => {
       // Lọc chỉ lấy course có status là "published"
       let filteredCourses = Array.isArray(data?.data)
         ? data.data.filter(
-            (course: any) => course.status === CourseStatus.PUBLISHED
+            (course: any) => course.status === CourseStatus.PUBLISHED,
           )
         : [];
 
@@ -60,21 +60,21 @@ const CourseList = () => {
         filteredCourses = filteredCourses.filter(
           (course: any) =>
             course.name?.toLowerCase().includes(searchLower) ||
-            course.description?.toLowerCase().includes(searchLower)
+            course.description?.toLowerCase().includes(searchLower),
         );
       }
 
       // 2. Filter by category
       if (selectedCategory && selectedCategory !== "") {
         filteredCourses = filteredCourses.filter(
-          (course: any) => course.categoryId === selectedCategory
+          (course: any) => course.categoryId === selectedCategory,
         );
       }
 
       // 3. Filter by target audience
       if (targetAudience && targetAudience !== "") {
         filteredCourses = filteredCourses.filter(
-          (course: any) => course.targetAudience === targetAudience
+          (course: any) => course.targetAudience === targetAudience,
         );
       }
 
@@ -98,14 +98,6 @@ const CourseList = () => {
       const startIndex = (page - 1) * size;
       const endIndex = startIndex + size;
       const paginatedCourses = filteredCourses.slice(startIndex, endIndex);
-
-      console.log("🎯 Frontend filtering results:", {
-        totalFromAPI: data?.data?.length || 0,
-        afterStatusFilter: filteredCourses.length,
-        afterPagination: paginatedCourses.length,
-        currentPage: page,
-        pageSize: size,
-      });
 
       setCourses(paginatedCourses);
       setTotal(totalFiltered); // Set total theo số lượng đã filter

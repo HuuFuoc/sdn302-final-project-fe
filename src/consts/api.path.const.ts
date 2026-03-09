@@ -1,8 +1,10 @@
 export const API_PATH = {
   AUTH: {
-    LOGIN: "/auth/",
-    LOGOUT: "/auth/logout",
-    REGISTER: "/auth/register",
+    LOGIN: "/user/login",
+    LOGOUT: "/user/logout",
+    REGISTER: "/user/register",
+    VERIFY_EMAIL: "/user/verify-email",
+    CHANGE_PASSWORD: "/user/change-password",
     FORGOT_PASSWORD: "/auth/forgot-password",
     CONFIRM_EMAIL: "/auth/confirmEmail",
     REQUEST_PASSWORD_RESET: "/auth/requestPasswordReset",
@@ -10,12 +12,11 @@ export const API_PATH = {
   },
   USER: {
     GET_USERS: "/user",
-    GET_USER_PROFILE: "/user/profile",
-    UPDATE_USER_PROFILE: "/user/profile",
+    GET_USER_PROFILE: "/user/get-me",
+    UPDATE_USER_PROFILE: "/user/update-me",
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
     DELETE_USER: (id: string) => `/user/${id}`,
     CREATE_USER: "/user/create",
-    CHANGE_PASSWORD: "/user/changePassword",
   },
   PRODUCT: {
     GET_ALL_PRODUCTS: "/products",
@@ -30,6 +31,7 @@ export const API_PATH = {
     DELETE_BLOG: (id: string) => `/blog/${id}`,
     UPDATE_BLOG: (id: string) => `/blog/${id}`,
     GET_BLOG_BY_ID: (id: string) => `/blog/${id}`,
+    GET_BLOG_BY_USER_ID: (userId: string) => `/blog/user/${userId}`,
   },
   APPOINTMENT: {
     CREATE_APPOINTMENT: "/appointments/book",
@@ -52,14 +54,16 @@ export const API_PATH = {
   QUESTION: {
     GET_ALL_QUESTIONS: "/question/paged",
     GET_QUESTION_BY_ID: (id: string) => `/question/${id}`,
-    GET_QUESTION_BY_SURVEY_ID: (surveyId: string) => `/question/by-survey/${surveyId}`,
+    GET_QUESTION_BY_SURVEY_ID: (surveyId: string) =>
+      `/question/by-survey/${surveyId}`,
     CREATE_QUESTION: "/question",
     UPDATE_QUESTION: (id: string) => `/question/${id}`,
     DELETE_QUESTION: (id: string) => `/question/${id}`,
   },
   ANSWER: {
     GET_ALL_ANSWERS: "/answer-options/paged",
-    GET_ANSWER_BY_QUESTION_ID: (questionId: string) => `/answer-options/by-question/${questionId}`,
+    GET_ANSWER_BY_QUESTION_ID: (questionId: string) =>
+      `/answer-options/by-question/${questionId}`,
     CREATE_ANSWER: "/answer-options/create",
     UPDATE_ANSWER: "/answer-options/update",
     DELETE_ANSWER: (id: string) => `/answer-options/${id}`,
@@ -75,7 +79,7 @@ export const API_PATH = {
   CONSULTANT: {
     GET_ALL_CONSULTANTS: "/consultant",
     CREATE_CONSULTANT: "/consultant/create",
-    UPDATE_CONSULTANT: (id: string) => `/consultant/update/${id}`,
+    UPDATE_CONSULTANT: (id: string) => `/consultant/${id}`,
     DELETE_CONSULTANT: (id: string) => `/consultant/${id}`,
     GET_CONSULTANT_BY_ID: (id: string) => `/consultant/${id}`,
   },
@@ -90,6 +94,7 @@ export const API_PATH = {
     GET_CART: "/cart/myCart",
     ADD_CART_ITEM: "/cart/addCourse",
     DELETE_CART_ITEM: (cartItemId: string) => `/cart/remove/${cartItemId}`,
+    CLEAR_CART: "/cart/clear",
   },
   SESSION: {
     GET_ALL_SESSIONS: "/session/all",
@@ -128,18 +133,32 @@ export const API_PATH = {
   },
   PAYMENT: {
     CREATE_PAYMENT: "/payment/createPaymentFromOrder",
+    GET_PAYMENT_HISTORY: (userId: string) => `/payment/history/${userId}`,
+    STRIPE_WEBHOOK: "/payment/stripe-webhook",
+    UPDATE_PAYMENT_STATUS: (paymentId: string) =>
+      `/payment/${paymentId}/status`,
+    GET_PAYMENT_BY_ID: (paymentId: string) => `/payment/${paymentId}`,
   },
   REVIEW: {
     GET_ALL_REVIEWS: "/review",
     GET_REVIEW_BY_ID: (id: string) => `/review/${id}`,
     CREATE_REVIEW: "/review/course",
+    UPDATE_REVIEW: (id: string) => `/review/${id}`,
     DELETE_REVIEW: (id: string) => `/review/${id}`,
     GET_REVIEW_BY_COURSE_ID: (courseId: string) => `/review/course/${courseId}`,
     GET_REVIEW_BY_USER_ID: (userId: string) => `/review/user/${userId}`,
     REVIEW_APPOINTMENT: "/review/appointment",
-    GET_REVIEW_BY_APPOINTMENT_ID: (appointmentId: string) => `/review/appointment/${appointmentId}`,
+    GET_REVIEW_BY_APPOINTMENT_ID: (appointmentId: string) =>
+      `/review/appointment/${appointmentId}`,
+    GET_REVIEW_BY_CONSULTANT_ID: (consultantId: string) =>
+      `/review/consultant/${consultantId}`,
   },
   DASHBOARD: {
     GET_DASHBOARD_OVERALL: "/dashboard/overall",
+  },
+  VNPAY: {
+    CREATE_PAYMENT_URL: "/vnpay/create-payment-url",
+    RETURN: "/vnpay/return",
+    IPN: "/vnpay/ipn",
   },
 };

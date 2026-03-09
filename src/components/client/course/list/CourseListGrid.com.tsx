@@ -50,8 +50,8 @@ const CourseListGrid: React.FC<CourseListGridProps> = ({
         transition={{ duration: 0.3 }}
       >
         <Row gutter={[24, 24]}>
-          {courses.map((course) => (
-            <Col key={course.id} xs={24} sm={12} lg={8} xl={6}>
+          {courses.map((course, index) => (
+            <Col key={course.id ?? index} xs={24} sm={12} lg={8} xl={6}>
               <CourseCard course={course} />
             </Col>
           ))}

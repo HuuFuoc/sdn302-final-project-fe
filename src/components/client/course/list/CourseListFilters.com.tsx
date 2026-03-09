@@ -58,7 +58,7 @@ const CourseListFilters: React.FC<CourseListFiltersProps> = ({
 
         if (response.data?.success && Array.isArray(response.data?.data)) {
           const activeCategories = response.data.data.filter(
-            (category: Category) => !category.isDelete
+            (category: Category) => !category.isDelete,
           );
           setCategories(activeCategories);
         } else {
@@ -128,7 +128,10 @@ const CourseListFilters: React.FC<CourseListFiltersProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="shadow-lg border-0" bodyStyle={{ padding: "24px" }}>
+      <Card
+        className="shadow-lg border-0"
+        styles={{ body: { padding: "24px" } }}
+      >
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
             <FilterOutlined className="text-blue-600 text-lg" />
