@@ -26,8 +26,8 @@ export const AuthService = {
   },
   confirmEmail(params: ConfirmEmailRequest) {
     return BaseService.get<ResponseSuccess<UserResponse>>({
-      url: API_PATH.AUTH.CONFIRM_EMAIL,
-      payload: params,
+      url: API_PATH.AUTH.VERIFY_EMAIL,
+      payload: { email_verify_token: params.token },
     });
   },
   requestPasswordReset(params: RequestPasswordResetRequest) {

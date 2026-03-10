@@ -69,7 +69,7 @@ export const API_PATH = {
     DELETE_ANSWER: (id: string) => `/answer-options/${id}`,
   },
   COURSE: {
-    GET_ALL_COURSES: "/Course",
+    GET_ALL_COURSES: "/api/course",
     CREATE_COURSE: "/course/create",
     UPDATE_COURSE: (id: string) => `/course/${id}`,
     DELETE_COURSE: (id: string) => `/course/${id}`,

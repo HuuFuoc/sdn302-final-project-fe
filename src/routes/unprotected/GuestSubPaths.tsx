@@ -26,14 +26,14 @@ const HomePage = lazy(() => import("../../pages/client/home"));
 const LoginPage = lazy(() => import("../../pages/auth/login"));
 const RegisterPage = lazy(() => import("../../pages/auth/register"));
 const ForgotPasswordPage = lazy(
-  () => import("../../pages/auth/forgot_password")
+  () => import("../../pages/auth/forgot_password"),
 );
 const CartPage = lazy(() => import("../../pages/client/cart"));
 const ResetPasswordPage = lazy(() => import("../../pages/auth/reset_password"));
 const ConfirmEmailPage = lazy(() => import("../../pages/auth/confirm_email"));
 const AppointmentPage = lazy(() => import("../../pages/client/appointment"));
 const AssessmentResult = lazy(
-  () => import("../../pages/client/assessment/result")
+  () => import("../../pages/client/assessment/result"),
 );
 //======================================================
 
@@ -158,7 +158,7 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
   [ROUTER_URL.AUTH.CONFIRM_EMAIL]: [
     {
       element: <ConfirmEmailPage />,
-      path: ROUTER_URL.AUTH.CONFIRM_EMAIL,
+      path: ROUTER_URL.AUTH.VERIFY_EMAIL,
     },
   ],
   [ROUTER_URL.AUTH.NOT_FOUND]: [

@@ -30,12 +30,35 @@ interface AuthContextType {
   handleLogin: (loginData: {
     email: string;
     password: string;
-  }) => Promise<UserResponse>;
+  }) => Promise<UserResponse | null>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const mapBackendRoleToUserRole = (backendRole: any): UserRole | null => {
+  // Backend currently sends numeric roles, e.g. 0 for customer
+  switch (backendRole) {
+    case 0:
+    case "Customer":
+      return UserRole.CUSTOMER;
+    case 1:
+    case "Staff":
+      return UserRole.STAFF;
+    case 2:
+    case "Manager":
+      return UserRole.MANAGER;
+    case 3:
+    case "Consultant":
+      return UserRole.CONSULTANT;
+    case 4:
+    case "Admin":
+      return UserRole.ADMIN;
+    default:
+      return null;
+  }
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
@@ -64,16 +87,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setToken(storedToken);
           try {
             // Verify and set role from token
-            const decoded = jwtDecode(storedToken) as { role?: UserRole };
-            if (
-              decoded.role &&
-              Object.values(UserRole).includes(decoded.role)
-            ) {
-              setRole(decoded.role);
-            } else {
-              // Invalid role in token
+            const decoded = jwtDecode(storedToken) as { role?: any };
+            const mappedRole = mapBackendRoleToUserRole(decoded.role);
+            if (!mappedRole) {
               throw new Error("Invalid role in token");
             }
+            setRole(mappedRole);
           } catch (error) {
             // Token is invalid or expired
             console.error("Token validation error:", error);
@@ -145,22 +164,54 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       try {
         const response = await AuthService.login(loginData);
-        const userData = response.data.data as UserResponse;
+        const { result } = response.data as {
+          message?: string;
+          result?: { access_token?: string; refresh_token?: string };
+        };
 
-        const token = userData.token;
-        if (!token)
+        const token = result?.access_token;
+        if (!token) {
           throw new HttpException(
             "No token provided",
             HTTP_STATUS.UNAUTHORIZED
           );
+        }
 
-        const decoded = jwtDecode(token) as { role?: UserRole };
+        // Optionally store refresh token if needed later
+        if (result?.refresh_token) {
+          localStorage.setItem("refresh_token", result.refresh_token);
+        }
 
-        if (!decoded.role || !Object.values(UserRole).includes(decoded.role)) {
+        const decoded = jwtDecode(token) as { role?: any; user_id?: string };
+        const mappedRole = mapBackendRoleToUserRole(decoded.role);
+        if (!mappedRole) {
           throw new HttpException("Invalid role", HTTP_STATUS.UNAUTHORIZED);
         }
 
-        const userRole = decoded.role;
+        const userRole = mappedRole;
+
+        // Minimal user info constructed from token + login data
+        const userData: UserResponse = {
+          id: decoded.user_id ?? "",
+          firstName: "",
+          lastName: "",
+          password: "",
+          phoneNumber: "",
+          gender: "",
+          email: loginData.email,
+          dob: "",
+          ageGroup: "",
+          token,
+          isVerified: true,
+          isDeleted: false,
+          verificationToken: "",
+          verificationTokenExpires: new Date(),
+          role: userRole,
+          profilePicUrl: "",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          fullName: "",
+        };
 
         // Store values
         setToken(token);

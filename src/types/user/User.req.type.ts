@@ -20,16 +20,11 @@ export interface ResetPasswordRequest {
 }
 
 export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   password: string;
-  phoneNumber: string;
-  role: UserRole;
-  address: string;
-  gender: string;
-  dob: string;
-  profilePicUrl?: string;
+  confirm_password: string;
+  date_of_birth: string;
 }
 
 export interface GetUserByIdRequest {
