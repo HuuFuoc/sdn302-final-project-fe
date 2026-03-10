@@ -6,8 +6,9 @@ import Background from '../../../assets/cover.jpg';
 
 const ConfirmEmailPage = () => {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-  const { isLoading, isSuccess } = useVerifyEmailToken(token);
+  // Lấy đúng query param theo link verify-email?email_verify_token=...
+  const emailVerifyToken = searchParams.get('email_verify_token');
+  const { isLoading, isSuccess } = useVerifyEmailToken(emailVerifyToken);
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
