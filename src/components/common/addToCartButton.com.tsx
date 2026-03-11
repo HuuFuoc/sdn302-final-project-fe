@@ -1,10 +1,15 @@
 import React from "react";
-import { ShoppingCartOutlined, LoadingOutlined } from "@ant-design/icons";
+import {
+  ShoppingCartOutlined,
+  LoadingOutlined,
+  CheckCircleOutlined,
+} from "@ant-design/icons";
 import { motion } from "framer-motion";
 import { useCart } from "../../contexts/Cart.context";
 
 interface AddToCartButtonProps {
   courseId: string;
+  isInCart?: boolean;
   onAdded?: () => void;
   variant?: "primary" | "secondary" | "compact";
   className?: string;
@@ -12,19 +17,35 @@ interface AddToCartButtonProps {
 
 const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   courseId,
+  isInCart = false,
   onAdded,
   variant = "primary",
   className = "",
 }) => {
-  const { addToCart, loading } = useCart();
+  const { addToCart, loading, cartItems } = useCart();
+
+  // Also check cart context in case isInCart prop is stale
+  const alreadyInCart =
+    isInCart || cartItems.some((item) => item.courseId === courseId);
 
   const handleAddToCart = async () => {
+    if (alreadyInCart) return;
     await addToCart(courseId);
     if (onAdded) onAdded();
   };
 
   const getButtonStyles = () => {
-    const baseStyles = "font-semibold transition-all duration-300 border-0 flex items-center justify-center gap-2";
+    const baseStyles =
+      "font-semibold transition-all duration-300 border-0 flex items-center justify-center gap-2";
+
+    if (alreadyInCart) {
+      switch (variant) {
+        case "compact":
+          return `${baseStyles} h-8 px-4 rounded-lg text-sm shadow-sm bg-green-500 text-white cursor-default`;
+        default:
+          return `${baseStyles} w-full h-12 rounded-xl text-lg shadow-lg bg-green-500 text-white cursor-default`;
+      }
+    }
 
     switch (variant) {
       case "primary":
@@ -47,8 +68,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       <button
         type="button"
         onClick={handleAddToCart}
-        disabled={loading}
-        className={`${getButtonStyles()} ${className} ${loading ? 'opacity-80 cursor-not-allowed' : ''}`}
+        disabled={loading || alreadyInCart}
+        className={`${getButtonStyles()} ${className} ${loading ? "opacity-80 cursor-not-allowed" : ""}`}
       >
         {loading ? (
           <>
@@ -59,6 +80,11 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
               <LoadingOutlined className="text-lg" />
             </motion.div>
             <span>Đang thêm...</span>
+          </>
+        ) : alreadyInCart ? (
+          <>
+            <CheckCircleOutlined className="text-lg" />
+            <span>Đã có trong giỏ hàng</span>
           </>
         ) : (
           <>

@@ -73,7 +73,7 @@ export const API_PATH = {
     CREATE_COURSE: "/course/create",
     UPDATE_COURSE: (id: string) => `/course/${id}`,
     DELETE_COURSE: (id: string) => `/course/${id}`,
-    GET_COURSE_BY_ID: (id: string) => `/Course/${id}`,
+    GET_COURSE_BY_ID: (id: string) => `/api/course/${id}`,
     GET_MY_COURSES: "/course/myCourses",
   },
   CONSULTANT: {
@@ -91,10 +91,10 @@ export const API_PATH = {
     GET_CATEGORY_BY_ID: (categoryId: string) => `/category/${categoryId}`,
   },
   CART: {
-    GET_CART: "/cart/myCart",
-    ADD_CART_ITEM: "/cart/addCourse",
-    DELETE_CART_ITEM: (cartItemId: string) => `/cart/remove/${cartItemId}`,
-    CLEAR_CART: "/cart/clear",
+    GET_CART: "/api/cart/myCart",
+    ADD_CART_ITEM: "/api/cart/addCourse",
+    DELETE_CART_ITEM: (cartItemId: string) => `/api/cart/remove/${cartItemId}`,
+    CLEAR_CART: "/api/cart/clear",
   },
   SESSION: {
     GET_ALL_SESSIONS: "/session/all",
@@ -124,41 +124,43 @@ export const API_PATH = {
     GET_PROGRAM_BY_ID: (id: string) => `/program/${id}`,
   },
   ORDER: {
-    GET_ORDERS: "/order/all",
-    GET_ORDER_BY_USER_ID: "order/myOrders",
-    CREATE_ORDER: "/order/createOrderFromCart",
-    GET_ORDER_BY_ID: (orderId: string) => `/order/${orderId}`,
+    GET_ORDERS: "/api/order/all",
+    GET_ORDER_BY_USER_ID: "/api/order/myOrders",
+    CREATE_ORDER: "/api/order/createOrderFromCart",
+    GET_ORDER_BY_ID: (orderId: string) => `/api/order/${orderId}`,
     CHANGE_ORDER_STATUS: (orderId: string, newStatus: string) =>
-      `/order/status/${orderId}/${newStatus}`,
+      `/api/order/status/${orderId}/${newStatus}`,
   },
   PAYMENT: {
-    CREATE_PAYMENT: "/payment/createPaymentFromOrder",
-    GET_PAYMENT_HISTORY: (userId: string) => `/payment/history/${userId}`,
-    STRIPE_WEBHOOK: "/payment/stripe-webhook",
+    CREATE_PAYMENT: "/api/payment/createPaymentFromOrder",
+    GET_PAYMENT_HISTORY: (userId: string) => `/api/payment/history/${userId}`,
+    STRIPE_WEBHOOK: "/api/payment/stripe-webhook",
     UPDATE_PAYMENT_STATUS: (paymentId: string) =>
-      `/payment/${paymentId}/status`,
-    GET_PAYMENT_BY_ID: (paymentId: string) => `/payment/${paymentId}`,
+      `/api/payment/${paymentId}/status`,
+    GET_PAYMENT_BY_ID: (paymentId: string) => `/api/payment/${paymentId}`,
   },
   REVIEW: {
-    GET_ALL_REVIEWS: "/review",
-    GET_REVIEW_BY_ID: (id: string) => `/review/${id}`,
-    CREATE_REVIEW: "/review/course",
-    UPDATE_REVIEW: (id: string) => `/review/${id}`,
-    DELETE_REVIEW: (id: string) => `/review/${id}`,
-    GET_REVIEW_BY_COURSE_ID: (courseId: string) => `/review/course/${courseId}`,
-    GET_REVIEW_BY_USER_ID: (userId: string) => `/review/user/${userId}`,
-    REVIEW_APPOINTMENT: "/review/appointment",
+    // Backend routes for review are under /api (same pattern as course)
+    GET_ALL_REVIEWS: "/api/review",
+    GET_REVIEW_BY_ID: (id: string) => `/api/review/${id}`,
+    CREATE_REVIEW: "/api/review/course",
+    UPDATE_REVIEW: (id: string) => `/api/review/${id}`,
+    DELETE_REVIEW: (id: string) => `/api/review/${id}`,
+    GET_REVIEW_BY_COURSE_ID: (courseId: string) =>
+      `/api/review/course/${courseId}`,
+    GET_REVIEW_BY_USER_ID: (userId: string) => `/api/review/user/${userId}`,
+    REVIEW_APPOINTMENT: "/api/review/appointment",
     GET_REVIEW_BY_APPOINTMENT_ID: (appointmentId: string) =>
-      `/review/appointment/${appointmentId}`,
+      `/api/review/appointment/${appointmentId}`,
     GET_REVIEW_BY_CONSULTANT_ID: (consultantId: string) =>
-      `/review/consultant/${consultantId}`,
+      `/api/review/consultant/${consultantId}`,
   },
   DASHBOARD: {
     GET_DASHBOARD_OVERALL: "/dashboard/overall",
   },
   VNPAY: {
-    CREATE_PAYMENT_URL: "/vnpay/create-payment-url",
-    RETURN: "/vnpay/return",
-    IPN: "/vnpay/ipn",
+    CREATE_PAYMENT_URL: "/api/vnpay/create-payment-url",
+    RETURN: "/api/vnpay/return",
+    IPN: "/api/vnpay/ipn",
   },
 };

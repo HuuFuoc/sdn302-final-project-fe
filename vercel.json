@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/vnpay/return",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/proxy"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

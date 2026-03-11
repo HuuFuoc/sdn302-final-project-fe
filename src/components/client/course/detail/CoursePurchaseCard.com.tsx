@@ -28,6 +28,10 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 }) => {
   const [isLiked, setIsLiked] = useState(false);
 
+  // Đảm bảo luôn có courseId hợp lệ cho API giỏ hàng
+  const courseId =
+    (course as any).id || (course as any)._id || (course as any).courseId;
+
   // Calculate final price and discount percentage
   const finalPrice = course.price * (1 - course.discount / 100);
   const discountPercentage = course.discount;
@@ -115,7 +119,10 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 
             {/* Action Buttons */}
             <div className="space-y-3 mb-6">
-              <AddToCartButton courseId={course.id} />
+              <AddToCartButton
+                courseId={courseId}
+                isInCart={!!(course as any).isInCart}
+              />
             </div>
 
             {/* Money Back Guarantee */}

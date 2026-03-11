@@ -33,7 +33,7 @@ const CourseDetail: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [totalReviews, setTotalReviews] = useState<number>(0);
   const [averageRating, setAverageRating] = useState<number>(0);
-  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [loadingReviews, setLoadingReviews] = useState<boolean>(false);
 
   // State cho user info
   const [userMap, setUserMap] = useState<Record<string, UserInfo>>({});
@@ -60,6 +60,7 @@ const CourseDetail: React.FC = () => {
           }
         }
       } catch (err) {
+        console.error("Error fetching course detail:", err);
         setCourse(null);
       } finally {
         setLoading(false);
@@ -76,24 +77,27 @@ const CourseDetail: React.FC = () => {
       const res = await ReviewService.getReviewByCourseId({ courseId });
       console.log("Reviews response:", res);
 
-      // Ensure reviews is always an array
-      let reviewsData = [];
-      if (res.data?.data) {
-        if (Array.isArray(res.data.data)) {
-          reviewsData = res.data.data;
-        } else if (res.data.data && typeof res.data.data === "object") {
-          // If it's an object, try to extract array from it
-          const dataObj = res.data.data as any;
-          reviewsData = dataObj.reviews || dataObj.data || [];
-        }
+      const dataObj = res.data?.data as {
+        reviews?: Review[];
+        data?: Review[];
+        averageRating?: number;
+        totalReviews?: number;
+      };
+
+      let reviewsData: Review[] = [];
+      if (dataObj) {
+        reviewsData = Array.isArray(dataObj.reviews)
+          ? dataObj.reviews
+          : Array.isArray(dataObj.data)
+          ? dataObj.data
+          : [];
+
+        setAverageRating(dataObj.averageRating || 0);
+        setTotalReviews(dataObj.totalReviews || reviewsData.length || 0);
       }
 
       console.log("Processed reviews data:", reviewsData);
       setReviews(reviewsData);
-      const pageInfo = res.data?.data;
-      setReviews(Array.isArray(pageInfo?.reviews) ? pageInfo.reviews : []);
-      setTotalReviews(pageInfo?.totalReviews || 0);
-      setAverageRating(pageInfo?.averageRating || 0);
     } catch (err) {
       console.error("Error fetching reviews:", err);
       message.error("Không thể tải đánh giá!");
@@ -132,8 +136,10 @@ const CourseDetail: React.FC = () => {
                 profilePicUrl: res.data.data.profilePicUrl,
               };
             }
-          } catch {}
-        })
+          } catch (error) {
+            console.error("Error fetching user info for review:", error);
+          }
+        }),
       );
       setUserMap(newUserMap);
     };

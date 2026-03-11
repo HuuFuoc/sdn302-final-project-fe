@@ -9,11 +9,12 @@ import type {
 import type { CartItem } from "../../types/cart/Cart.res.type";
 
 export const CartService = {
-  getCartItems(params: ViewCartRequest) {
-    return BaseService.get<ResponseSuccess<CartItem[]>>({
-      url: API_PATH.CART.GET_CART,
-      payload: params,
-    });
+  getCartItems(_params?: ViewCartRequest) {
+    return BaseService.get<ResponseSuccess<{ items: CartItem[]; totalAmount: number }>>(
+      {
+        url: API_PATH.CART.GET_CART,
+      },
+    );
   },
   addCartItem(params: AddToCartRequest) {
     return BaseService.post<ResponseSuccess<CartItem>>({

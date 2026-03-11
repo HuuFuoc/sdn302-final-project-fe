@@ -16,17 +16,22 @@ function getWordsFromHTML(html: string) {
   return text.split(/\s+/).filter(Boolean);
 }
 
+const getTargetAudienceLabel = (audience?: string) => {
+  if (!audience) return "người học";
+
+  // Map theo enum CourseTargetAudience: Student, UniversityStudent, Parent, GeneralPublic
+  const map: Record<string, string> = {
+    Student: "học sinh",
+    UniversityStudent: "sinh viên",
+    Parent: "phụ huynh",
+    GeneralPublic: "cộng đồng",
+  };
+
+  return map[audience] || "người học";
+};
+
 const CourseDescription: React.FC<CourseDescriptionProps> = ({ course }) => {
   const [expanded, setExpanded] = useState(false);
-
-  const getTargetAudienceLabel = (audience: string) => {
-    const map: Record<string, string> = {
-      student: "Học sinh",
-      teacher: "Giáo viên",
-      parent: "Phụ huynh",
-    };
-    return map[audience] || audience;
-  };
 
   // Xử lý giới hạn từ
   const words = getWordsFromHTML(course.content || "");
@@ -62,7 +67,9 @@ const CourseDescription: React.FC<CourseDescriptionProps> = ({ course }) => {
       </Paragraph>
       <Paragraph className="text-gray-700 text-base leading-relaxed">
         Khóa học này được thiết kế đặc biệt cho{" "}
-        {getTargetAudienceLabel(course.targetAudience).toLowerCase()}
+        <span className="font-semibold">
+          {getTargetAudienceLabel(course.targetAudience)}
+        </span>{" "}
         với nội dung phù hợp và phương pháp giảng dạy hiện đại. Bạn sẽ được học
         từ những chuyên gia hàng đầu trong lĩnh vực này.
       </Paragraph>

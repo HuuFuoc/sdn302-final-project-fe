@@ -63,13 +63,17 @@ const mapBackendRoleToUserRole = (backendRole: any): UserRole | null => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState<UserRole | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<UserRole | null>(
+    () => localStorage.getItem("role") as UserRole | null,
+  );
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem("token"),
+  );
   // const [userInfo, setUserInfo] = useState<
   //   ResponseSuccess<UserResponse>["data"] | null
   // >(null);
   const [userInfo, setUserInfo] = useState<UserResponse | null>(() => {
-    const stored = localStorage.getItem('userInfo');
+    const stored = localStorage.getItem("userInfo");
     return stored ? JSON.parse(stored) : null;
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -173,7 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (!token) {
           throw new HttpException(
             "No token provided",
-            HTTP_STATUS.UNAUTHORIZED
+            HTTP_STATUS.UNAUTHORIZED,
           );
         }
 
@@ -228,7 +232,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading(false);
       }
     },
-    [logout]
+    [logout],
   );
 
   return (
@@ -256,7 +260,7 @@ export const useAuth = () => {
   if (context === undefined) {
     throw new HttpException(
       "useAuth must be used within an AuthProvider",
-      HTTP_STATUS.INTERNAL_SERVER_ERROR
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
     );
   }
   return context;

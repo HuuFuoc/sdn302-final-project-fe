@@ -14,6 +14,7 @@ import LessonDetailPage from "../../pages/customer/lesson";
 import ProgramDetail from "../../pages/client/program/detail";
 import ClientSurveyDetail from "../../pages/client/survey/detail";
 import PaymentPageMain from "../../pages/customer/payment";
+import VnpayReturnPage from "../../pages/customer/payment/vnpay-return";
 import PaymentSuccess from "../../pages/customer/success";
 import PaymentFail from "../../pages/customer/cancel";
 import NotFoundPage from "../../pages/auth/not_found";
@@ -99,6 +100,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         {
           path: ROUTER_URL.CLIENT.PAYMENT,
           element: <PaymentPageMain />,
+        },
+        {
+          path: "/api/vnpay/return",
+          element: <VnpayReturnPage />,
         },
         {
           path: ROUTER_URL.CLIENT.PAYMENT_SUCCESS,

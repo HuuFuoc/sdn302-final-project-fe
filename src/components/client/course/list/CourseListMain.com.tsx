@@ -46,9 +46,17 @@ const CourseList = () => {
       const res = await CourseService.getAllCourses(params);
       const data = res.data as any;
 
+      // Normalize id field (backend may return _id)
+      const normalizedCourses = Array.isArray(data?.data)
+        ? data.data.map((course: any) => ({
+            ...course,
+            id: course.id ?? course._id ?? course.courseId,
+          }))
+        : [];
+
       // Lọc chỉ lấy course có status là "published"
-      let filteredCourses = Array.isArray(data?.data)
-        ? data.data.filter(
+      let filteredCourses = Array.isArray(normalizedCourses)
+        ? normalizedCourses.filter(
             (course: any) => course.status === CourseStatus.PUBLISHED,
           )
         : [];

@@ -14,7 +14,8 @@ import { useCart } from "../../../contexts/Cart.context";
 import CartCard from "./CartCard.com";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import DeleteCartItem from "./DeleteCartItem.com";
-import { useCreateOrder } from "../../../hooks/useOrder";
+import { BaseService } from "../../../app/api/base.service";
+import { API_PATH } from "../../../consts/api.path.const";
 
 const { Title } = Typography;
 
@@ -36,8 +37,6 @@ const ViewCartPage: React.FC = () => {
     // eslint-disable-next-line
   }, []);
 
-  const createOrderMutation = useCreateOrder();
-
   const handleSelect = (cartId: string, checked: boolean) => {
     setSelectedIds((prev) =>
       checked ? [...prev, cartId] : prev.filter((id) => id !== cartId)
@@ -46,7 +45,7 @@ const ViewCartPage: React.FC = () => {
 
   const isChecked = (cartId: string) => selectedIds.includes(cartId);
 
-  const handleCreateOrder = () => {
+  const handleCreateOrder = async () => {
     if (selectedIds.length === 0) {
       return helpers.notificationMessage(
         "Vui lòng chọn ít nhất một sản phẩm để thanh toán",
@@ -54,29 +53,60 @@ const ViewCartPage: React.FC = () => {
       );
     }
 
-    createOrderMutation.mutate(
-      { selectedCartItemIds: selectedIds },
-      {
-        onSuccess: (res) => {
-          if (res?.data?.data.orderId) {
-            navigate(ROUTER_URL.CLIENT.PAYMENT, {
-              state: { orderId: res.data.data.orderId },
-            });
-          } else {
-            helpers.notificationMessage(
-              "Tạo đơn hàng thất bại. Vui lòng thử lại.",
-              "error"
-            );
-          }
-        },
-        onError: () => {
-          helpers.notificationMessage(
-            "Đã xảy ra lỗi khi tạo đơn hàng.",
-            "error"
-          );
-        },
+    try {
+      // 1. Tạo order từ giỏ hàng hiện tại
+      const orderRes = await BaseService.post<any>({
+        url: API_PATH.ORDER.CREATE_ORDER,
+        payload: { selectedCartItemIds: selectedIds },
+        isLoading: true,
+      });
+
+      const orderData = orderRes.data?.data;
+      const orderId = orderData?._id || orderData?.orderId;
+
+      if (!orderId) {
+        throw new Error("Không lấy được mã đơn hàng từ server");
       }
-    );
+
+      // 2. Tạo payment từ order
+      const paymentRes = await BaseService.post<any>({
+        url: API_PATH.PAYMENT.CREATE_PAYMENT,
+        payload: { order_id: orderId, paymentMethod: "vnpay" },
+        isLoading: true,
+      });
+
+      const paymentData = paymentRes.data?.data;
+      const paymentId = paymentData?._id || paymentData?.paymentId;
+      const paymentNo = paymentData?.paymentNo;
+
+      if (!paymentId) {
+        throw new Error("Không lấy được paymentId từ server");
+      }
+
+      // 3. Lấy URL thanh toán VNPay
+      const vnpRes = await BaseService.post<any>({
+        url: API_PATH.VNPAY.CREATE_PAYMENT_URL,
+        payload: {
+          paymentId,
+          orderInfo: `Thanh toan don hang ${paymentNo || orderId}`,
+        },
+        isLoading: true,
+      });
+
+      const vnpUrl = vnpRes.data?.url || vnpRes.data?.data?.url;
+      if (!vnpUrl) {
+        throw new Error("Không lấy được URL thanh toán VNPay từ server");
+      }
+
+      // Redirect sang cổng thanh toán VNPay
+      window.location.href = vnpUrl;
+    } catch (error: any) {
+      console.error("Lỗi khi thực hiện thanh toán VNPay:", error);
+      helpers.notificationMessage(
+        error?.message || "Đã xảy ra lỗi khi tạo đơn hàng/thanh toán.",
+        "error"
+      );
+    }
   };
 
   if (loading) {

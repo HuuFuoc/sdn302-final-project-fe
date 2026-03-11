@@ -52,9 +52,23 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
     setLoading(true);
     try {
-      const response = await CartService.getCartItems({ userId: userInfo.id });
-      if (response?.data?.success && Array.isArray(response.data.data)) {
-        setCartItems(response.data.data);
+      const response = await CartService.getCartItems();
+      if (response?.data?.success && response.data.data) {
+        const apiItems = response.data.data.items || [];
+        const mapped: CartItem[] = apiItems.map((item: any) => ({
+          cartId: item._id,
+          courseId: item.course?._id,
+          courseName: item.course?.name || "",
+          courseImageUrl:
+            item.course?.imageUrl ||
+            item.course?.imageUrls?.[0] ||
+            "/no-image.png",
+          price: item.price,
+          discount: item.discount,
+          status: "PENDING" as any,
+          createdAt: item.course?.created_at || "",
+        }));
+        setCartItems(mapped);
       } else {
         setCartItems([]);
       }
@@ -86,15 +100,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     if (!userInfo?.id || !token) {
       helpers.notificationMessage(
         "Vui lòng đăng nhập để thêm vào giỏ hàng",
-        "warning"
+        "warning",
       );
+      return;
+    }
+
+    if (!courseId) {
+      helpers.notificationMessage("Không tìm thấy thông tin khóa học", "error");
+      return;
+    }
+
+    // Prevent duplicate add
+    const alreadyInCart = cartItems.some((item) => item.courseId === courseId);
+    if (alreadyInCart) {
+      helpers.notificationMessage("Khóa học đã có trong giỏ hàng", "warning");
       return;
     }
 
     try {
       setLoading(true);
       const response = await CartService.addCartItem({
-        courseId: courseId,
+        course_id: courseId,
       });
 
       if (response?.data?.success) {
@@ -104,8 +130,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         helpers.notificationMessage("Không thể thêm vào giỏ hàng", "error");
       }
     } catch (error) {
+      // Global axios interceptor already shows the API error message for HTTP errors.
+      // Only show a fallback message for non-HTTP errors.
       console.error("Lỗi thêm vào giỏ hàng:", error);
-      helpers.notificationMessage("Không thể thêm vào giỏ hàng", "error");
+      if (!(error instanceof HttpException)) {
+        helpers.notificationMessage("Không thể thêm vào giỏ hàng", "error");
+      }
     } finally {
       setLoading(false);
     }

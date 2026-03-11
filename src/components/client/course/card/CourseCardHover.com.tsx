@@ -21,6 +21,10 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
   // Calculate final price after discount
   const finalPrice = course.price * (1 - course.discount / 100);
 
+  // Đảm bảo luôn có courseId hợp lệ cho nút thêm giỏ hàng
+  const courseId =
+    (course as any).id || (course as any)._id || (course as any).courseId;
+
   // Format creation date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -143,7 +147,10 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
                 Đã sở hữu
               </Button>
             ) : (
-              <AddToCartButton courseId={course.id} />
+              <AddToCartButton
+                courseId={courseId}
+                isInCart={!!(course as any).isInCart}
+              />
             )}
 
             <div className="flex space-x-2">

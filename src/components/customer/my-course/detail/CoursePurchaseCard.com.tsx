@@ -28,6 +28,9 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 }) => {
   const [isLiked, setIsLiked] = useState(false);
 
+  const courseId =
+    (course as any).id || (course as any)._id || (course as any).courseId;
+
   // Calculate final price and discount percentage
   const finalPrice = course.price - course.discount;
   const discountPercentage =
@@ -113,7 +116,7 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 
             {/* Action Buttons */}
             <div className="space-y-3 mb-6">
-              <AddToCartButton courseId={course.id} />
+              <AddToCartButton courseId={courseId} />
 
               <Button
                 type="default"

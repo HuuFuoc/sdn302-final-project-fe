@@ -121,5 +121,6 @@ export const ROUTER_URL = {
     PAYMENT: "/thanh-toan",
     PAYMENT_SUCCESS: "/thanh-toan-thanh-cong",
     PAYMENT_FAIL: "/thanh-toan-that-bai",
+    VNPAY_RETURN: "/api/vnpay/return",
   },
 };

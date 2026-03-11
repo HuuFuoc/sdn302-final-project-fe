@@ -9,10 +9,16 @@ interface CourseInfoActionsProps {
   navigate: (to: number) => void;
 }
 
-const CourseInfoActions: React.FC<CourseInfoActionsProps> = ({ course, navigate }) => {
+const CourseInfoActions: React.FC<CourseInfoActionsProps> = ({
+  course,
+  navigate,
+}) => {
+  const courseId =
+    (course as any).id || (course as any)._id || (course as any).courseId;
+
   return (
     <div className="space-y-4">
-      <AddToCartButton courseId={course.id} />
+      <AddToCartButton courseId={courseId} />
       
       <Button 
         size="middle"
