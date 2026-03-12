@@ -3,4 +3,6 @@ export enum UserRole {
   STAFF = "Staff",
   CUSTOMER = "Customer",
   INSTRUCTOR = "Instructor",
+  MANAGER = "Manager",
+  CONSULTANT = "Consultant",
 }
