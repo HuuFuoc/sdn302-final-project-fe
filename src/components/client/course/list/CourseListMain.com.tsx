@@ -46,11 +46,17 @@ const CourseList = () => {
       const res = await CourseService.getAllCourses(params);
       const data = res.data as any;
 
-      // Normalize id field (backend may return _id)
+      // Normalize id & image fields (backend may return _id, imageUrl)
       const normalizedCourses = Array.isArray(data?.data)
         ? data.data.map((course: any) => ({
             ...course,
             id: course.id ?? course._id ?? course.courseId,
+            imageUrls:
+              Array.isArray(course.imageUrls) && course.imageUrls.length > 0
+                ? course.imageUrls
+                : course.imageUrl
+                ? [course.imageUrl]
+                : [],
           }))
         : [];
 

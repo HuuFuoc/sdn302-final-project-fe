@@ -6,6 +6,7 @@ import {
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import { useCart } from "../../contexts/Cart.context";
+import { helpers } from "../../utils";
 
 interface AddToCartButtonProps {
   courseId: string;
@@ -30,7 +31,17 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
   const handleAddToCart = async () => {
     if (alreadyInCart) return;
-    await addToCart(courseId);
+
+    const normalizedId = courseId?.toString().trim();
+    if (!normalizedId) {
+      helpers.notificationMessage(
+        "Không xác định được khóa học để thêm vào giỏ hàng.",
+        "error"
+      );
+      return;
+    }
+
+    await addToCart(normalizedId);
     if (onAdded) onAdded();
   };
 

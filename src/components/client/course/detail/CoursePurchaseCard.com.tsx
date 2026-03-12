@@ -30,6 +30,7 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   const [isLiked, setIsLiked] = useState(false);
 
   // Đảm bảo luôn có courseId hợp lệ cho API giỏ hàng
+  const raw = course as any;
   const courseId =
     (course as any).id || (course as any)._id || (course as any).courseId;
   const courseImage =

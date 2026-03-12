@@ -5,12 +5,14 @@ import {
   PlayCircleOutlined,
   FileTextOutlined,
   PictureOutlined,
+  LockOutlined,
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 interface Lecture {
+  id?: string;
   title: string;
   duration: string;
   preview: boolean;
@@ -29,9 +31,15 @@ interface CourseSection {
 
 interface CourseContentProps {
   content: CourseSection[];
+  isPurchased: boolean;
+  onLessonClick?: (lessonId: string) => void;
 }
 
-const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
+const CourseContent: React.FC<CourseContentProps> = ({
+  content,
+  isPurchased,
+  onLessonClick,
+}) => {
   const totalLessons = content.reduce(
     (acc, section) => acc + section.lessons,
     0
@@ -90,47 +98,51 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
           >
             {section.lectures && section.lectures.length > 0 ? (
               <div className="space-y-1 pb-4">
-                {section.lectures.map((lecture, lectureIndex) => (
-                  <div
-                    key={lectureIndex}
-                    className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors"
-                  >
-                    <div className="flex items-center space-x-3">
-                      {/* Hiển thị icon theo lessonType */}
-                      {getLessonIcon(lecture.lessonType)}
-                      <Text className="text-gray-700 text-sm">
-                        {lecture.title}
+                {section.lectures.map((lecture, lectureIndex) => {
+                  const disabled = !isPurchased;
+                  const canClick = isPurchased && !!onLessonClick && !!lecture.id;
+
+                  return (
+                    <div
+                      key={lecture.id || lectureIndex}
+                      className={`flex items-center justify-between py-2 px-4 rounded transition-colors ${
+                        disabled
+                          ? "opacity-60 cursor-not-allowed"
+                          : "hover:bg-gray-50 cursor-pointer"
+                      }`}
+                      onClick={() => {
+                        if (!canClick) return;
+                        onLessonClick && lecture.id && onLessonClick(lecture.id);
+                      }}
+                    >
+                      <div className="flex items-center space-x-3">
+                        {/* Hiển thị icon theo lessonType */}
+                        {getLessonIcon(lecture.lessonType)}
+                        <Text className="text-gray-700 text-sm">
+                          {lecture.title}
+                        </Text>
+                        {lecture.preview && isPurchased && (
+                          <Button
+                            type="link"
+                            size="small"
+                            className="text-purple-600 p-0 h-auto text-xs"
+                          >
+                            Xem trước
+                          </Button>
+                        )}
+                        {!isPurchased && (
+                          <span className="flex items-center text-xs text-gray-500 ml-2">
+                            <LockOutlined className="mr-1" />
+                            Mua khóa học để học bài này
+                          </span>
+                        )}
+                      </div>
+                      <Text className="text-gray-600 text-sm">
+                        {lecture.duration}
                       </Text>
-                      {lecture.preview && (
-                        <Button
-                          type="link"
-                          size="small"
-                          className="text-purple-600 p-0 h-auto text-xs"
-                        >
-                          Xem trước
-                        </Button>
-                      )}
-                      {/* XÓA hoặc BỎ COMMENT phần ảnh dưới đây */}
-                      {/* {lecture.imageUrl && lecture.imageUrl !== "" && (
-                        <img
-                          src={lecture.imageUrl}
-                          alt={lecture.title}
-                          style={{
-                            maxWidth: 80,
-                            maxHeight: 80,
-                            marginLeft: 8,
-                            borderRadius: 6,
-                            border: "1px solid #eee",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )} */}
                     </div>
-                    <Text className="text-gray-600 text-sm">
-                      {lecture.duration}
-                    </Text>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-gray-600 text-sm py-4 px-4">
