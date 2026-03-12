@@ -185,9 +185,17 @@ const CourseDetail: React.FC = () => {
 
   // Gọi check mua khi đã có courseId
   useEffect(() => {
-    if (courseId) {
-      checkCoursePurchased(courseId as string);
+    if (!courseId) return;
+
+    // Nếu chưa đăng nhập (không có token hoặc userInfo) thì không call API order
+    const token = localStorage.getItem("token");
+    const userInfoStr = localStorage.getItem("userInfo");
+    if (!token || !userInfoStr) {
+      setIsPurchased(false);
+      return;
     }
+
+    checkCoursePurchased(courseId as string);
   }, [courseId, checkCoursePurchased]);
 
   // Lấy review theo courseId
