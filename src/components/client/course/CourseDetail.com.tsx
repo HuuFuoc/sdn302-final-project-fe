@@ -56,15 +56,78 @@ const CourseDetail: React.FC = () => {
       setLoading(true);
       try {
         if (courseId) {
+
           const normalizedCourseId = courseId.trim();
-          // Truyen them userId vao request de API tra ve isPurchased dung cho user hien tai
+
           const res = await CourseService.getCourseById({
             id: normalizedCourseId,
             userId: userId ? userId : undefined,
-          });
+      
           const detailData = res.data?.data as CourseDetailResponse | undefined;
           if (res.data?.success && detailData?.id) {
             setCourse(detailData);
+
+          if (res.data && res.data.success && res.data.data) {
+            // Dữ liệu backend có dạng { course, sessions }, dùng any để map linh hoạt
+            const raw: any = res.data.data as any;
+            const rawCourse: any = raw.course ?? raw;
+            const rawSessions: any[] = raw.sessions ?? [];
+
+            const mappedCourse: CourseDetailResponse = {
+              id: rawCourse._id || rawCourse.id,
+              name: rawCourse.name,
+              userId: rawCourse.user_id || rawCourse.userId,
+              categoryId: rawCourse.category_id || rawCourse.categoryId,
+              content: rawCourse.content,
+              status: rawCourse.status,
+              targetAudience: rawCourse.targetAudience,
+              imageUrls:
+                rawCourse.imageUrls && rawCourse.imageUrls.length > 0
+                  ? rawCourse.imageUrls
+                  : rawCourse.imageUrl
+                  ? [rawCourse.imageUrl]
+                  : [],
+              videoUrls: rawCourse.videoUrls || [],
+              price: rawCourse.price,
+              discount: rawCourse.discount || 0,
+              slug: rawCourse.slug,
+              createdAt: rawCourse.created_at || rawCourse.createdAt,
+              isInCart: !!rawCourse.isInCart,
+              isPurchased: !!rawCourse.isPurchased,
+              sessionList:
+                rawSessions.map((session) => {
+                  const lessons: any[] = session.lessons || [];
+                  return {
+                    id: session._id || session.id,
+                    courseId: session.course_id || session.courseId,
+                    name: session.name,
+                    userId: session.user_id || session.userId,
+                    slug: session.slug,
+                    content: session.content,
+                    lessonList: lessons.map((lesson) => ({
+                      id: lesson._id || lesson.id,
+                      name: lesson.name,
+                      content: lesson.content,
+                      lessonType: lesson.lessonType,
+                      videoUrl: lesson.videoUrl,
+                      imageUrl: lesson.imageUrl,
+                      fullTime: lesson.fullTime,
+                      positionOrder: lesson.positionOrder,
+                      sessionId: lesson.session_id || lesson.sessionId,
+                      courseId: lesson.course_id || lesson.courseId,
+                      userAvatar: "",
+                      fullName: "",
+                      createdAt: lesson.created_at || lesson.createdAt,
+                      updatedAt: lesson.updated_at || lesson.updatedAt,
+                      userId: lesson.user_id || lesson.userId,
+                    })),
+                  };
+                }) || [],
+              riskLevel: rawCourse.riskLevel,
+            };
+
+            setCourse(mappedCourse);
+
           } else {
             // Fallback when detail endpoint returns inconsistent shape
             const allRes = await CourseService.getAllCourses({
