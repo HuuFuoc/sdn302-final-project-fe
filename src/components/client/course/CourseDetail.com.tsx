@@ -48,15 +48,29 @@ const CourseDetail: React.FC = () => {
       setLoading(true);
       try {
         if (courseId) {
-          // Truyền thêm userId vào request để API trả về isPurchased đúng cho user hiện tại
+          const normalizedCourseId = courseId.trim();
+          // Truyen them userId vao request de API tra ve isPurchased dung cho user hien tai
           const res = await CourseService.getCourseById({
-            id: courseId,
+            id: normalizedCourseId,
             userId: userId ? userId : undefined,
           });
-          if (res.data && res.data.success && res.data.data) {
-            setCourse(res.data.data as CourseDetailResponse);
+          const detailData = res.data?.data as CourseDetailResponse | undefined;
+          if (res.data?.success && detailData?.id) {
+            setCourse(detailData);
           } else {
-            setCourse(null);
+            // Fallback when detail endpoint returns inconsistent shape
+            const allRes = await CourseService.getAllCourses({
+              pageNumber: 1,
+              pageSize: 500,
+              userId: userId ? userId : undefined,
+            } as any);
+            const list = Array.isArray(allRes.data?.data) ? allRes.data.data : [];
+            const matched = list.find((item: any) => {
+              const id = String(item?.id ?? item?._id ?? "").trim();
+              const slug = String(item?.slug ?? "").trim();
+              return id === normalizedCourseId || slug === normalizedCourseId;
+            });
+            setCourse((matched as CourseDetailResponse) ?? null);
           }
         }
       } catch (err) {
@@ -71,10 +85,13 @@ const CourseDetail: React.FC = () => {
 
   // Lấy review theo courseId
   const fetchReviews = async () => {
-    if (!courseId) return;
+    const reviewCourseId = course?.id || courseId?.trim();
+    if (!reviewCourseId) return;
     setLoadingReviews(true);
     try {
-      const res = await ReviewService.getReviewByCourseId({ courseId });
+      const res = await ReviewService.getReviewByCourseId({
+        courseId: reviewCourseId,
+      });
       console.log("Reviews response:", res);
 
       const dataObj = res.data?.data as {
@@ -110,11 +127,11 @@ const CourseDetail: React.FC = () => {
   };
 
   useEffect(() => {
-    if (courseId) {
+    if (course?.id || courseId) {
       fetchReviews();
     }
     // eslint-disable-next-line
-  }, [courseId]);
+  }, [course?.id, courseId]);
 
   // Lấy thông tin user cho từng review
   useEffect(() => {

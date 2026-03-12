@@ -87,30 +87,22 @@ const AppointmentDetail: React.FC = () => {
             setReviewLoading(true);
             ReviewService.getReviewByAppointmentId(appointmentId)
                 .then(res => {
-                    // Xử lý response trả về array
-                    const reviewData = res?.data?.data;
+                    const rawData = res?.data?.data;
+                    const reviewData = Array.isArray(rawData)
+                        ? rawData
+                        : rawData
+                            ? [rawData]
+                            : [];
+                    const matchedReviews = reviewData.filter(
+                        (item: Review) => item?.appointmentId === appointmentId
+                    );
 
-                    if (reviewData && Array.isArray(reviewData) && reviewData.length > 0) {
-                        // Lưu trữ tất cả reviews
-                        // setAllReviews(reviewData); // Removed
-
-                        // Chọn review mới nhất (dựa trên createdAt)
-                        const sortedReviews = reviewData.sort((a, b) =>
+                    if (matchedReviews.length > 0) {
+                        const sortedReviews = matchedReviews.sort((a, b) =>
                             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                         );
-                        const latestReview = sortedReviews[0];
-                        setReview(latestReview);
-                    } else if (reviewData && !Array.isArray(reviewData)) {
-                        // Trường hợp data là object đơn lẻ
-                        if (reviewData.rating !== undefined || reviewData.comment) {
-                            // setAllReviews([reviewData]); // Removed
-                            setReview(reviewData);
-                        } else {
-                            // setAllReviews([]); // Removed
-                            setReview(null);
-                        }
+                        setReview(sortedReviews[0]);
                     } else {
-                        // setAllReviews([]); // Removed
                         setReview(null);
                     }
                 })

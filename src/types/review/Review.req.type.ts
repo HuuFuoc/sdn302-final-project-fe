@@ -1,7 +1,9 @@
 export interface GetAllReviewRequest {
-  pageSize: number;
-  pageNumber: number;
+  pageSize?: number;
+  pageNumber?: number;
   filterByCourseId?: string;
+  filterByUserId?: string;
+  filterByAppointmentId?: string;
 }
 export interface GetReviewByCourseIdRequest {
   courseId: string;
@@ -15,6 +17,8 @@ export interface CreateReviewRequest {
   rating: number;
   comment: string;
 }
+
+export type CreateCourseReviewRequest = CreateReviewRequest;
 export interface DeleteReviewRequest {
   id: string;
 }

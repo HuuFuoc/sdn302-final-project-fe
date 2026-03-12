@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Typography } from "antd";
 import type { Course } from "../../../types/course/Course.res.type";
+import coverImage from "../../../assets/cover.jpg";
 
 const { Title, Paragraph } = Typography;
 
@@ -9,7 +10,11 @@ interface MyCourseCardProps {
   onClick?: () => void;
 }
 
-const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
+const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => {
+  const courseImage =
+    course.imageUrls?.[0] || (course as any).imageUrl || coverImage;
+
+  return (
   <Card
     hoverable
     onClick={onClick}
@@ -33,10 +38,11 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
       },
     }}
     cover={
-      course.imageUrls && course.imageUrls.length > 0 ? (
+      ((course.imageUrls && course.imageUrls.length > 0) ||
+        (course as any).imageUrl) ? (
         <img
           alt={course.name}
-          src={course.imageUrls[0]}
+          src={courseImage}
           style={{
             borderRadius: "18px 18px 0 0",
             height: 320, // Tăng từ 250 lên 320
@@ -44,6 +50,10 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
             width: "100%",
             boxShadow: "0 2px 12px 0 rgba(32,85,138,0.08)",
             transition: "transform 0.2s",
+          }}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            (e.currentTarget as HTMLImageElement).src = coverImage;
           }}
         />
       ) : (
@@ -99,6 +109,7 @@ const MyCourseCard: React.FC<MyCourseCardProps> = ({ course, onClick }) => (
       `}
     </style>
   </Card>
-);
+  );
+};
 
 export default MyCourseCard;

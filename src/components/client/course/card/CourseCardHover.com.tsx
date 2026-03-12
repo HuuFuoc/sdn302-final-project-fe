@@ -10,6 +10,7 @@ import {
 import type { Course } from "../../../../types/course/Course.res.type";
 import { formatCurrency } from "../../../../utils/helper";
 import AddToCartButton from "../../../common/addToCartButton.com";
+import coverImage from "../../../../assets/cover.jpg";
 
 const { Paragraph, Text } = Typography;
 
@@ -24,6 +25,8 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
   // Đảm bảo luôn có courseId hợp lệ cho nút thêm giỏ hàng
   const courseId =
     (course as any).id || (course as any)._id || (course as any).courseId;
+  const courseImage =
+    course.imageUrls?.[0] || (course as any).imageUrl || coverImage;
 
   // Format creation date
   const formatDate = (dateString: string) => {
@@ -57,11 +60,12 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
         {/* Header Image */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={course.imageUrls?.[0] || "/no-image.png"}
+            src={courseImage}
             alt={course.name}
             className="w-full h-full object-cover"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+              e.currentTarget.onerror = null;
+              (e.currentTarget as HTMLImageElement).src = coverImage;
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

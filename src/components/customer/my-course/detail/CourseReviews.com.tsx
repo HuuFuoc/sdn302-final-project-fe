@@ -14,7 +14,7 @@ import UpdateReview from "../../../client/review/UpdateReview.com";
 import { useCreateReview } from "../../../../hooks/useReview";
 import { UserService } from "../../../../services/user/user.service";
 import { EditOutlined } from "@ant-design/icons";
-import type { Review } from "../../../../types/review/Review.res.type"; // Thêm dòng này
+import type { Review } from "../../../../types/review/Review.res.type";
 const { Title, Text, Paragraph } = Typography;
 
 interface CourseReviewsProps {
@@ -24,7 +24,7 @@ interface CourseReviewsProps {
   totalReviews?: number;
   reviews?: Review[];
   loading: boolean;
-  averageRating: number; // thêm dòng này
+  averageRating: number;
   onReviewChanged: () => void;
 }
 
@@ -46,7 +46,6 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const createReview = useCreateReview();
 
-  // Map userId -> user info
   const [userMap, setUserMap] = useState<Record<string, UserInfo>>({});
 
   useEffect(() => {
@@ -82,8 +81,8 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
       });
       form.resetFields();
       onReviewChanged();
-    } catch (err) {
-      // Thông báo lỗi đã được handle trong hook
+    } catch {
+      // Error notification is already handled by hook
     } finally {
       setSubmitting(false);
     }
@@ -100,26 +99,21 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
           Tất cả đánh giá
         </Title>
         <div className="flex items-center mb-2 gap-4">
-          <Rate
-            disabled
-            allowHalf
-            value={averageRating}
-            style={{ fontSize: 20 }}
-          />
+          <Rate disabled allowHalf value={averageRating} style={{ fontSize: 20 }} />
           <span className="font-semibold text-lg text-[#20558A]">
             {averageRating.toFixed(1)} / 5.0
           </span>
-          <span className="text-gray-500 text-base">
-            ({totalReviews} đánh giá)
-          </span>
+          <span className="text-gray-500 text-base">({totalReviews} đánh giá)</span>
         </div>
       </div>
 
       <div className="space-y-6">
-        {reviews.length === 0 ? (
-          <div className="text-gray-500">
-            Chưa có đánh giá nào cho khóa học này.
+        {loading ? (
+          <div className="py-4">
+            <Spin />
           </div>
+        ) : reviews.length === 0 ? (
+          <div className="text-gray-500">Chưa có đánh giá nào cho khóa học này.</div>
         ) : (
           reviews.map((review, index) => (
             <div
@@ -170,30 +164,18 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
                         setUpdateModal(true);
                       }}
                     />
-                    <DeleteReview
-                      reviewId={review.id}
-                      onDeleted={onReviewChanged}
-                    />
+                    <DeleteReview reviewId={review.id} onDeleted={onReviewChanged} />
                   </div>
                 )}
               </div>
-              <Paragraph className="text-gray-700 text-sm mb-3">
-                {review.comment}
-              </Paragraph>
+              <Paragraph className="text-gray-700 text-sm mb-3">{review.comment}</Paragraph>
             </div>
           ))
         )}
       </div>
 
-      <div className="mt-6">{loading ? <Spin /> : null}</div>
-      {/* Form đánh giá */}
       {userId ? (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleFinish}
-          className="mb-8"
-        >
+        <Form form={form} layout="vertical" onFinish={handleFinish} className="mb-8">
           <Form.Item
             name="rating"
             label="Đánh giá của bạn"
@@ -231,7 +213,7 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
         review={selectedUpdateReview}
         onSuccess={() => {
           setUpdateModal(false);
-          onReviewChanged(); // fetch lại data
+          onReviewChanged();
         }}
       />
     </Card>

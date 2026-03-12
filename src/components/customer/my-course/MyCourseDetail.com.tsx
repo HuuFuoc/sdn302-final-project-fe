@@ -40,10 +40,13 @@ const MyCourseDetail: React.FC<MyCourseDetailProps> = ({ course }) => {
 
   // Lấy review theo courseId
   const fetchReviews = async () => {
-    if (!courseId) return;
+    const reviewCourseId = course.id || courseId;
+    if (!reviewCourseId) return;
     setLoadingReviews(true);
     try {
-      const res = await ReviewService.getReviewByCourseId({ courseId });
+      const res = await ReviewService.getReviewByCourseId({
+        courseId: reviewCourseId,
+      });
       const pageInfo = res.data?.data;
       setReviews(Array.isArray(pageInfo?.reviews) ? pageInfo.reviews : []);
       setTotalReviews(pageInfo?.totalReviews || 0);
@@ -58,10 +61,10 @@ const MyCourseDetail: React.FC<MyCourseDetailProps> = ({ course }) => {
   };
 
   useEffect(() => {
-    if (courseId) {
+    if (course.id || courseId) {
       fetchReviews();
     }
-  }, [courseId]);
+  }, [course.id, courseId]);
 
   const handleReviewChanged = () => {
     fetchReviews();

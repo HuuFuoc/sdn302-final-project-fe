@@ -140,20 +140,15 @@ export const API_PATH = {
     GET_PAYMENT_BY_ID: (paymentId: string) => `/api/payment/${paymentId}`,
   },
   REVIEW: {
-    // Backend routes for review are under /api (same pattern as course)
     GET_ALL_REVIEWS: "/api/review",
-    GET_REVIEW_BY_ID: (id: string) => `/api/review/${id}`,
-    CREATE_REVIEW: "/api/review/course",
-    UPDATE_REVIEW: (id: string) => `/api/review/${id}`,
-    DELETE_REVIEW: (id: string) => `/api/review/${id}`,
+    CREATE_COURSE_REVIEW: "/api/review/course",
+    CREATE_APPOINTMENT_REVIEW: "/api/review/appointment",
     GET_REVIEW_BY_COURSE_ID: (courseId: string) =>
       `/api/review/course/${courseId}`,
     GET_REVIEW_BY_USER_ID: (userId: string) => `/api/review/user/${userId}`,
-    REVIEW_APPOINTMENT: "/api/review/appointment",
-    GET_REVIEW_BY_APPOINTMENT_ID: (appointmentId: string) =>
-      `/api/review/appointment/${appointmentId}`,
-    GET_REVIEW_BY_CONSULTANT_ID: (consultantId: string) =>
-      `/api/review/consultant/${consultantId}`,
+    GET_REVIEW_BY_ID: (id: string) => `/api/review/${id}`,
+    UPDATE_REVIEW: (id: string) => `/api/review/${id}`,
+    DELETE_REVIEW: (id: string) => `/api/review/${id}`,
   },
   DASHBOARD: {
     GET_DASHBOARD_OVERALL: "/dashboard/overall",

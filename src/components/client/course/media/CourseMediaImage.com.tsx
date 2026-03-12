@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Image } from "antd";
 import type { Course } from "../../../../types/course/Course.res.type";
+import coverImage from "../../../../assets/cover.jpg";
 
 interface CourseMediaImageProps {
   course: Course;
@@ -9,14 +10,15 @@ interface CourseMediaImageProps {
 const CourseMediaImage: React.FC<CourseMediaImageProps> = ({ course }) => {
   const [imageError, setImageError] = useState(false);
 
-  const fallbackImage =
-    "https://via.placeholder.com/800x450/4f46e5/ffffff?text=Course+Image";
+  const fallbackImage = coverImage;
+  const courseImage =
+    course.imageUrls?.[0] || (course as any).imageUrl || fallbackImage;
 
   return (
     <div className="relative overflow-hidden group">
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-all duration-500" />
       <Image
-        src={imageError ? fallbackImage : course.imageUrls?.[0]}
+        src={imageError ? fallbackImage : courseImage}
         alt={course.name}
         className="w-full h-64 object-cover transform group-hover:scale-105 transition-all duration-700"
         onError={() => setImageError(true)}

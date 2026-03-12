@@ -109,11 +109,18 @@ const ReviewManager: React.FC = () => {
     try {
       const res = await ReviewService.getReviewById({ id: reviewId });
       if (res.data?.success && res.data?.data) {
-        setSelectedReview(res.data.data);
-        // Lấy thông tin khóa học chi tiết
-        const courseRes = await CourseService.getCourseById({ id: res.data.data.courseId });
-        if (courseRes.data?.success && courseRes.data?.data) {
-          setSelectedCourse(courseRes.data.data);
+        const reviewData = res.data.data;
+        setSelectedReview(reviewData);
+        // Load course detail only for course reviews
+        if (reviewData.courseId) {
+          const courseRes = await CourseService.getCourseById({
+            id: reviewData.courseId,
+          });
+          if (courseRes.data?.success && courseRes.data?.data) {
+            setSelectedCourse(courseRes.data.data);
+          } else {
+            setSelectedCourse(null);
+          }
         } else {
           setSelectedCourse(null);
         }

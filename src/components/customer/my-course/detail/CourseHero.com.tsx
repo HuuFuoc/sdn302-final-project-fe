@@ -2,6 +2,7 @@ import React from "react";
 import { Typography, Row, Col, Rate } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
+import coverImage from "../../../../assets/cover.jpg";
 
 const { Text } = Typography;
 
@@ -11,6 +12,9 @@ interface CourseHeroProps {
 }
 
 const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
+  const courseImage =
+    course.imageUrls?.[0] || (course as any).imageUrl || coverImage;
+
   const getTargetAudienceLabel = (audience: string) => {
     const map: Record<string, string> = {
       student: "Học sinh",
@@ -46,10 +50,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
           {/* Ảnh đại diện khóa học chiếm 6 phần (60%) */}
           <Col xs={24} md={14} style={{ textAlign: "center" }}>
             <img
-              src={
-                course.imageUrls?.[0] ||
-                "https://via.placeholder.com/320x180?text=No+Image"
-              }
+              src={courseImage}
               alt={course.name}
               style={{
                 width: "100%",
@@ -59,6 +60,10 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
                 borderRadius: 16,
                 boxShadow: "0 2px 12px 0 rgba(32,85,138,0.10)",
                 marginBottom: 16,
+              }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                (e.currentTarget as HTMLImageElement).src = coverImage;
               }}
             />
           </Col>

@@ -14,6 +14,7 @@ import {
 import type { Course } from "../../../../types/course/Course.res.type";
 import { formatCurrency } from "../../../../utils/helper";
 import AddToCartButton from "../../../common/addToCartButton.com";
+import coverImage from "../../../../assets/cover.jpg";
 
 const { Title, Text } = Typography;
 
@@ -30,6 +31,8 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 
   const courseId =
     (course as any).id || (course as any)._id || (course as any).courseId;
+  const courseImage =
+    course.imageUrls?.[0] || (course as any).imageUrl || coverImage;
 
   // Calculate final price and discount percentage
   const finalPrice = course.price - course.discount;
@@ -74,11 +77,12 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
           {/* Course Image */}
           <div className="relative">
             <img
-              src={course.imageUrls?.[0] || "/no-image.png"}
+              src={courseImage}
               alt={course.name}
               className="w-full h-48 object-cover"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+                e.currentTarget.onerror = null;
+                (e.currentTarget as HTMLImageElement).src = coverImage;
               }}
             />
             {discountPercentage > 0 && (
