@@ -84,7 +84,7 @@ export const API_PATH = {
     GET_CONSULTANT_BY_ID: (id: string) => `/consultant/${id}`,
   },
   CATEGORY: {
-    GET_ALL_CATEGORIES: "/category",
+    GET_ALL_CATEGORIES: "/api/category",
     CREATE_CATEGORY: "/category/create",
     UPDATE_CATEGORY: (categoryId: string) => `/category/${categoryId}`,
     DELETE_CATEGORY: (categoryId: string) => `/category/${categoryId}`,
