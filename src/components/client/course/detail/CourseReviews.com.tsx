@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Typography, Spin, Avatar, Rate } from "antd";
 
 interface UserInfo {
-  fullName: string;
+  name: string;
   profilePicUrl?: string;
 }
 
@@ -60,17 +60,17 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
               src={userMap[review.userId]?.profilePicUrl}
               className="bg-blue-600 flex-shrink-0"
             >
-              {userMap[review.userId]?.fullName
-                ? userMap[review.userId].fullName
+              {userMap[review.userId]?.name
+                ? userMap[review.userId].name
                     .split(" ")
-                    .map((name: string) => name[0])
+                    .map((part: string) => part[0])
                     .join("")
                     .toUpperCase()
                 : "U"}
             </Avatar>
             <div>
               <Typography.Text className="font-semibold text-gray-900 block">
-                {userMap[review.userId]?.fullName || "Người dùng"}
+                {userMap[review.userId]?.name || "Người dùng"}
               </Typography.Text>
               <Rate
                 disabled

@@ -7,7 +7,6 @@ import {
   StarOutlined,
 } from "@ant-design/icons";
 import { UserService } from "../../../../services/user/user.service";
-import type { UserResponse } from "../../../../types/user/User.res.type";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -15,10 +14,17 @@ interface CourseInstructorProps {
   instructorId: string;
 }
 
+interface Instructor {
+  id: string;
+  name: string;
+  email?: string;
+  avatar?: string;
+}
+
 const CourseInstructor: React.FC<CourseInstructorProps> = ({
   instructorId,
 }) => {
-  const [instructor, setInstructor] = useState<UserResponse | null>(null);
+  const [instructor, setInstructor] = useState<Instructor | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,8 +32,15 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
       setLoading(true);
       try {
         const res = await UserService.getUserById({ userId: instructorId });
-        if (res.data?.success && res.data?.data) {
-          setInstructor(res.data.data as UserResponse);
+        const raw: any = res.data?.data;
+
+        if (raw) {
+          setInstructor({
+            id: raw._id || raw.id || "",
+            name: raw.name || raw.fullName || "Unknown author",
+            email: raw.email,
+            avatar: raw.avatar || raw.profilePicUrl,
+          });
         } else {
           setInstructor(null);
         }
@@ -72,16 +85,16 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
       <div className="flex items-center gap-6 p-6">
         <Avatar
           size={90}
-          src={instructor.profilePicUrl}
+          src={instructor.avatar}
           className="bg-blue-600 shadow-lg"
-          icon={!instructor.profilePicUrl ? <UserOutlined /> : undefined}
+          icon={!instructor.avatar ? <UserOutlined /> : undefined}
           style={{
             border: "4px solid #fff",
             boxShadow: "0 4px 16px 0 rgba(32,85,138,0.10)",
           }}
         >
-          {!instructor.profilePicUrl &&
-            instructor.fullName
+          {!instructor.avatar &&
+            instructor.name
               ?.split(" ")
               .map((name) => name[0])
               .join("")
@@ -90,7 +103,7 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
             <Title level={4} style={{ margin: 0, color: "#20558A" }}>
-              {instructor.fullName}
+              {instructor.name}
             </Title>
           </div>
           <Text
@@ -120,18 +133,13 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
             <MailOutlined className="text-gray-400" />
             <Text>Email: {instructor.email || "Chưa cập nhật"}</Text>
           </div>
-          {instructor.ageGroup && (
-            <Tag color="geekblue" style={{ marginTop: 4 }}>
-              Nhóm tuổi: {instructor.ageGroup}
-            </Tag>
-          )}
         </div>
       </div>
       <Paragraph
         className="text-gray-700 text-sm leading-relaxed px-6 pb-4"
         style={{ margin: 0 }}
       >
-        {`Giảng viên ${instructor.fullName} là chuyên gia trong lĩnh vực ${major} với nhiều năm kinh nghiệm giảng dạy và tư vấn.`}
+        {`Giảng viên ${instructor.name} là chuyên gia trong lĩnh vực ${major} với nhiều năm kinh nghiệm giảng dạy và tư vấn.`}
       </Paragraph>
     </Card>
   );

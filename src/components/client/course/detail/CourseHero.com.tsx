@@ -8,9 +8,16 @@ const { Text } = Typography;
 interface CourseHeroProps {
   course: Course;
   averageRating: number; // thêm prop này
+  authorName?: string;
+  authorLoading?: boolean;
 }
 
-const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
+const CourseHero: React.FC<CourseHeroProps> = ({
+  course,
+  averageRating,
+  authorName,
+  authorLoading,
+}) => {
   const getTargetAudienceLabel = (audience: string) => {
     const map: Record<string, string> = {
       student: "Học sinh",
@@ -139,28 +146,45 @@ const CourseHero: React.FC<CourseHeroProps> = ({ course, averageRating }) => {
                 230 học viên
               </span>
             </div>
-            {/* Meta */}
+            {/* Author + Meta */}
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: 32,
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 8,
                 fontSize: 16,
                 color: "#6b7280",
               }}
             >
               <span>
-                <CalendarOutlined
-                  style={{ marginRight: 4, color: "#2563eb" }}
-                />
-                {formatDate(course.createdAt)}
+                Tạo bởi{" "}
+                <span style={{ fontWeight: 600, color: "#111827" }}>
+                  {authorLoading
+                    ? "Đang tải..."
+                    : authorName || "Unknown author"}
+                </span>
               </span>
-              <span>
-                <ClockCircleOutlined
-                  style={{ marginRight: 4, color: "#2563eb" }}
-                />
-                Tiếng Việt
-              </span>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 24,
+                }}
+              >
+                <span>
+                  <CalendarOutlined
+                    style={{ marginRight: 4, color: "#2563eb" }}
+                  />
+                  {formatDate(course.createdAt)}
+                </span>
+                <span>
+                  <ClockCircleOutlined
+                    style={{ marginRight: 4, color: "#2563eb" }}
+                  />
+                  Tiếng Việt
+                </span>
+              </div>
             </div>
           </Col>
         </Row>

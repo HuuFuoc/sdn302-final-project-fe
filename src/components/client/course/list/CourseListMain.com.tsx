@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { CourseService } from "../../../../services/course/course.service";
 import type { Course } from "../../../../types/course/Course.res.type";
@@ -20,120 +20,136 @@ const CourseList = () => {
   const [targetAudience, setTargetAudience] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const fetchCourses = async (page = 1, size = itemsPerPage) => {
-    setLoading(true);
+  const fetchCourses = useCallback(
+    async (page = 1, size = itemsPerPage) => {
+      setLoading(true);
 
-    // Lấy userId từ localStorage
-    let userId = undefined;
-    const userInfoStr = localStorage.getItem("userInfo");
-    if (userInfoStr) {
-      try {
-        const userInfo = JSON.parse(userInfoStr);
-        userId = userInfo.id;
-      } catch {
-        userId = undefined;
-      }
-    }
-
-    // CHỈ GỬI CÁC PARAM CƠ BẢN LÊN API
-    const params: any = {
-      pageNumber: 1,
-      pageSize: 50,
-      userId,
-    };
-
-    try {
-      const res = await CourseService.getAllCourses(params);
-      const data = res.data as any;
-
-      // Normalize id & image fields (backend may return _id, imageUrl)
-      const normalizedCourses = Array.isArray(data?.data)
-        ? data.data.map((course: any) => ({
-            ...course,
-            id: course.id ?? course._id ?? course.courseId,
-            imageUrls:
-              Array.isArray(course.imageUrls) && course.imageUrls.length > 0
-                ? course.imageUrls
-                : course.imageUrl
-                ? [course.imageUrl]
-                : [],
-          }))
-        : [];
-
-      // Lọc chỉ lấy course có status là "published"
-      let filteredCourses = Array.isArray(normalizedCourses)
-        ? normalizedCourses.filter(
-            (course: any) => course.status === CourseStatus.PUBLISHED,
-          )
-        : [];
-
-      // FRONTEND FILTERING
-      // 1. Filter by search term
-      if (searchTerm && searchTerm.trim() !== "") {
-        const searchLower = searchTerm.toLowerCase().trim();
-        filteredCourses = filteredCourses.filter(
-          (course: any) =>
-            course.name?.toLowerCase().includes(searchLower) ||
-            course.description?.toLowerCase().includes(searchLower),
-        );
-      }
-
-      // 2. Filter by category
-      if (selectedCategory && selectedCategory !== "") {
-        filteredCourses = filteredCourses.filter(
-          (course: any) => course.categoryId === selectedCategory,
-        );
-      }
-
-      // 3. Filter by target audience
-      if (targetAudience && targetAudience !== "") {
-        filteredCourses = filteredCourses.filter(
-          (course: any) => course.targetAudience === targetAudience,
-        );
-      }
-
-      // 4. Sort by price
-      if (priceSort && priceSort !== "") {
-        filteredCourses.sort((a: any, b: any) => {
-          const priceA = a.price || 0;
-          const priceB = b.price || 0;
-
-          if (priceSort === "ASC") {
-            return priceA - priceB; // Tăng dần
-          } else if (priceSort === "DESC") {
-            return priceB - priceA; // Giảm dần
+      // Lấy userId từ localStorage
+      let userId: string | undefined = undefined;
+      const userInfoStr = localStorage.getItem("userInfo");
+      if (userInfoStr) {
+        try {
+          const userInfo = JSON.parse(userInfoStr) as { id?: string };
+          if (userInfo && typeof userInfo.id === "string") {
+            userId = userInfo.id;
           }
-          return 0;
-        });
+        } catch {
+          userId = undefined;
+        }
       }
 
-      // PAGINATION Ở FRONTEND
-      const totalFiltered = filteredCourses.length;
-      const startIndex = (page - 1) * size;
-      const endIndex = startIndex + size;
-      const paginatedCourses = filteredCourses.slice(startIndex, endIndex);
+      // CHỈ GỬI CÁC PARAM CƠ BẢN LÊN API
+      const params = {
+        pageNumber: 1,
+        pageSize: 50,
+        userId,
+      };
 
-      setCourses(paginatedCourses);
-      setTotal(totalFiltered); // Set total theo số lượng đã filter
-    } catch (err) {
-      setCourses([]);
-      setTotal(0);
-      console.error("Lỗi khi lấy danh sách khóa học:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const res = await CourseService.getAllCourses(params as never);
+        const data = res.data as { data?: Course[] | unknown };
+
+        const rawCourses = Array.isArray(data?.data)
+          ? (data.data as Course[])
+          : [];
+
+        // Normalize id & image fields (backend may return _id, imageUrl)
+        const normalizedCourses: Course[] = rawCourses.map((course) => {
+          const c = course as Course & {
+            _id?: string;
+            courseId?: string;
+            imageUrl?: string;
+            description?: string;
+          };
+
+          const imageUrls =
+            Array.isArray(c.imageUrls) && c.imageUrls.length > 0
+              ? c.imageUrls
+              : c.imageUrl
+              ? [c.imageUrl]
+              : [];
+
+          return {
+            ...c,
+            id: c.id ?? c._id ?? c.courseId ?? "",
+            imageUrls,
+          };
+        });
+
+        // Lọc chỉ lấy course có status là "published"
+        let filteredCourses = normalizedCourses.filter(
+          (course) => course.status === CourseStatus.PUBLISHED,
+        );
+
+        // FRONTEND FILTERING
+        // 1. Filter by search term
+        if (searchTerm && searchTerm.trim() !== "") {
+          const searchLower = searchTerm.toLowerCase().trim();
+          filteredCourses = filteredCourses.filter(
+            (course) =>
+              course.name?.toLowerCase().includes(searchLower) ||
+              (course as { description?: string }).description
+                ?.toLowerCase()
+                .includes(searchLower),
+          );
+        }
+
+        // 2. Filter by category
+        if (selectedCategory && selectedCategory !== "") {
+          filteredCourses = filteredCourses.filter(
+            (course) => course.categoryId === selectedCategory,
+          );
+        }
+
+        // 3. Filter by target audience
+        if (targetAudience && targetAudience !== "") {
+          filteredCourses = filteredCourses.filter(
+            (course) => course.targetAudience === targetAudience,
+          );
+        }
+
+        // 4. Sort by price
+        if (priceSort && priceSort !== "") {
+          filteredCourses.sort((a, b) => {
+            const priceA = a.price || 0;
+            const priceB = b.price || 0;
+
+            if (priceSort === "ASC") {
+              return priceA - priceB; // Tăng dần
+            } else if (priceSort === "DESC") {
+              return priceB - priceA; // Giảm dần
+            }
+            return 0;
+          });
+        }
+
+        // PAGINATION Ở FRONTEND
+        const totalFiltered = filteredCourses.length;
+        const startIndex = (page - 1) * size;
+        const endIndex = startIndex + size;
+        const paginatedCourses = filteredCourses.slice(startIndex, endIndex);
+
+        setCourses(paginatedCourses);
+        setTotal(totalFiltered); // Set total theo số lượng đã filter
+      } catch (err) {
+        setCourses([]);
+        setTotal(0);
+        console.error("Lỗi khi lấy danh sách khóa học:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      priceSort,
+      searchTerm,
+      selectedCategory,
+      targetAudience,
+    ],
+  );
 
   useEffect(() => {
     fetchCourses(current, pageSize);
-  }, [
-    current,
-    pageSize,
-    selectedCategory,
-    priceSort,
-    targetAudience,
-    searchTerm,
-  ]);
+  }, [current, pageSize, fetchCourses]);
 
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);

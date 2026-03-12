@@ -23,7 +23,7 @@ import CourseReviews from "./detail/CourseReviews.com.tsx";
 const { Title } = Typography;
 
 interface UserInfo {
-  fullName: string;
+  name: string;
   profilePicUrl?: string;
 }
 
@@ -42,6 +42,10 @@ const CourseDetail: React.FC = () => {
   // Trạng thái kiểm tra đã mua khóa học hay chưa
   // const [checkingPurchase, setCheckingPurchase] = useState<boolean>(false);
   const [isPurchased, setIsPurchased] = useState<boolean>(false);
+
+  // Tên tác giả khóa học (author)
+  const [authorName, setAuthorName] = useState<string>("");
+  const [authorLoading, setAuthorLoading] = useState<boolean>(false);
 
   // State cho user info
   const [userMap, setUserMap] = useState<Record<string, UserInfo>>({});
@@ -206,27 +210,46 @@ const CourseDetail: React.FC = () => {
       const res = await ReviewService.getReviewByCourseId({ courseId });
       console.log("Reviews response:", res);
 
-      const dataObj = res.data?.data as {
-        reviews?: Review[];
-        data?: Review[];
-        averageRating?: number;
-        totalReviews?: number;
-      };
+      const raw = res.data?.data as any;
 
-      let reviewsData: Review[] = [];
-      if (dataObj) {
-        reviewsData = Array.isArray(dataObj.reviews)
-          ? dataObj.reviews
-          : Array.isArray(dataObj.data)
-            ? dataObj.data
-            : [];
+      // Backend trả data là array thuần: data: [ { _id, course_id, user_id, ... } ]
+      const rawReviews: any[] = Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.reviews)
+        ? raw.reviews
+        : Array.isArray(raw?.data)
+        ? raw.data
+        : [];
 
-        setAverageRating(dataObj.averageRating || 0);
-        setTotalReviews(dataObj.totalReviews || reviewsData.length || 0);
-      }
+      const normalizedReviews: Review[] = rawReviews.map((r: any) => ({
+        id: r.id ?? r._id ?? "",
+        courseId: r.courseId ?? r.course_id ?? courseId,
+        // Backend dùng user_id cho người review
+        userId:
+          r.userId ??
+          r.user_id ??
+          r.customerId ??
+          r.customer_id ??
+          "",
+        rating: r.rating ?? r.rate ?? 0,
+        comment: r.comment ?? r.content ?? "",
+        createdAt: r.createdAt ?? r.created_at ?? "",
+      }));
 
-      console.log("Processed reviews data:", reviewsData);
-      setReviews(reviewsData);
+      // Tính average rating & total từ dữ liệu thực tế
+      const totalReviewsCount = normalizedReviews.length;
+      const sumRating = normalizedReviews.reduce(
+        (sum, r) => sum + (r.rating || 0),
+        0,
+      );
+      const avgRating =
+        totalReviewsCount > 0 ? sumRating / totalReviewsCount : 0;
+
+      setAverageRating(avgRating);
+      setTotalReviews(totalReviewsCount);
+
+      console.log("Processed reviews data:", normalizedReviews);
+      setReviews(normalizedReviews);
     } catch (err) {
       console.error("Error fetching reviews:", err);
       message.error("Không thể tải đánh giá!");
@@ -259,10 +282,11 @@ const CourseDetail: React.FC = () => {
         missingIds.map(async (id) => {
           try {
             const res = await UserService.getUserById({ userId: id });
-            if (res.data?.success && res.data?.data) {
+            const rawUser: any = res.data?.data;
+            if (rawUser) {
               newUserMap[id] = {
-                fullName: res.data.data.fullName,
-                profilePicUrl: res.data.data.profilePicUrl,
+                name: rawUser.name || rawUser.fullName || "Unknown user",
+                profilePicUrl: rawUser.avatar || rawUser.profilePicUrl,
               };
             }
           } catch (error) {
@@ -275,6 +299,34 @@ const CourseDetail: React.FC = () => {
     if (Array.isArray(reviews) && reviews.length > 0) fetchUsers();
     // eslint-disable-next-line
   }, [reviews]);
+
+  // Lấy tên tác giả khóa học (author) sau khi đã có course detail
+  useEffect(() => {
+    const fetchAuthorName = async () => {
+      if (!course?.userId) {
+        setAuthorName("");
+        return;
+      }
+
+      setAuthorLoading(true);
+      try {
+        const res = await UserService.getUserById({ userId: course.userId });
+        const rawUser: any = res.data?.data;
+        const name =
+          (rawUser && (rawUser.name || rawUser.fullName)) || "Unknown author";
+        setAuthorName(name);
+      } catch (error) {
+        console.error("Error fetching course author:", error);
+        setAuthorName("Unknown author");
+      } finally {
+        setAuthorLoading(false);
+      }
+    };
+
+    if (course?.userId) {
+      fetchAuthorName();
+    }
+  }, [course?.userId]);
 
   // Loading state
   if (loading) {
@@ -329,7 +381,12 @@ const CourseDetail: React.FC = () => {
   return (
     <div className="min-h-screen ">
       {/* Hero Section */}
-      <CourseHero course={course} averageRating={averageRating} />
+      <CourseHero
+        course={course}
+        averageRating={averageRating}
+        authorName={authorName || "Unknown author"}
+        authorLoading={authorLoading}
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
