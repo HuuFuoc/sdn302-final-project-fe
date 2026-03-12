@@ -13,8 +13,12 @@ const CourseInfoActions: React.FC<CourseInfoActionsProps> = ({
   course,
   navigate,
 }) => {
+  const raw = course as any;
   const courseId =
-    (course as any).id || (course as any)._id || (course as any).courseId;
+    raw.id ||
+    raw._id ||
+    raw.courseId ||
+    (raw.course && (raw.course._id || raw.course.id));
 
   return (
     <div className="space-y-4">

@@ -36,7 +36,27 @@ const LessonDetail: React.FC = () => {
         if (lessonId) {
           const res = await LessonService.getLessonById({ lessonId });
           if (res.data?.success && res.data?.data) {
-            setLesson(res.data.data as Lesson);
+            // API trả về field dạng _id, course_id, session_id → map sang Lesson
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const raw: any = res.data.data;
+            const mappedLesson: Lesson = {
+              id: raw._id || raw.id,
+              name: raw.name,
+              content: raw.content,
+              lessonType: raw.lessonType,
+              videoUrl: raw.videoUrl,
+              imageUrl: raw.imageUrl,
+              fullTime: raw.fullTime,
+              positionOrder: raw.positionOrder,
+              sessionId: raw.session_id || raw.sessionId,
+              courseId: raw.course_id || raw.courseId,
+              userAvatar: "",
+              fullName: "",
+              createdAt: raw.created_at || raw.createdAt,
+              updatedAt: raw.updated_at || raw.updatedAt,
+              userId: raw.user_id || raw.userId,
+            };
+            setLesson(mappedLesson);
           } else {
             setLesson(null);
           }
@@ -84,13 +104,23 @@ const LessonDetail: React.FC = () => {
           sessionsRes.data?.success &&
           Array.isArray(sessionsRes.data?.data)
         ) {
-          const sessions = sessionsRes.data.data as Session[];
-          // KHÔNG CẦN SET allSessions VÌ KHÔNG DÙNG
-          // setAllSessions(sessions);
+          // API trả về session với field _id, course_id,... → map sang Session
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const rawSessions: any[] = sessionsRes.data.data;
 
-          // Fetch lessons cho từng session
+          const normalizedSessions: Session[] = rawSessions.map((s) => ({
+            id: s._id || s.id,
+            courseId: s.course_id || s.courseId,
+            name: s.name,
+            userId: s.user_id || s.userId,
+            slug: s.slug,
+            content: s.content,
+            positionOrder: s.positionOrder,
+          }));
+
+          // Fetch lessons cho từng session bằng sessionId chuẩn
           const sessionsWithLessonsData = await Promise.all(
-            sessions.map(async (sessionItem) => {
+            normalizedSessions.map(async (sessionItem) => {
               try {
                 const lessonsRes = await LessonService.getLessonBySessionId({
                   SessionId: sessionItem.id,
@@ -110,7 +140,7 @@ const LessonDetail: React.FC = () => {
                   lessons: [],
                 };
               }
-            })
+            }),
           );
 
           setSessionsWithLessons(sessionsWithLessonsData);
@@ -206,62 +236,41 @@ const LessonDetail: React.FC = () => {
             >
               {sessionItem.lessons && sessionItem.lessons.length > 0 ? (
                 <div className="space-y-1 pb-4">
-                  {sessionItem.lessons.map((lessonItem: Lesson) => (
-                    <div
-                      key={lessonItem.id}
-                      className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors cursor-pointer"
-                      onClick={() => {
-                        console.log("Clicked lesson:", lessonItem); // Debug
-                        console.log("Current lessonId:", lessonId); // Debug
-                        console.log("Target lessonId:", lessonItem.id); // Debug
+                  {sessionItem.lessons.map((lessonItem: any) => {
+                    const targetId = lessonItem.id || lessonItem._id;
+                    const isActive = targetId === lessonId;
 
-                        if (lessonItem.id !== lessonId) {
-                          // SỬA: Thay thế :lessonId bằng ID thực
+                    return (
+                      <div
+                        key={targetId}
+                        className="flex items-center justify-between py-2 px-4 hover:bg-gray-50 rounded transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (!targetId || targetId === lessonId) return;
                           navigate(
                             ROUTER_URL.CUSTOMER.LESSON_DETAIL.replace(
                               ":lessonId",
-                              lessonItem.id
-                            )
+                              targetId,
+                            ),
                           );
-                        }
-                      }}
-                      style={{
-                        backgroundColor:
-                          lessonItem.id === lessonId
-                            ? "#e6f7ff"
-                            : "transparent",
-                        borderLeft:
-                          lessonItem.id === lessonId
+                        }}
+                        style={{
+                          backgroundColor: isActive ? "#e6f7ff" : "transparent",
+                          borderLeft: isActive
                             ? "3px solid #20558A"
                             : "3px solid transparent",
-                        fontWeight: lessonItem.id === lessonId ? 600 : 400,
-                        color: lessonItem.id === lessonId ? "#20558A" : "#666",
-                      }}
-                    >
-                      <div className="flex items-center space-x-3">
-                        {getLessonIcon(lessonItem.lessonType)}
-                        <span className="text-gray-700 text-sm">
-                          {lessonItem.name}
-                        </span>
-
-                        {/* Hiển thị ảnh thumbnail nếu có */}
-                        {/* {lessonItem.imageUrl && lessonItem.imageUrl !== "" && (
-                          <img
-                            src={lessonItem.imageUrl}
-                            alt={lessonItem.name}
-                            style={{
-                              maxWidth: 60,
-                              maxHeight: 40,
-                              marginLeft: 8,
-                              borderRadius: 4,
-                              border: "1px solid #eee",
-                              objectFit: "cover",
-                            }}
-                          />
-                        )} */}
+                          fontWeight: isActive ? 600 : 400,
+                          color: isActive ? "#20558A" : "#666",
+                        }}
+                      >
+                        <div className="flex items-center space-x-3">
+                          {getLessonIcon(lessonItem.lessonType)}
+                          <span className="text-gray-700 text-sm">
+                            {lessonItem.name}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-gray-600 text-sm py-4 px-4">

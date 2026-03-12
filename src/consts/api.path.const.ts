@@ -103,16 +103,17 @@ export const API_PATH = {
     UPDATE_SESSION: (id: string) => `/session/${id}`,
     DELETE_SESSION: (id: string) => `/session/${id}`,
     GET_SESSION_BY_COURSE_ID: (courseId: string) =>
-      `/session/course/${courseId}`,
+      `/api/session/course/${courseId}`,
   },
   LESSON: {
     GET_ALL_LESSONS: "/lesson/paged",
-    GET_LESSON_BY_ID: (id: string) => `/lesson/${id}`,
+    // Backend lesson detail API (used on lesson page)
+    GET_LESSON_BY_ID: (id: string) => `/api/lesson/${id}`,
     CREATE_LESSON: "/lesson",
     UPDATE_LESSON: (id: string) => `/lesson/${id}`,
     DELETE_LESSON: (id: string) => `/lesson/${id}`,
     GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
-      `/lesson/session/${sessionId}`,
+      `/api/lesson/session/${sessionId}`,
   },
   PROGRAM: {
     GET_ALL_PROGRAMS: "/program",

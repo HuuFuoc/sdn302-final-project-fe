@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Row, Col, Spin, Button, Typography, message } from "antd";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 import { CourseService } from "../../../services/course/course.service";
 import { ReviewService } from "../../../services/review/review.service";
 import { UserService } from "../../../services/user/user.service";
+import { BaseService } from "../../../app/api/base.service";
+import { API_PATH } from "../../../consts/api.path.const";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { Review } from "../../../types/review/Review.res.type";
 // Import detail components
 import CourseHero from "./detail/CourseHero.com.tsx";
@@ -14,7 +18,7 @@ import CourseDescription from "./detail/CourseDescription.com.tsx";
 import CourseInstructor from "./detail/CourseInstructor.com.tsx";
 import CoursePurchaseCard from "./detail/CoursePurchaseCard.com.tsx";
 import CourseReviews from "./detail/CourseReviews.com.tsx";
-import MyCourseDetail from "../../customer/my-course/MyCourseDetail.com.tsx";
+// import MyCourseDetail from "../../customer/my-course/MyCourseDetail.com.tsx";
 
 const { Title } = Typography;
 
@@ -35,6 +39,10 @@ const CourseDetail: React.FC = () => {
   const [averageRating, setAverageRating] = useState<number>(0);
   const [loadingReviews, setLoadingReviews] = useState<boolean>(false);
 
+  // Trạng thái kiểm tra đã mua khóa học hay chưa
+  // const [checkingPurchase, setCheckingPurchase] = useState<boolean>(false);
+  const [isPurchased, setIsPurchased] = useState<boolean>(false);
+
   // State cho user info
   const [userMap, setUserMap] = useState<Record<string, UserInfo>>({});
 
@@ -48,13 +56,71 @@ const CourseDetail: React.FC = () => {
       setLoading(true);
       try {
         if (courseId) {
-          // Truyền thêm userId vào request để API trả về isPurchased đúng cho user hiện tại
+          // Truyền thêm userId vào request để API trả về isInCart / flag khác (nếu có)
           const res = await CourseService.getCourseById({
             id: courseId,
             userId: userId ? userId : undefined,
           });
           if (res.data && res.data.success && res.data.data) {
-            setCourse(res.data.data as CourseDetailResponse);
+            // Dữ liệu backend có dạng { course, sessions }, dùng any để map linh hoạt
+            const raw: any = res.data.data as any;
+            const rawCourse: any = raw.course ?? raw;
+            const rawSessions: any[] = raw.sessions ?? [];
+
+            const mappedCourse: CourseDetailResponse = {
+              id: rawCourse._id || rawCourse.id,
+              name: rawCourse.name,
+              userId: rawCourse.user_id || rawCourse.userId,
+              categoryId: rawCourse.category_id || rawCourse.categoryId,
+              content: rawCourse.content,
+              status: rawCourse.status,
+              targetAudience: rawCourse.targetAudience,
+              imageUrls:
+                rawCourse.imageUrls && rawCourse.imageUrls.length > 0
+                  ? rawCourse.imageUrls
+                  : rawCourse.imageUrl
+                  ? [rawCourse.imageUrl]
+                  : [],
+              videoUrls: rawCourse.videoUrls || [],
+              price: rawCourse.price,
+              discount: rawCourse.discount || 0,
+              slug: rawCourse.slug,
+              createdAt: rawCourse.created_at || rawCourse.createdAt,
+              isInCart: !!rawCourse.isInCart,
+              isPurchased: !!rawCourse.isPurchased,
+              sessionList:
+                rawSessions.map((session) => {
+                  const lessons: any[] = session.lessons || [];
+                  return {
+                    id: session._id || session.id,
+                    courseId: session.course_id || session.courseId,
+                    name: session.name,
+                    userId: session.user_id || session.userId,
+                    slug: session.slug,
+                    content: session.content,
+                    lessonList: lessons.map((lesson) => ({
+                      id: lesson._id || lesson.id,
+                      name: lesson.name,
+                      content: lesson.content,
+                      lessonType: lesson.lessonType,
+                      videoUrl: lesson.videoUrl,
+                      imageUrl: lesson.imageUrl,
+                      fullTime: lesson.fullTime,
+                      positionOrder: lesson.positionOrder,
+                      sessionId: lesson.session_id || lesson.sessionId,
+                      courseId: lesson.course_id || lesson.courseId,
+                      userAvatar: "",
+                      fullName: "",
+                      createdAt: lesson.created_at || lesson.createdAt,
+                      updatedAt: lesson.updated_at || lesson.updatedAt,
+                      userId: lesson.user_id || lesson.userId,
+                    })),
+                  };
+                }) || [],
+              riskLevel: rawCourse.riskLevel,
+            };
+
+            setCourse(mappedCourse);
           } else {
             setCourse(null);
           }
@@ -68,6 +134,61 @@ const CourseDetail: React.FC = () => {
     };
     fetchCourse();
   }, [courseId, userId]);
+
+  // Kiểm tra user đã mua khóa học hay chưa dựa vào order logs
+  const checkCoursePurchased = useCallback(async (currentCourseId: string) => {
+    try {
+      const ordersRes = await BaseService.get<{
+        data?: { _id?: string; orderId?: string; status?: string }[];
+      }>({
+        url: API_PATH.ORDER.GET_ORDER_BY_USER_ID,
+        isLoading: false,
+      });
+
+      const orders = ordersRes.data?.data || [];
+
+      const paidOrders = orders.filter(
+        (o) => (o.status || "").toLowerCase() === "paid",
+      );
+
+      if (paidOrders.length === 0) {
+        setIsPurchased(false);
+        return;
+      }
+
+      const detailResponses = await Promise.all(
+        paidOrders.map((order) =>
+          BaseService.get<{
+            data?: { logs?: { course_id?: string }[] };
+          }>({
+            url: API_PATH.ORDER.GET_ORDER_BY_ID(
+              String(order._id || order.orderId),
+            ),
+            isLoading: false,
+          }),
+        ),
+      );
+
+      const allLogs =
+        detailResponses.flatMap((res) => res.data?.data?.logs || []) || [];
+
+      const hasPurchased = allLogs.some(
+        (log) => log.course_id === currentCourseId,
+      );
+
+      setIsPurchased(hasPurchased);
+    } catch (error) {
+      console.error("Error checking course purchase status:", error);
+      setIsPurchased(false);
+    }
+  }, []);
+
+  // Gọi check mua khi đã có courseId
+  useEffect(() => {
+    if (courseId) {
+      checkCoursePurchased(courseId as string);
+    }
+  }, [courseId, checkCoursePurchased]);
 
   // Lấy review theo courseId
   const fetchReviews = async () => {
@@ -89,8 +210,8 @@ const CourseDetail: React.FC = () => {
         reviewsData = Array.isArray(dataObj.reviews)
           ? dataObj.reviews
           : Array.isArray(dataObj.data)
-          ? dataObj.data
-          : [];
+            ? dataObj.data
+            : [];
 
         setAverageRating(dataObj.averageRating || 0);
         setTotalReviews(dataObj.totalReviews || reviewsData.length || 0);
@@ -168,10 +289,7 @@ const CourseDetail: React.FC = () => {
     );
   }
 
-  // Nếu đã mua thì render MyCourseDetail, chưa mua thì render giao diện cũ
-  if (course.isPurchased) {
-    return <MyCourseDetail course={course} />;
-  }
+  const finalIsPurchased = isPurchased || course.isPurchased;
 
   // Highlights từ data thật
   const courseHighlights = [
@@ -189,6 +307,7 @@ const CourseDetail: React.FC = () => {
       expanded: false,
       lectures:
         session.lessonList?.map((lesson) => ({
+          id: lesson.id,
           title: lesson.name,
           duration: lesson.fullTime ? `${lesson.fullTime} phút` : "",
           preview: false,
@@ -214,7 +333,19 @@ const CourseDetail: React.FC = () => {
               <CourseHighlights highlights={courseHighlights} />
 
               {/* Course Content */}
-              <CourseContent content={courseContent} />
+              <CourseContent
+                content={courseContent}
+                isPurchased={finalIsPurchased}
+                onLessonClick={(lessonId) => {
+                  // Điều hướng sang trang học lesson theo lessonId
+                  navigate(
+                    ROUTER_URL.CUSTOMER.LESSON_DETAIL.replace(
+                      ":lessonId",
+                      lessonId,
+                    ),
+                  );
+                }}
+              />
 
               {/* Description */}
               <CourseDescription course={course} />

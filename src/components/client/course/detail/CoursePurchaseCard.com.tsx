@@ -29,8 +29,12 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   const [isLiked, setIsLiked] = useState(false);
 
   // Đảm bảo luôn có courseId hợp lệ cho API giỏ hàng
+  const raw = course as any;
   const courseId =
-    (course as any).id || (course as any)._id || (course as any).courseId;
+    raw.id ||
+    raw._id ||
+    raw.courseId ||
+    (raw.course && (raw.course._id || raw.course.id));
 
   // Calculate final price and discount percentage
   const finalPrice = course.price * (1 - course.discount / 100);
