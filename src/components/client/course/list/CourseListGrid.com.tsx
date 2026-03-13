@@ -7,6 +7,7 @@ import CustomPagination from "../../../common/Pagiation.com.tsx";
 
 interface CourseListGridProps {
   courses: Course[];
+  myCourseIds: Set<string>;
   loading: boolean;
   total: number;
   current: number;
@@ -16,6 +17,7 @@ interface CourseListGridProps {
 
 const CourseListGrid: React.FC<CourseListGridProps> = ({
   courses,
+  myCourseIds,
   loading,
   total,
   current,
@@ -52,7 +54,10 @@ const CourseListGrid: React.FC<CourseListGridProps> = ({
         <Row gutter={[24, 24]}>
           {courses.map((course, index) => (
             <Col key={course.id ?? index} xs={24} sm={12} lg={8} xl={6}>
-              <CourseCard course={course} />
+              <CourseCard
+                course={course}
+                isPurchased={myCourseIds.has(course.id)}
+              />
             </Col>
           ))}
         </Row>

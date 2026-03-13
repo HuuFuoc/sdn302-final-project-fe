@@ -5,15 +5,19 @@ import type { Course } from "../../../../types/course/Course.res.type";
 
 interface CourseCardImageProps {
   course: Course;
+  isPurchased?: boolean;
 }
 
-const CourseCardImage: React.FC<CourseCardImageProps> = ({ course }) => {
+const CourseCardImage: React.FC<CourseCardImageProps> = ({
+  course,
+  isPurchased = false,
+}) => {
   // Calculate discount percentage
   const discountPercentage = course.discount;
 
   return (
     <div className="relative overflow-hidden h-56">
-      {course.isPurchased === true ? (
+      {isPurchased ? (
         <Badge.Ribbon
           text="Đã mua"
           color="green"

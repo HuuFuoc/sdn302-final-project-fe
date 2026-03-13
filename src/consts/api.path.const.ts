@@ -74,7 +74,7 @@ export const API_PATH = {
     UPDATE_COURSE: (id: string) => `/course/${id}`,
     DELETE_COURSE: (id: string) => `/course/${id}`,
     GET_COURSE_BY_ID: (id: string) => `/api/course/${id}`,
-    GET_MY_COURSES: "/course/myCourses",
+    GET_MY_COURSES: "/api/course/myCourses",
   },
   CONSULTANT: {
     GET_ALL_CONSULTANTS: "/consultant",

@@ -2,6 +2,7 @@ import { BaseService } from "../../app/api/base.service";
 import type { ResponseSuccess } from "../../app/interface";
 import type {
   CreateReviewRequest,
+  CreateCourseReviewRequest,
   DeleteReviewRequest,
   GetAllReviewRequest,
   GetReviewByCourseIdRequest,
@@ -24,6 +25,12 @@ export const ReviewService = {
     });
   },
   createReview(params: CreateReviewRequest) {
+    return BaseService.post<ResponseSuccess<Review>>({
+      url: API_PATH.REVIEW.CREATE_REVIEW,
+      payload: params,
+    });
+  },
+  createCourseReview(params: CreateCourseReviewRequest) {
     return BaseService.post<ResponseSuccess<Review>>({
       url: API_PATH.REVIEW.CREATE_REVIEW,
       payload: params,

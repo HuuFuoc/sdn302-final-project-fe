@@ -26,8 +26,24 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
       setLoading(true);
       try {
         const res = await UserService.getUserById({ userId: instructorId });
-        if (res.data?.success && res.data?.data) {
-          setInstructor(res.data.data as UserResponse);
+        const raw = res.data?.data as
+          | (Partial<UserResponse> & {
+              _id?: string;
+              id?: string;
+              name?: string;
+              fullName?: string;
+              avatar?: string;
+              profilePicUrl?: string;
+            })
+          | undefined;
+
+        if (raw) {
+          setInstructor({
+            ...(raw as UserResponse),
+            id: raw.id || raw._id || "",
+            fullName: raw.fullName || raw.name || "Unknown author",
+            profilePicUrl: raw.profilePicUrl || raw.avatar || "",
+          });
         } else {
           setInstructor(null);
         }

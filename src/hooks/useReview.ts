@@ -11,7 +11,13 @@ import { helpers } from "../utils";
  */
 export const useCreateReview = () => {
   return useMutation({
-    mutationFn: (data: CreateReviewRequest) => ReviewService.createReview(data),
+    mutationFn: (data: CreateReviewRequest) =>
+      ReviewService.createCourseReview({
+        course_id: data.courseId,
+        user_id: data.userId,
+        rating: data.rating,
+        comment: data.comment,
+      }),
     onSuccess: () => {
       helpers.notificationMessage("Đánh giá thành công", "success");
     },

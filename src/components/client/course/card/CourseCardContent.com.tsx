@@ -12,9 +12,13 @@ const { Paragraph } = Typography;
 
 interface CourseCardContentProps {
   course: Course;
+  isPurchased?: boolean;
 }
 
-const CourseCardContent: React.FC<CourseCardContentProps> = ({ course }) => {
+const CourseCardContent: React.FC<CourseCardContentProps> = ({
+  course,
+  isPurchased = false,
+}) => {
   // Calculate final price after discount
   const finalPrice = course.price * (1 - course.discount / 100);
 
@@ -65,7 +69,7 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({ course }) => {
       <div className="mt-auto">
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            {course.isPurchased === true ? (
+            {isPurchased ? (
               <span className="flex items-center text-green-600 font-bold text-base">
                 <CheckCircleTwoTone twoToneColor="#52c41a" className="mr-2" />
                 Đã sở hữu

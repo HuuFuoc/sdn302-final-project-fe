@@ -33,8 +33,16 @@ const MyCourseList: React.FC = () => {
       if (!userId) return;
       setLoading(true);
       try {
-        const res = await CourseService.getMyCourses(userId);
-        setCourses(res.data?.data || []);
+        const res = await CourseService.getMyCourses();
+        const rawCourses = Array.isArray(res.data?.data) ? res.data.data : [];
+        const normalizedCourses: Course[] = rawCourses.map((course) => {
+          const raw = course as Course & { _id?: string; courseId?: string };
+          return {
+            ...raw,
+            id: raw.id ?? raw._id ?? raw.courseId ?? "",
+          };
+        });
+        setCourses(normalizedCourses);
       } catch (err) {
         message.error("Không thể tải danh sách khóa học của bạn!");
       } finally {
@@ -112,8 +120,8 @@ const MyCourseList: React.FC = () => {
             {risk === "High"
               ? "Cao"
               : risk === "Medium"
-              ? "Trung bình"
-              : "Thấp"}
+                ? "Trung bình"
+                : "Thấp"}
           </span>
         );
       },
@@ -128,7 +136,7 @@ const MyCourseList: React.FC = () => {
           className="bg-[#20558A] hover:bg-blue-700 text-white"
           onClick={() =>
             navigate(
-              ROUTER_URL.CLIENT.COURSE_DETAIL.replace(":courseId", record.id)
+              ROUTER_URL.CLIENT.COURSE_DETAIL.replace(":courseId", record.id),
             )
           }
         >

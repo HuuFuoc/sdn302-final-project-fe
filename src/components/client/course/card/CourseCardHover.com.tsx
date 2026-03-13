@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, Typography, Button, Divider } from "antd";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ClockCircleOutlined,
@@ -8,6 +9,7 @@ import {
   CheckCircleTwoTone,
 } from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
+import { ROUTER_URL } from "../../../../consts/router.path.const";
 import { formatCurrency } from "../../../../utils/helper";
 import AddToCartButton from "../../../common/addToCartButton.com";
 
@@ -15,15 +17,27 @@ const { Paragraph, Text } = Typography;
 
 interface CourseCardHoverProps {
   course: Course;
+  isPurchased?: boolean;
 }
 
-const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
+const CourseCardHover: React.FC<CourseCardHoverProps> = ({
+  course,
+  isPurchased = false,
+}) => {
   // Calculate final price after discount
   const finalPrice = course.price * (1 - course.discount / 100);
 
   // Đảm bảo luôn có courseId hợp lệ cho nút thêm giỏ hàng
-  const courseId =
-    (course as any).id || (course as any)._id || (course as any).courseId;
+  const rawCourse = course as Course & {
+    _id?: string;
+    courseId?: string;
+    isInCart?: boolean;
+  };
+  const courseId = rawCourse.id || rawCourse._id || rawCourse.courseId || "";
+  const myCourseDetailUrl = ROUTER_URL.CLIENT.MY_COURSE_DETAIL.replace(
+    ":courseId",
+    courseId,
+  );
 
   // Format creation date
   const formatDate = (dateString: string) => {
@@ -109,7 +123,7 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
           {/* Price */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              {course.isPurchased === true ? (
+              {isPurchased ? (
                 <span className="flex items-center text-green-600 font-bold text-base">
                   <CheckCircleTwoTone twoToneColor="#52c41a" className="mr-2" />
                   Đã sở hữu
@@ -136,20 +150,21 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({ course }) => {
 
           {/* Action Buttons */}
           <div className="space-y-3">
-            {course.isPurchased === true ? (
-              <Button
-                type="primary"
-                icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
-                block
-                disabled
-                className="bg-green-500 border-0"
-              >
-                Đã sở hữu
-              </Button>
+            {isPurchased ? (
+              <Link to={myCourseDetailUrl}>
+                <Button
+                  type="primary"
+                  icon={<CheckCircleTwoTone twoToneColor="#ffffff" />}
+                  block
+                  className="bg-green-600 hover:!bg-green-700 border-0"
+                >
+                  Học tiếp
+                </Button>
+              </Link>
             ) : (
               <AddToCartButton
                 courseId={courseId}
-                isInCart={!!(course as any).isInCart}
+                isInCart={!!rawCourse.isInCart}
               />
             )}
 

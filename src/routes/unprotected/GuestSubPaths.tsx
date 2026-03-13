@@ -13,6 +13,7 @@ import CourseDetail from "../../components/client/course/CourseDetail.com";
 import LessonDetailPage from "../../pages/customer/lesson";
 import ProgramDetail from "../../pages/client/program/detail";
 import ClientSurveyDetail from "../../pages/client/survey/detail";
+import MyCourseDetailPage from "../../pages/client/my-course/detail";
 import PaymentPageMain from "../../pages/customer/payment";
 import VnpayReturnPage from "../../pages/customer/payment/vnpay-return";
 import PaymentSuccess from "../../pages/customer/success";
@@ -64,6 +65,10 @@ export const publicSubPaths: Record<string, RouteObject[]> = {
         {
           path: ROUTER_URL.CLIENT.COURSE_DETAIL,
           element: <CourseDetail />,
+        },
+        {
+          path: ROUTER_URL.CLIENT.MY_COURSE_DETAIL,
+          element: <MyCourseDetailPage />,
         },
         {
           path: ROUTER_URL.CLIENT.BLOG,

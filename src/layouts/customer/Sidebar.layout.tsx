@@ -23,17 +23,17 @@ const { Sider } = Layout;
 // Hàm dùng chung cho focus effects
 const createFocusHandlers = (itemName: string) => ({
   onFocus: (e: any) => {
-    e.target.style.transform = 'scale(1.01)';
-    e.target.style.transition = 'all 0.15s ease';
-    e.target.style.backgroundColor = 'rgba(24, 144, 255, 0.1)';
-    e.target.style.borderRadius = '6px';
+    e.target.style.transform = "scale(1.01)";
+    e.target.style.transition = "all 0.15s ease";
+    e.target.style.backgroundColor = "rgba(24, 144, 255, 0.1)";
+    e.target.style.borderRadius = "6px";
     console.log(`${itemName} item focused`);
   },
   onBlur: (e: any) => {
-    e.target.style.transform = 'scale(1)';
-    e.target.style.backgroundColor = 'transparent';
+    e.target.style.transform = "scale(1)";
+    e.target.style.backgroundColor = "transparent";
     console.log(`${itemName} item blurred`);
-  }
+  },
 });
 
 const SidebarLayout: React.FC = () => {
@@ -79,31 +79,31 @@ const SidebarLayout: React.FC = () => {
       key: ROUTER_URL.CUSTOMER.BASE,
       icon: <DashboardOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.BASE}>Tổng quan</Link>,
-      ...createFocusHandlers('Customer Dashboard')
+      ...createFocusHandlers("Customer Dashboard"),
     },
     {
       key: ROUTER_URL.CUSTOMER.COURSE,
       icon: <BookOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.MY_COURSE}>Khóa học của tôi</Link>,
-      ...createFocusHandlers('Customer Courses')
+      ...createFocusHandlers("Customer Courses"),
     },
     {
       key: ROUTER_URL.CUSTOMER.ASSESSMENT,
       icon: <FileTextOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.ASSESSMENT}>Đánh giá của tôi</Link>,
-      ...createFocusHandlers('Customer Assessments')
+      ...createFocusHandlers("Customer Assessments"),
     },
     {
       key: ROUTER_URL.CUSTOMER.APPOINTMENTS,
       icon: <CalendarOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.APPOINTMENTS}>Lịch hẹn tư vấn</Link>,
-      ...createFocusHandlers('Customer Appointments')
+      ...createFocusHandlers("Customer Appointments"),
     },
     {
       key: ROUTER_URL.CLIENT.CART,
       icon: <ShoppingCartOutlined />,
       label: <Link to={ROUTER_URL.CLIENT.CART}>Giỏ hàng</Link>,
-      ...createFocusHandlers('Customer Cart')
+      ...createFocusHandlers("Customer Cart"),
     },
     {
       key: ROUTER_URL.CUSTOMER.ORDER_HISTORY,
@@ -111,7 +111,7 @@ const SidebarLayout: React.FC = () => {
       label: (
         <Link to={ROUTER_URL.CUSTOMER.ORDER_HISTORY}>Lịch sử đơn hàng</Link>
       ),
-      ...createFocusHandlers('Customer Order History')
+      ...createFocusHandlers("Customer Order History"),
     },
     {
       key: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
@@ -119,29 +119,29 @@ const SidebarLayout: React.FC = () => {
       label: (
         <Link to={ROUTER_URL.CUSTOMER.REVIEW_HISTORY}>Lịch sử đánh giá</Link>
       ),
-      ...createFocusHandlers('Customer Review History')
+      ...createFocusHandlers("Customer Review History"),
     },
     {
       key: ROUTER_URL.CUSTOMER.FAVORITES,
       icon: <HeartOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.FAVORITES}>Yêu thích</Link>,
-      ...createFocusHandlers('Customer Favorites')
+      ...createFocusHandlers("Customer Favorites"),
     },
     {
       key: ROUTER_URL.CUSTOMER.SETTINGS,
       icon: <SettingOutlined />,
       label: <Link to={ROUTER_URL.CUSTOMER.SETTINGS}>Cài đặt</Link>,
-      ...createFocusHandlers('Customer Settings')
+      ...createFocusHandlers("Customer Settings"),
     },
   ];
 
   const getSelectedKey = () => {
     const path = location.pathname;
     // Cải thiện logic selection để tránh bug
-    const exactMatch = menuItems.find(item => path === item.key);
+    const exactMatch = menuItems.find((item) => path === item.key);
     if (exactMatch) return exactMatch.key;
 
-    const startsWithMatch = menuItems.find(item => path.startsWith(item.key));
+    const startsWithMatch = menuItems.find((item) => path.startsWith(item.key));
     if (startsWithMatch) return startsWithMatch.key;
 
     return ROUTER_URL.CUSTOMER.BASE;

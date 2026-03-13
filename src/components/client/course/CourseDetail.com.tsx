@@ -83,8 +83,8 @@ const CourseDetail: React.FC = () => {
                 rawCourse.imageUrls && rawCourse.imageUrls.length > 0
                   ? rawCourse.imageUrls
                   : rawCourse.imageUrl
-                  ? [rawCourse.imageUrl]
-                  : [],
+                    ? [rawCourse.imageUrl]
+                    : [],
               videoUrls: rawCourse.videoUrls || [],
               price: rawCourse.price,
               discount: rawCourse.discount || 0,
@@ -204,7 +204,7 @@ const CourseDetail: React.FC = () => {
 
   // Lấy review theo courseId
   const fetchReviews = async () => {
-    if (!courseId) return;
+    if (!courseId || courseId === "undefined") return;
     setLoadingReviews(true);
     try {
       const res = await ReviewService.getReviewByCourseId({ courseId });
@@ -216,21 +216,16 @@ const CourseDetail: React.FC = () => {
       const rawReviews: any[] = Array.isArray(raw)
         ? raw
         : Array.isArray(raw?.reviews)
-        ? raw.reviews
-        : Array.isArray(raw?.data)
-        ? raw.data
-        : [];
+          ? raw.reviews
+          : Array.isArray(raw?.data)
+            ? raw.data
+            : [];
 
       const normalizedReviews: Review[] = rawReviews.map((r: any) => ({
         id: r.id ?? r._id ?? "",
         courseId: r.courseId ?? r.course_id ?? courseId,
         // Backend dùng user_id cho người review
-        userId:
-          r.userId ??
-          r.user_id ??
-          r.customerId ??
-          r.customer_id ??
-          "",
+        userId: r.userId ?? r.user_id ?? r.customerId ?? r.customer_id ?? "",
         rating: r.rating ?? r.rate ?? 0,
         comment: r.comment ?? r.content ?? "",
         createdAt: r.createdAt ?? r.created_at ?? "",

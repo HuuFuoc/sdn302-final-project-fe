@@ -9,15 +9,26 @@ import CourseCardHover from "./CourseCardHover.com.tsx";
 
 interface CourseCardProps {
   course: Course;
+  isPurchased?: boolean;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard: React.FC<CourseCardProps> = ({
+  course,
+  isPurchased = false,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const courseDetailUrl = ROUTER_URL.CLIENT.COURSE_DETAIL.replace(
     ":courseId",
     course.id?.toString() ?? "",
   );
+
+  const myCourseDetailUrl = ROUTER_URL.CLIENT.MY_COURSE_DETAIL.replace(
+    ":courseId",
+    course.id?.toString() ?? "",
+  );
+
+  const targetUrl = isPurchased ? myCourseDetailUrl : courseDetailUrl;
 
   return (
     <motion.div
@@ -30,10 +41,16 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       whileHover={{ y: -4 }}
       style={{ zIndex: isHovered ? 10001 : 1 }}
     >
-      <Link to={courseDetailUrl} className="block">
-        <div className="group relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-lg transition-shadow duration-300 h-full">
-          <CourseCardImage course={course} />
-          <CourseCardContent course={course} />
+      <Link to={targetUrl} className="block">
+        <div
+          className={`group relative overflow-hidden rounded-2xl transition-shadow duration-300 h-full ${
+            isPurchased
+              ? "bg-emerald-50 shadow-lg shadow-emerald-100/60 ring-1 ring-emerald-200"
+              : "bg-white shadow-md hover:shadow-lg"
+          }`}
+        >
+          <CourseCardImage course={course} isPurchased={isPurchased} />
+          <CourseCardContent course={course} isPurchased={isPurchased} />
         </div>
       </Link>
 
@@ -59,7 +76,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
-              <CourseCardHover course={course} />
+              <CourseCardHover course={course} isPurchased={isPurchased} />
             </motion.div>
           </div>
         )}

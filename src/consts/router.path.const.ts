@@ -104,6 +104,7 @@ export const ROUTER_URL = {
     BASE: "/",
     COURSE: "/khoa-hoc",
     COURSE_DETAIL: "/khoa-hoc/:courseId",
+    MY_COURSE_DETAIL: "/my-course/:courseId",
     BLOG: "/blog",
     BLOG_DETAIL: "/blog/:blogId",
     COUNSEL: "/tu-van",

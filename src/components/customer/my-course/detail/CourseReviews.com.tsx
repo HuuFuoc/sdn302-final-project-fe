@@ -8,6 +8,7 @@ import {
   Spin,
   Input,
   Form,
+  message,
 } from "antd";
 import DeleteReview from "../../../client/review/DeleteReview.com";
 import UpdateReview from "../../../client/review/UpdateReview.com";
@@ -57,14 +58,23 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
         ids.map(async (id) => {
           try {
             const res = await UserService.getUserById({ userId: id });
-            if (res.data?.success && res.data?.data) {
+            const raw = res.data?.data as
+              | {
+                  fullName?: string;
+                  name?: string;
+                  profilePicUrl?: string;
+                  avatar?: string;
+                }
+              | undefined;
+
+            if (raw) {
               newUserMap[id] = {
-                fullName: res.data.data.fullName,
-                profilePicUrl: res.data.data.profilePicUrl,
+                fullName: raw.fullName || raw.name || "Người dùng",
+                profilePicUrl: raw.profilePicUrl || raw.avatar,
               };
             }
           } catch {}
-        })
+        }),
       );
       setUserMap(newUserMap);
     };
@@ -72,6 +82,16 @@ const CourseReviews: React.FC<CourseReviewsProps> = ({
   }, [reviews]);
 
   const handleFinish = async (values: { rating: number; comment: string }) => {
+    if (!userId) {
+      message.warning("Bạn cần đăng nhập để đánh giá.");
+      return;
+    }
+
+    if (!courseId || courseId === "undefined") {
+      message.error("Không xác định được khóa học để đánh giá.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       await createReview.mutateAsync({

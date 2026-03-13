@@ -15,6 +15,13 @@ export interface CreateReviewRequest {
   rating: number;
   comment: string;
 }
+
+export interface CreateCourseReviewRequest {
+  course_id: string;
+  user_id: string;
+  rating: number;
+  comment: string;
+}
 export interface DeleteReviewRequest {
   id: string;
 }

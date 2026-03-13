@@ -11,6 +11,7 @@ const itemsPerPage = 12;
 
 const CourseList = () => {
   const [courses, setCourses] = useState<Course[]>([]);
+  const [myCourseIds, setMyCourseIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(itemsPerPage);
@@ -19,6 +20,33 @@ const CourseList = () => {
   const [priceSort, setPriceSort] = useState<string>("");
   const [targetAudience, setTargetAudience] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const fetchMyCourses = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    const userInfo = localStorage.getItem("userInfo");
+    const isLoggedIn = Boolean(token && userInfo);
+
+    if (!isLoggedIn) {
+      setMyCourseIds(new Set());
+      return;
+    }
+
+    try {
+      const res = await CourseService.getMyCourses();
+      const rawCourses = Array.isArray(res.data?.data) ? res.data.data : [];
+      const ids = rawCourses
+        .map((course) => {
+          const raw = course as Course & { _id?: string; courseId?: string };
+          return raw.id ?? raw._id ?? raw.courseId ?? "";
+        })
+        .filter((id): id is string => Boolean(id));
+
+      setMyCourseIds(new Set(ids));
+    } catch {
+      // Fallback empty set to avoid UI crash when my-courses API fails
+      setMyCourseIds(new Set());
+    }
+  }, []);
 
   const fetchCourses = useCallback(
     async (page = 1, size = itemsPerPage) => {
@@ -66,8 +94,8 @@ const CourseList = () => {
             Array.isArray(c.imageUrls) && c.imageUrls.length > 0
               ? c.imageUrls
               : c.imageUrl
-              ? [c.imageUrl]
-              : [];
+                ? [c.imageUrl]
+                : [];
 
           return {
             ...c,
@@ -139,13 +167,12 @@ const CourseList = () => {
         setLoading(false);
       }
     },
-    [
-      priceSort,
-      searchTerm,
-      selectedCategory,
-      targetAudience,
-    ],
+    [priceSort, searchTerm, selectedCategory, targetAudience],
   );
+
+  useEffect(() => {
+    fetchMyCourses();
+  }, [fetchMyCourses]);
 
   useEffect(() => {
     fetchCourses(current, pageSize);
@@ -208,6 +235,7 @@ const CourseList = () => {
         {/* Course Grid */}
         <CourseListGrid
           courses={courses}
+          myCourseIds={myCourseIds}
           loading={loading}
           total={total}
           current={current}
