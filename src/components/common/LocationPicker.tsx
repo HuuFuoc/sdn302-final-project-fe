@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Input, Button, Modal, Space, Tabs, message, Spin } from 'antd';
 import { EnvironmentOutlined, SearchOutlined, GlobalOutlined, LoadingOutlined, AimOutlined } from '@ant-design/icons';
 
@@ -591,7 +591,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 
     return (
         <>
-            {/* INPUT CHÍNH - HIỂN THỊ ĐỊA CHỈ ĐÃ CHỌN */}
+            {/* Main input - shows selected address */}
             <Input
                 value={value}
                 placeholder={placeholder}
@@ -624,7 +624,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
                     items={tabItems}
                 />
 
-                {/* HIỂN THỊ ĐỊA CHỈ ĐÃ CHỌN */}
+                {/* Selected address preview */}
                 {selectedLocation && (
                     <div style={{
                         marginTop: 16,

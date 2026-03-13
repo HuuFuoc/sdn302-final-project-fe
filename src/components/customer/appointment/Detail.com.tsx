@@ -53,7 +53,7 @@ const AppointmentDetail: React.FC = () => {
     // Check if user can review/edit reviews based on role
     const isCustomer = role === UserRole.CUSTOMER;
     const isManager = role === UserRole.MANAGER;
-    const isConsultant = role === UserRole.CONSULTANT;
+    const isInstructor = role === UserRole.INSTRUCTOR || role === UserRole.CONSULTANT;
 
     // Only customers can create/edit/delete their own reviews
     const canCreateReview = isCustomer;
@@ -339,14 +339,14 @@ const AppointmentDetail: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Consultant Info */}
+                            {/* Instructor Info */}
                             <div className="space-y-6">
                                 <div className="bg-gray-50 p-6 rounded-xl">
                                     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                                         <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                             <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
                                         </svg>
-                                        Tư vấn viên
+                                        Giảng viên
                                     </h3>
                                     {consultant ? (
                                         <div className="flex items-start gap-4">
@@ -380,7 +380,7 @@ const AppointmentDetail: React.FC = () => {
                                             <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
                                             </svg>
-                                            <p>Chưa chỉ định tư vấn viên</p>
+                                            <p>Chưa chỉ định giảng viên</p>
                                         </div>
                                     )}
                                 </div>
@@ -475,7 +475,7 @@ const AppointmentDetail: React.FC = () => {
                                         ) : (
                                             <div className="max-w-2xl">
                                                 <Card className={`border-0 shadow-xl rounded-2xl overflow-hidden ${isManager ? 'bg-gradient-to-br from-blue-50 to-indigo-50' :
-                                                    isConsultant ? 'bg-gradient-to-br from-green-50 to-emerald-50' :
+                                                    isInstructor ? 'bg-gradient-to-br from-green-50 to-emerald-50' :
                                                         'bg-gradient-to-br from-white to-gray-50'
                                                     }`}>
                                                     <div className="flex items-start gap-4 mb-6">
@@ -529,7 +529,7 @@ const AppointmentDetail: React.FC = () => {
                                                         )}
                                                     </div>
                                                     <div className={`p-6 rounded-xl border-l-4 ${isManager ? 'bg-blue-50 border-blue-500' :
-                                                        isConsultant ? 'bg-green-50 border-green-500' :
+                                                        isInstructor ? 'bg-green-50 border-green-500' :
                                                             'bg-gray-50 border-blue-500'
                                                         }`}>
                                                         <p className="text-gray-800 text-lg leading-relaxed italic">
@@ -593,7 +593,7 @@ const AppointmentDetail: React.FC = () => {
                                         ) : (
                                             <div className="max-w-2xl">
                                                 <div className={`text-center py-12 rounded-xl ${isManager ? 'bg-blue-50 text-blue-600' :
-                                                    isConsultant ? 'bg-green-50 text-green-600' :
+                                                    isInstructor ? 'bg-green-50 text-green-600' :
                                                         'bg-gray-50 text-gray-500'
                                                     }`}>
                                                     <svg className="w-16 h-16 mx-auto mb-4 text-current opacity-50" fill="currentColor" viewBox="0 0 20 20">
@@ -601,12 +601,12 @@ const AppointmentDetail: React.FC = () => {
                                                     </svg>
                                                     <h4 className="text-lg font-medium mb-2">
                                                         {isManager ? 'Chưa có đánh giá từ khách hàng' :
-                                                            isConsultant ? 'Chưa có phản hồi từ khách hàng' :
+                                                            isInstructor ? 'Chưa có phản hồi từ khách hàng' :
                                                                 'Chưa có đánh giá'}
                                                     </h4>
                                                     <p className="text-current opacity-75">
                                                         {isManager ? 'Khách hàng chưa đánh giá cuộc hẹn này' :
-                                                            isConsultant ? 'Khách hàng chưa để lại phản hồi về dịch vụ tư vấn' :
+                                                            isInstructor ? 'Khách hàng chưa để lại phản hồi về giảng viên' :
                                                                 'Cuộc hẹn này chưa được đánh giá'}
                                                     </p>
                                                 </div>

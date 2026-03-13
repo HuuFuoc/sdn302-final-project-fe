@@ -19,34 +19,29 @@ const AdminDeleteConsultant: React.FC<AdminDeleteConsultantProps> = ({
 }) => {
   const handleDelete = async () => {
     if (!consultant) {
-      message.error("Không tìm thấy chuyên viên tư vấn.");
+      message.error("Không tìm thấy giảng viên.");
       return;
     }
 
     try {
-      // Lấy toàn bộ consultant (hoặc nếu backend hỗ trợ filter theo userId thì truyền userId)
       const res = await ConsultantService.getAllConsultants({
         PageNumber: 1,
-        PageSize: 10, // hoặc số lớn hơn tổng số consultant
+        PageSize: 1000,
       });
-      // Tìm consultant có userId === consultant.id (id ở đây là userId)
-      const consultantData = res.data?.data?.find(
-        (c) => c.userId === consultant.id
-      );
 
-      if (consultantData) {
-        await ConsultantService.deleteConsultant({ id: consultantData.id });
-        message.success(`Đã xoá chuyên viên: ${consultant.fullName}`);
-        onClose();
-        onDeleted?.();
-      } else {
-        message.error("Không tìm thấy consultant tương ứng với user này!");
+      const consultantData = res.data?.data?.find((c) => c.userId === consultant.id);
+
+      if (!consultantData) {
+        message.error("Không tìm thấy giảng viên tương ứng với người dùng này!");
+        return;
       }
+
+      await ConsultantService.deleteConsultant({ id: consultantData.id });
+      message.success(`Đã gỡ giảng viên: ${consultant.fullName}`);
+      onClose();
+      onDeleted?.();
     } catch (error: any) {
-      console.error("Delete consultant error:", error);
-      message.error(
-        error?.response?.data?.message || "Xoá chuyên viên tư vấn thất bại!"
-      );
+      message.error(error?.response?.data?.message || "Gỡ giảng viên thất bại!");
     }
   };
 
@@ -55,23 +50,22 @@ const AdminDeleteConsultant: React.FC<AdminDeleteConsultantProps> = ({
       open={open}
       onCancel={onClose}
       onOk={handleDelete}
-      okText="Xác nhận xoá"
+      okText="Xác nhận gỡ"
       okType="danger"
-      cancelText="Huỷ"
+      cancelText="Hủy"
       title={
         <span className="text-red-600">
           <ExclamationCircleOutlined className="mr-2" />
-          Xác nhận xoá chuyên viên tư vấn
+          Xác nhận gỡ giảng viên
         </span>
       }
     >
       {consultant ? (
         <p>
-          Bạn có chắc muốn xoá chuyên viên{" "}
-          <strong>{consultant.fullName}</strong> không?
+          Bạn có chắc muốn gỡ giảng viên <strong>{consultant.fullName}</strong> không?
         </p>
       ) : (
-        <p>Không tìm thấy thông tin chuyên viên.</p>
+        <p>Không tìm thấy thông tin giảng viên.</p>
       )}
     </Modal>
   );

@@ -1,15 +1,30 @@
 import { useEffect, useState } from "react";
-import { Table, Image, message, Button, Space, Tag, Modal, Select } from "antd";
+import {
+  Table,
+  Image,
+  message,
+  Button,
+  Space,
+  Tag,
+  Select,
+  Modal,
+  Form,
+  Input,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { DeleteOutlined, EyeOutlined, PlusOutlined } from "@ant-design/icons";
-import { UserService } from "../../../../services/user/user.service";
-import { UserRole } from "../../../../app/enums/userRole.enum";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
 import CustomPagination from "../../../common/Pagiation.com";
-import CustomSearch from "../../../common/CustomSearch.com"; // ✅ thêm component tìm kiếm
-import AdminCreateConsultantForm from "./AdminCreateConsultant";
+import CustomSearch from "../../../common/CustomSearch.com";
 import AdminDeleteConsultant from "./AdminDeleteConsultant";
 import AdminViewConsultant from "./AdminViewConsultant";
+import AdminCreateConsultantForm from "./AdminCreateConsultant";
+import { ConsultantService } from "../../../../services/consultant/consultant.service";
 
 const { Option } = Select;
 
@@ -20,34 +35,53 @@ const AdminConsultantManager = () => {
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [consultantToDelete, setConsultantToDelete] =
-    useState<Consultant | null>(null);
+  const [consultantToDelete, setConsultantToDelete] = useState<Consultant | null>(
+    null,
+  );
   const [isVerified, setIsVerified] = useState<boolean | undefined>(undefined);
   const [viewConsultantId, setViewConsultantId] = useState<string | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
 
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [editingUser, setEditingUser] = useState<Consultant | null>(null);
+  const [editingInstructorId, setEditingInstructorId] = useState("");
+  const [editForm] = Form.useForm();
+
   const fetchConsultants = async () => {
     setLoading(true);
     try {
-      const res = await UserService.getAllUsers({
-        pageNumber: current,
-        pageSize,
-        role: UserRole.CONSULTANT, // Lọc trực tiếp ở backend
-        searchCondition: searchKeyword || undefined,
-        isVerified,
+      const res = await ConsultantService.getAllConsultants({
+        PageNumber: current,
+        PageSize: pageSize,
+        FilterByName: searchKeyword || undefined,
       });
       const data = res.data as any;
+      const rawList = Array.isArray(data?.data)
+        ? data.data
+        : Array.isArray(data?.pageData)
+          ? data.pageData
+          : Array.isArray(data)
+            ? data
+            : [];
 
-      if (!Array.isArray(data?.data)) {
-        throw new Error("Invalid data format from API");
-      }
+      const filteredList =
+        isVerified === undefined
+          ? rawList
+          : rawList.filter((item: any) => Boolean(item?.isVerified) === isVerified);
 
-      setConsultants(data.data);
-      setTotal(data.total || data.data.length);
-    } catch (err) {
-      message.error("Lỗi khi lấy danh sách tư vấn viên!");
+      setConsultants(filteredList);
+      setTotal(
+        data?.totalCount ??
+          data?.total ??
+          data?.pageInfo?.totalItems ??
+          filteredList.length,
+      );
+    } catch {
+      message.error("Lỗi khi lấy danh sách giảng viên!");
       setConsultants([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }
@@ -55,7 +89,7 @@ const AdminConsultantManager = () => {
 
   useEffect(() => {
     fetchConsultants();
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, pageSize, searchKeyword, isVerified]);
 
   const handlePageChange = (page: number, size: number) => {
@@ -70,6 +104,83 @@ const AdminConsultantManager = () => {
 
   const handleDelete = (record: Consultant) => {
     setConsultantToDelete(record);
+  };
+
+  const handleOpenEdit = async (record: Consultant) => {
+    setEditingUser(record);
+    setEditModalOpen(true);
+
+    try {
+      const res = await ConsultantService.getAllConsultants({
+        PageNumber: 1,
+        PageSize: 1000,
+      });
+      const list = Array.isArray((res.data as any)?.data)
+        ? (res.data as any).data
+        : [];
+      const matched = list.find((item: Consultant) => item.userId === record.id);
+
+      if (!matched?.id) {
+        message.error("Không tìm thấy instructorId để cập nhật.");
+        setEditModalOpen(false);
+        return;
+      }
+
+      setEditingInstructorId(matched.id);
+      editForm.setFieldsValue({
+        fullName: matched.fullName || record.fullName || "",
+        email: matched.email || record.email || "",
+        phoneNumber: matched.phoneNumber || record.phoneNumber || "",
+        jobTitle: matched.jobTitle || "",
+        qualifications: Array.isArray(matched.qualifications)
+          ? matched.qualifications.join(", ")
+          : "",
+        status: matched.status || "Active",
+      });
+    } catch (error: any) {
+      message.error(
+        error?.response?.data?.message || "Không thể tải dữ liệu giảng viên.",
+      );
+      setEditModalOpen(false);
+    }
+  };
+
+  const handleUpdate = async (values: any) => {
+    if (!editingInstructorId) {
+      message.error("Thiếu instructorId để cập nhật.");
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      await ConsultantService.updateConsultant({
+        id: editingInstructorId,
+        fullName: values.fullName,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        jobTitle: values.jobTitle,
+        qualifications: values.qualifications
+          ? values.qualifications
+              .split(",")
+              .map((item: string) => item.trim())
+              .filter(Boolean)
+          : [],
+        status: values.status,
+      });
+
+      message.success("Cập nhật giảng viên thành công");
+      setEditModalOpen(false);
+      setEditingInstructorId("");
+      setEditingUser(null);
+      editForm.resetFields();
+      fetchConsultants();
+    } catch (error: any) {
+      message.error(
+        error?.response?.data?.message || "Cập nhật giảng viên thất bại",
+      );
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const columns: ColumnsType<Consultant> = [
@@ -118,12 +229,8 @@ const AdminConsultantManager = () => {
       key: "gender",
       render: (gender: string) => {
         const g = (gender || "").toLowerCase();
-        if (g === "male" || g === "nam") {
-          return <Tag color="blue">Nam</Tag>;
-        }
-        if (g === "female" || g === "nữ") {
-          return <Tag color="pink">Nữ</Tag>;
-        }
+        if (g === "male" || g === "nam") return <Tag color="blue">Nam</Tag>;
+        if (g === "female" || g === "nữ") return <Tag color="pink">Nữ</Tag>;
         return <Tag color="default">Khác</Tag>;
       },
     },
@@ -131,18 +238,19 @@ const AdminConsultantManager = () => {
       title: "Vai trò",
       dataIndex: "role",
       key: "role",
-      render: () => <Tag color="purple">Tư vấn viên</Tag>,
+      render: () => <Tag color="cyan">Giảng viên</Tag>,
     },
     {
       title: "Ngày sinh",
       dataIndex: "dob",
       key: "dob",
-      render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
+      render: (date: string) =>
+        date ? new Date(date).toLocaleDateString("vi-VN") : "-",
     },
     {
       title: "Thao tác",
       key: "action",
-      width: 150,
+      width: 220,
       render: (_, record: Consultant) => (
         <Space size="small">
           <Button
@@ -153,12 +261,18 @@ const AdminConsultantManager = () => {
             title="Xem chi tiết"
           />
           <Button
+            icon={<EditOutlined />}
+            size="small"
+            onClick={() => handleOpenEdit(record)}
+            title="Cập nhật"
+          />
+          <Button
             type="primary"
             danger
             icon={<DeleteOutlined />}
             size="small"
             onClick={() => handleDelete(record)}
-            title="Xoá"
+            title="Xóa"
           />
         </Space>
       ),
@@ -169,32 +283,26 @@ const AdminConsultantManager = () => {
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Quản lý Tư vấn viên
-          </h2>
-          <p className="text-gray-600 mt-1">
-            Quản lý đội ngũ tư vấn viên hệ thống
-          </p>
+          <h2 className="text-2xl font-bold text-gray-900">Quản lý giảng viên</h2>
+          <p className="text-gray-600 mt-1">Quản lý đội ngũ giảng viên hệ thống</p>
         </div>
         <Button
           type="primary"
-          size="large"
-          className="bg-[#20558A]"
           icon={<PlusOutlined />}
-          onClick={() => setIsModalOpen(true)}
+          className="bg-primary"
+          onClick={() => setCreateModalOpen(true)}
         >
-          Thêm tư vấn viên mới
+          Thêm yêu cầu giảng viên
         </Button>
       </div>
 
-      {/* Thanh tìm kiếm và filter */}
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <CustomSearch
           onSearch={(keyword) => {
             setCurrent(1);
             setSearchKeyword(keyword);
           }}
-          placeholder="Tìm kiếm tư vấn viên theo tên, email, số điện thoại"
+          placeholder="Tìm kiếm giảng viên theo tên, email, số điện thoại"
           inputWidth="w-96"
         />
         <Select
@@ -213,7 +321,7 @@ const AdminConsultantManager = () => {
       </div>
 
       <div className="mb-4">
-        <Tag color="purple">Tổng cộng: {total} tư vấn viên</Tag>
+        <Tag color="cyan">Tổng cộng: {total} giảng viên</Tag>
       </div>
 
       <Table
@@ -233,21 +341,6 @@ const AdminConsultantManager = () => {
         onChange={handlePageChange}
       />
 
-      <Modal
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={null}
-        width={600}
-      >
-        <AdminCreateConsultantForm
-          onSuccess={() => {
-            setIsModalOpen(false);
-            fetchConsultants();
-          }}
-        />
-      </Modal>
-
-      {/* Modal xoá tư vấn viên */}
       <AdminDeleteConsultant
         open={!!consultantToDelete}
         onClose={() => setConsultantToDelete(null)}
@@ -257,9 +350,10 @@ const AdminConsultantManager = () => {
           fetchConsultants();
         }}
       />
+
       {viewConsultantId && (
         <AdminViewConsultant
-          userId={viewConsultantId} // Sửa lại prop này cho đúng
+          userId={viewConsultantId}
           open={viewModalOpen}
           onClose={() => {
             setViewModalOpen(false);
@@ -267,6 +361,81 @@ const AdminConsultantManager = () => {
           }}
         />
       )}
+
+      <Modal
+        open={createModalOpen}
+        footer={null}
+        onCancel={() => setCreateModalOpen(false)}
+        destroyOnClose
+        width={900}
+        title="Tạo yêu cầu trở thành giảng viên"
+      >
+        <AdminCreateConsultantForm
+          onSuccess={() => {
+            setCreateModalOpen(false);
+            fetchConsultants();
+          }}
+        />
+      </Modal>
+
+      <Modal
+        open={editModalOpen}
+        title={`Cập nhật giảng viên${
+          editingUser?.fullName ? `: ${editingUser.fullName}` : ""
+        }`}
+        onCancel={() => {
+          setEditModalOpen(false);
+          setEditingInstructorId("");
+          setEditingUser(null);
+          editForm.resetFields();
+        }}
+        onOk={() => editForm.submit()}
+        confirmLoading={updating}
+        okText="Lưu thay đổi"
+        cancelText="Hủy"
+        destroyOnClose
+      >
+        <Form form={editForm} layout="vertical" onFinish={handleUpdate}>
+          <Form.Item
+            name="fullName"
+            label="Họ và tên"
+            rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ required: true, message: "Vui lòng nhập email" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item name="phoneNumber" label="Số điện thoại">
+            <Input />
+          </Form.Item>
+
+          <Form.Item name="jobTitle" label="Chức danh">
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="qualifications"
+            label="Bằng cấp / Chứng chỉ"
+            extra="Nhập nhiều giá trị, phân tách bằng dấu phẩy"
+          >
+            <Input.TextArea rows={3} />
+          </Form.Item>
+
+          <Form.Item name="status" label="Trạng thái">
+            <Select>
+              <Option value="Active">Active</Option>
+              <Option value="Inactive">Inactive</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };

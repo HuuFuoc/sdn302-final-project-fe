@@ -113,8 +113,9 @@ const useProtectedRoutes = (): RouteObject[] => {
       ];
       break;
 
+    case UserRole.INSTRUCTOR:
     case UserRole.CONSULTANT:
-      // Consultant has access to consultant routes and customer routes
+      // Instructor has access to consultant routes and customer routes
       protectedRoutes = [
         ...ConsultantRoutes.map(route => ({
           ...route,
@@ -122,7 +123,7 @@ const useProtectedRoutes = (): RouteObject[] => {
             <Suspense>
               <GuardProtectedRoute
                 component={route.element as JSX.Element}
-                allowedRoles={[UserRole.CONSULTANT]}
+                allowedRoles={[UserRole.INSTRUCTOR, UserRole.CONSULTANT]}
               />
             </Suspense>
           )
@@ -133,7 +134,7 @@ const useProtectedRoutes = (): RouteObject[] => {
             <Suspense>
               <GuardProtectedRoute
                 component={route.element as JSX.Element}
-                allowedRoles={[UserRole.CONSULTANT]}
+                allowedRoles={[UserRole.INSTRUCTOR, UserRole.CONSULTANT]}
               />
             </Suspense>
           )

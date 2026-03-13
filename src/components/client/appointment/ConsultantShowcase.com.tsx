@@ -27,7 +27,7 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
             setConsultants(consultantList);
             setFilteredConsultants(consultantList);
         } catch (err) {
-            message.error("Không thể tải danh sách tư vấn viên!");
+            message.error("Không thể tải danh sách giảng viên!");
         } finally {
             setLoading(false);
         }
@@ -54,15 +54,15 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
                         Đội ngũ chuyên gia
                     </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Gặp gỡ những chuyên gia hàng đầu của chúng tôi, sẵn sàng hỗ trợ bạn
-                        với kinh nghiệm phong phú và chuyên môn sâu rộng.
+                        Gặp gỡ đội ngũ giảng viên của chúng tôi, sẵn sàng hỗ trợ bạn
+                        với kinh nghiệm và chuyên môn sâu rộng.
                     </p>
                 </div>
 
                 {/* Search and Filter */}
                 <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-between items-center">
                     <Input
-                        placeholder="Tìm kiếm chuyên gia theo tên, email hoặc mô tả..."
+                        placeholder="Tìm kiếm giảng viên theo tên, email hoặc mô tả..."
                         prefix={<SearchOutlined />}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -83,7 +83,7 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
                 {/* Results Info */}
                 <div className="mb-6">
                     <p className="text-gray-600">
-                        Hiển thị {filteredConsultants.length} trên {consultants.length} chuyên gia
+                        Hiển thị {filteredConsultants.length} trên {consultants.length} giảng viên
                     </p>
                 </div>
 
@@ -91,7 +91,7 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
                 {loading ? (
                     <div className="text-center py-12">
                         <Spin size="large" />
-                        <p className="mt-4 text-gray-600">Đang tải danh sách chuyên gia...</p>
+                        <p className="mt-4 text-gray-600">Đang tải danh sách giảng viên...</p>
                     </div>
                 ) : filteredConsultants.length > 0 ? (
                     <Row gutter={[24, 24]}>
@@ -109,12 +109,12 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
                     <div className="text-center py-12">
                         <div className="text-gray-400 text-6xl mb-4">🔍</div>
                         <h3 className="text-xl font-semibold text-gray-600 mb-2">
-                            Không tìm thấy chuyên gia
+                            Không tìm thấy giảng viên
                         </h3>
                         <p className="text-gray-500">
                             {searchTerm
-                                ? `Không có chuyên gia nào phù hợp với từ khóa "${searchTerm}"`
-                                : "Hiện tại chưa có chuyên gia nào có sẵn"
+                                ? `Không có giảng viên nào phù hợp với từ khóa "${searchTerm}"`
+                                : "Hiện tại chưa có giảng viên nào có sẵn"
                             }
                         </p>
                         {searchTerm && (

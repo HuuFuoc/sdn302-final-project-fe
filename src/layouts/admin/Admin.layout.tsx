@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import SidebarLayout from "./Sidebar.layout";
 import { Outlet, useLocation } from "react-router-dom";
 import {
@@ -45,7 +45,7 @@ const AdminLayout: React.FC = () => {
       "manager-category": "Quản Lý Danh Mục",
       settings: "Cài Đặt",
       analytics: "Thống Kê & Báo Cáo",
-      "staff-consultants": "Nhân Viên & Tư Vấn",
+      "staff-consultants": "Nhân Viên & Giảng Viên",
       permissions: "Phân Quyền Hệ Thống",
       "community-programs": "Chương Trình Cộng Đồng",
       resources: "Tài Nguyên Hỗ Trợ",
@@ -205,3 +205,6 @@ const AdminLayout: React.FC = () => {
 };
 
 export default AdminLayout;
+
+
+

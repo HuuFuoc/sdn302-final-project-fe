@@ -46,10 +46,10 @@ export default function CounselList() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-[#20558A] mb-4">
-          Đội ngũ tư vấn viên chuyên nghiệp
+          Đội ngũ giảng viên
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Tìm hiểu về đội ngũ tư vấn viên giàu kinh nghiệm của chúng tôi,
+          Tìm hiểu về đội ngũ giảng viên giàu kinh nghiệm của chúng tôi,
           sẵn sàng hỗ trợ bạn trong mọi vấn đề.
         </p>
       </div>
@@ -60,7 +60,7 @@ export default function CounselList() {
             <Spin size="large" />
           </div>
         ) : consultants.length === 0 ? (
-          <Empty description="Không có tư vấn viên nào" />
+          <Empty description="Không có giảng viên nào" />
         ) : (
           consultants.map((counsel) => (
             <CounselCard
