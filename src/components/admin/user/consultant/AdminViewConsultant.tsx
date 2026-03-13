@@ -4,7 +4,7 @@ import { ConsultantService } from "../../../../services/consultant/consultant.se
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
 
 interface AdminViewConsultantProps {
-  userId: string; // Đổi tên prop thành userId cho rõ ràng
+  userId: string;
   open: boolean;
   onClose: () => void;
 }
@@ -19,42 +19,38 @@ const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
 
   useEffect(() => {
     if (open && userId) fetchData();
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, userId]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 1. Lấy danh sách consultant
       const res = await ConsultantService.getAllConsultants({
         PageNumber: 1,
         PageSize: 1000,
       });
+
       if (!res.data || !Array.isArray(res.data.data)) {
-        message.error("Không thể tải danh sách tư vấn viên.");
+        message.error("Không thể tải danh sách giảng viên.");
         setConsultant(null);
-        setLoading(false);
         return;
       }
-      // 2. Tìm consultant có userId trùng với userId truyền vào
+
       const found = res.data.data.find((c: Consultant) => c.userId === userId);
       if (!found) {
-        message.error("Không tìm thấy tư vấn viên.");
+        message.error("Không tìm thấy giảng viên.");
         setConsultant(null);
-        setLoading(false);
         return;
       }
-      // 3. Gọi tiếp API getConsultantById với id của consultant
-      const detailRes = await ConsultantService.getConsultantById({
-        id: found.id,
-      });
-      if (detailRes.data && detailRes.data.success) {
+
+      const detailRes = await ConsultantService.getConsultantById({ id: found.id });
+      if (detailRes.data?.success) {
         setConsultant(detailRes.data.data);
       } else {
-        message.error("Không thể tải thông tin tư vấn viên.");
+        message.error("Không thể tải thông tin giảng viên.");
         setConsultant(null);
       }
-    } catch (err) {
+    } catch {
       message.error("Lỗi khi gọi API.");
       setConsultant(null);
     } finally {
@@ -67,7 +63,7 @@ const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
       open={open}
       onCancel={onClose}
       onOk={onClose}
-      title="Chi tiết Tư vấn viên"
+      title="Chi tiết giảng viên"
       width={700}
       centered
     >
@@ -78,40 +74,30 @@ const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
           <Descriptions.Item label="Ảnh đại diện">
             <Avatar src={consultant.profilePicUrl} size={100} />
           </Descriptions.Item>
-          <Descriptions.Item label="Họ và tên">
-            {consultant.fullName}
-          </Descriptions.Item>
-          <Descriptions.Item label="Email">
-            {consultant.email}
-          </Descriptions.Item>
-          <Descriptions.Item label="Số điện thoại">
-            {consultant.phoneNumber}
-          </Descriptions.Item>
-          <Descriptions.Item label="Chức danh">
-            {consultant.jobTitle}
-          </Descriptions.Item>
+          <Descriptions.Item label="Họ và tên">{consultant.fullName}</Descriptions.Item>
+          <Descriptions.Item label="Email">{consultant.email}</Descriptions.Item>
+          <Descriptions.Item label="Số điện thoại">{consultant.phoneNumber}</Descriptions.Item>
+          <Descriptions.Item label="Chức danh">{consultant.jobTitle}</Descriptions.Item>
           <Descriptions.Item label="Trình độ chuyên môn">
-            {consultant.qualifications.join(", ")}
+            {consultant.qualifications?.join(", ")}
           </Descriptions.Item>
           <Descriptions.Item label="Ngày vào làm">
             {new Date(consultant.hireDate).toLocaleDateString("vi-VN")}
           </Descriptions.Item>
           <Descriptions.Item label="Mức lương">
-            {consultant.salary.toLocaleString("vi-VN", {
+            {consultant.salary?.toLocaleString("vi-VN", {
               style: "currency",
               currency: "VND",
             })}
           </Descriptions.Item>
           <Descriptions.Item label="Trạng thái">
             <Tag color={consultant.status === "Active" ? "green" : "red"}>
-              {consultant.status === "Active"
-                ? "Đang hoạt động"
-                : "Ngừng hoạt động"}
+              {consultant.status === "Active" ? "Đang hoạt động" : "Ngừng hoạt động"}
             </Tag>
           </Descriptions.Item>
         </Descriptions>
       ) : (
-        <p>Không tìm thấy tư vấn viên.</p>
+        <p>Không tìm thấy giảng viên.</p>
       )}
     </Modal>
   );

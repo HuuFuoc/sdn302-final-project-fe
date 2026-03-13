@@ -38,9 +38,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const mapBackendRoleToUserRole = (backendRole: any): UserRole | null => {
-  // Backend numeric enum: Admin=0, Staff=1, User=2, Instructor=3
+  // Backend role mapping supports both legacy and current enum/string values.
   switch (backendRole) {
     case 0:
+    case 4:
     case "Admin":
       return UserRole.ADMIN;
     case 1:
@@ -50,6 +51,7 @@ const mapBackendRoleToUserRole = (backendRole: any): UserRole | null => {
     case "User":
       return UserRole.CUSTOMER;
     case 3:
+    case "Consultant":
     case "Instructor":
       return UserRole.INSTRUCTOR;
     default:

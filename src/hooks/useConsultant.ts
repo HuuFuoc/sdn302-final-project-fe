@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+﻿import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { ROUTER_URL } from "../consts/router.path.const";
 import { helpers } from "../utils";
@@ -8,17 +8,31 @@ import type {
   UpdateConsultantRequest,
 } from "../types/consultant/consultant.req.type";
 
-/**
- * Hook for use UpdateConsultant
- */
 export const useUpdateConsultant = () => {
   const navigate = useNavigate();
+
   return useMutation({
     mutationFn: (data: UpdateConsultantRequest) =>
       ConsultantService.updateConsultant(data),
     onSuccess: () => {
+      helpers.notificationMessage("C?p nh?t gi?ng viên thành công", "success");
+      navigate(ROUTER_URL.ADMIN.STAFF_CONSULTANTS);
+    },
+    onError: (error) => {
+      helpers.notificationMessage(error.message, "error");
+    },
+  });
+};
+
+export const useCreateConsultant = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (data: CreateConsultantRequest) =>
+      ConsultantService.createConsultant(data),
+    onSuccess: () => {
       helpers.notificationMessage(
-        "Cập nhập Chuyên viên tư vấn thành công",
+        "G?i yêu c?u tr? thành gi?ng viên thành công",
         "success"
       );
       navigate(ROUTER_URL.ADMIN.STAFF_CONSULTANTS);
@@ -29,23 +43,3 @@ export const useUpdateConsultant = () => {
   });
 };
 
-/**
- * Hook for use CreateConsultant
- */
-export const useCreateConsultant = () => {
-  const navigate = useNavigate();
-  return useMutation({
-    mutationFn: (data: CreateConsultantRequest) =>
-      ConsultantService.createConsultant(data),
-    onSuccess: () => {
-      helpers.notificationMessage(
-        "Tạo Chuyên viên tư vấn thành công",
-        "success"
-      );
-      navigate(ROUTER_URL.ADMIN.STAFF_CONSULTANTS);
-    },
-    onError: (error) => {
-      helpers.notificationMessage(error.message, "error");
-    },
-  });
-};

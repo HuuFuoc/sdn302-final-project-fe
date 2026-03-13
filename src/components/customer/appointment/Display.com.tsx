@@ -62,6 +62,8 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
     };
 
     const role = React.useMemo(() => localStorage.getItem("role") || UserRole.CUSTOMER, []);
+    const isInstructorRole =
+        role === UserRole.INSTRUCTOR || role === UserRole.CONSULTANT;
 
     const [consultants, setConsultants] = React.useState<ConsultantOption[]>([]);
 
@@ -81,7 +83,7 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                     })) as ConsultantOption[];
                     setConsultants(list);
                 })
-                .catch(() => helpers.notificationMessage("Không thể tải danh sách tư vấn viên", "error"));
+                .catch(() => helpers.notificationMessage("Không thể tải danh sách giảng viên", "error"));
         }
     }, [role]);
 
@@ -98,10 +100,10 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
     const handleAssignConsultant = async (appointmentId: string, consultantUserId: string) => {
         try {
             await AppointmentService.assignConsultant({ appointmentId, consultantUserId });
-            helpers.notificationMessage("Gán tư vấn viên thành công", "success");
+            helpers.notificationMessage("Gán giảng viên thành công", "success");
             onRefresh();
         } catch (err) {
-            helpers.notificationMessage("Gán tư vấn viên thất bại", "error");
+            helpers.notificationMessage("Gán giảng viên thất bại", "error");
         }
     };
 
@@ -182,7 +184,7 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
             ),
         },
         {
-            title: <span className="font-semibold text-gray-700">Tư vấn viên</span>,
+            title: <span className="font-semibold text-gray-700">Giảng viên</span>,
             dataIndex: "consultant",
             key: "consultant",
             render: (consultant, record) => {
@@ -190,7 +192,7 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                     return (
                         <Select
                             optionLabelProp="label"
-                            placeholder="Chọn tư vấn viên"
+                            placeholder="Chọn giảng viên"
                             value={consultant?.id}
                             style={{ width: 240 }}
                             className="rounded-lg"
@@ -269,8 +271,8 @@ const AppointmentDisplay: React.FC<DisplayProps> = ({
                     );
                 }
 
-                // Consultant: only allow change from ASSIGNED to PROCESSING / COMPLETED / CANCELLED
-                if (role === UserRole.CONSULTANT && (status === AppointmentStatus.ASSIGNED || status === AppointmentStatus.PROCESSING)) {
+                // Instructor: only allow change from ASSIGNED to PROCESSING / COMPLETED / CANCELLED
+                if (isInstructorRole && (status === AppointmentStatus.ASSIGNED || status === AppointmentStatus.PROCESSING)) {
                     const allowedNext = status === AppointmentStatus.ASSIGNED
                         ? [AppointmentStatus.PROCESSING, AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED]
                         : [AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED];

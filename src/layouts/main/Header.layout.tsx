@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+﻿import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SearchCom from "../../components/common/search.com";
 import { useAuth } from "../../contexts/Auth.context";
@@ -153,7 +153,7 @@ const HeaderLayout = () => {
             key: "consultant-dashboard",
             icon: <DashboardOutlined className="text-blue-600" />,
             label: (
-              <span className="text-gray-700">Bảng điều khiển tư vấn</span>
+              <span className="text-gray-700">Bảng điều khiển giảng viên</span>
             ),
             onClick: () => navigate(ROUTER_URL.CONSULTANT.BASE),
           },
@@ -264,6 +264,8 @@ const HeaderLayout = () => {
         return "text-green-600";
       case UserRole.CONSULTANT:
         return "text-blue-600";
+      case UserRole.INSTRUCTOR:
+        return "text-amber-600";
       case UserRole.CUSTOMER:
         return "text-primary";
       default:
@@ -349,6 +351,7 @@ const HeaderLayout = () => {
                 case UserRole.STAFF:
                   navigate(ROUTER_URL.STAFF.SETTINGS);
                   break;
+                case UserRole.INSTRUCTOR:
                 case UserRole.CONSULTANT:
                   navigate(ROUTER_URL.CONSULTANT.SETTINGS);
                   break;
@@ -497,3 +500,8 @@ const HeaderLayout = () => {
 };
 
 export default HeaderLayout;
+
+
+
+
+

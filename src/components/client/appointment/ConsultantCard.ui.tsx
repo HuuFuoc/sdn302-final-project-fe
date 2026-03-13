@@ -50,7 +50,7 @@ const ConsultantCard: React.FC<ConsultantCardProps> = ({
                 description={
                     <div className="space-y-2">
                         <p className="text-gray-600 text-sm line-clamp-3 mb-3">
-                            {consultant.jobTitle || "Chuyên gia tư vấn với nhiều năm kinh nghiệm"}
+                            {consultant.jobTitle || "Giảng viên với nhiều năm kinh nghiệm"}
                         </p>
 
                         <div className="space-y-1 text-xs">

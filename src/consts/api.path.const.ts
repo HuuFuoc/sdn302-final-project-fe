@@ -17,6 +17,7 @@ export const API_PATH = {
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
     DELETE_USER: (id: string) => `/user/${id}`,
     CREATE_USER: "/user/create",
+    BECOME_INSTRUCTOR: "/user/become-instructor",
   },
   PRODUCT: {
     GET_ALL_PRODUCTS: "/products",
@@ -76,12 +77,21 @@ export const API_PATH = {
     GET_COURSE_BY_ID: (id: string) => `/api/course/${id}`,
     GET_MY_COURSES: "/api/course/myCourses",
   },
+  INSTRUCTOR: {
+    GET_ALL_INSTRUCTORS: "/api/instructor",
+    GET_INSTRUCTOR_BY_ID: (id: string) => `/api/instructor/${id}`,
+    UPDATE_INSTRUCTOR: (id: string) => `/api/instructor/${id}`,
+    DELETE_INSTRUCTOR: (id: string) => `/api/instructor/${id}`,
+    GET_INSTRUCTOR_REQUESTS: "/api/instructor/request",
+    REVIEW_INSTRUCTOR_REQUEST: (requestId: string) =>
+      `/api/instructor/request/${requestId}/review`,
+  },
   CONSULTANT: {
-    GET_ALL_CONSULTANTS: "/consultant",
-    CREATE_CONSULTANT: "/consultant/create",
-    UPDATE_CONSULTANT: (id: string) => `/consultant/${id}`,
-    DELETE_CONSULTANT: (id: string) => `/consultant/${id}`,
-    GET_CONSULTANT_BY_ID: (id: string) => `/consultant/${id}`,
+    GET_ALL_CONSULTANTS: "/api/instructor",
+    CREATE_CONSULTANT: "/user/become-instructor",
+    UPDATE_CONSULTANT: (id: string) => `/api/instructor/${id}`,
+    DELETE_CONSULTANT: (id: string) => `/api/instructor/${id}`,
+    GET_CONSULTANT_BY_ID: (id: string) => `/api/instructor/${id}`,
   },
   CATEGORY: {
     GET_ALL_CATEGORIES: "/api/category",

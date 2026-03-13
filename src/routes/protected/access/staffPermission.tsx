@@ -1,6 +1,8 @@
 import { lazy } from "react";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
+import AdminInstructorRequestManager from "../../../components/admin/user/staff-consultant/AdminInstructorRequestManager";
+import AdminConsultantManager from "../../../components/admin/user/consultant/AdminConsultantManager";
 
 // Lazy load staff pages
 const StaffLayout = lazy(() => import("../../../layouts/staff/Staff.layout"));
@@ -46,12 +48,20 @@ export const StaffRoutes: RouteObject[] = [
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
+                path: ROUTER_URL.STAFF.INSTRUCTORS,
+                element: <AdminConsultantManager />,
+            },
+            {
                 path: "reports",
                 element: <OverviewPage />, // Temporary placeholder
             },
             {
                 path: ROUTER_URL.STAFF.SETTINGS,
                 element: <SettingsPage />,
+            },
+            {
+                path: ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS,
+                element: <AdminInstructorRequestManager />,
             },
         ],
     },

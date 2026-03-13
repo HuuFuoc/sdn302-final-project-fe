@@ -36,6 +36,7 @@ const LoginPage = () => {
         return ROUTER_URL.COMMON.HOME;
       case UserRole.STAFF:
         return ROUTER_URL.COMMON.HOME;
+      case UserRole.INSTRUCTOR:
       case UserRole.CONSULTANT:
         return ROUTER_URL.COMMON.HOME;
       default:

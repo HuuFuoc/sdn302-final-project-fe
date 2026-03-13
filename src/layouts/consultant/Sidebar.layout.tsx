@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Button, message } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -155,7 +155,7 @@ const SidebarLayout: React.FC = () => {
                                 TVC
                             </div>
                             <div className="text-white">
-                                <div className="text-sm font-medium">Tư vấn viên</div>
+                                <div className="text-sm font-medium">Giảng viên</div>
                                 <div className="text-xs text-gray-300">Phòng ngừa ma túy</div>
                             </div>
                         </div>
@@ -210,3 +210,6 @@ const SidebarLayout: React.FC = () => {
 };
 
 export default SidebarLayout;
+
+
+
