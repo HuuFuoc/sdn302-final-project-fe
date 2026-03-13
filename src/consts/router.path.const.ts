@@ -124,4 +124,16 @@ export const ROUTER_URL = {
     PAYMENT_FAIL: "/thanh-toan-that-bai",
     VNPAY_RETURN: "/api/vnpay/return",
   },
+  INSTRUCTOR: {
+    BASE: "/instructor",
+    DASHBOARD: "/instructor/tong-quan",
+    COURSES: "/instructor/khoa-hoc",
+    COURSE_DETAIL: "/instructor/khoa-hoc/:courseId",
+    LESSONS: "/instructor/bai-hoc",
+    LESSON_DETAIL: "/instructor/bai-hoc/:lessonId",
+    STUDENTS: "/instructor/hoc-vien",
+    REVIEWS: "/instructor/danh-gia",
+    REVENUE: "/instructor/doanh-thu",
+    SETTINGS: "/instructor/cai-dat",
+  },
 };

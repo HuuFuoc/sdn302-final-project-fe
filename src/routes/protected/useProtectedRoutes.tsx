@@ -7,6 +7,7 @@ import { CustomerRoutes } from "./access/customerPermission";
 import { ConsultantRoutes } from "./access/consultantPermission";
 import { StaffRoutes } from "./access/staffPermission";
 import { ManagerRoutes } from "./access/managerPermission";
+import { InstructorRoutes } from "./access/instructorPermission";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { useAuth } from "../../contexts/Auth.context";
 import GuardProtectedRoute from "./GuardProtectedRoute";
@@ -133,6 +134,34 @@ const useProtectedRoutes = (): RouteObject[] => {
               <GuardProtectedRoute
                 component={route.element as JSX.Element}
                 allowedRoles={[UserRole.CONSULTANT]}
+              />
+            </Suspense>
+          )
+        }))
+      ];
+      break;
+
+    case UserRole.INSTRUCTOR:
+      // Instructor có layout riêng và cũng được dùng các route customer
+      protectedRoutes = [
+        ...InstructorRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.INSTRUCTOR]}
+              />
+            </Suspense>
+          )
+        })),
+        ...CustomerRoutes.map(route => ({
+          ...route,
+          element: (
+            <Suspense>
+              <GuardProtectedRoute
+                component={route.element as JSX.Element}
+                allowedRoles={[UserRole.INSTRUCTOR]}
               />
             </Suspense>
           )

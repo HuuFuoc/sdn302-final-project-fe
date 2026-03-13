@@ -176,6 +176,27 @@ const HeaderLayout = () => {
         );
         break;
 
+      case UserRole.INSTRUCTOR:
+        items.push(
+          {
+            key: "instructor-dashboard",
+            icon: <DashboardOutlined className="text-amber-600" />,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển giảng viên</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.INSTRUCTOR.BASE),
+          },
+          {
+            key: "instructor-courses",
+            icon: <BookOutlined className="text-amber-600" />,
+            label: (
+              <span className="text-gray-700">Khóa học của tôi</span>
+            ),
+            onClick: () => navigate(ROUTER_URL.INSTRUCTOR.COURSES),
+          }
+        );
+        break;
+
       case UserRole.CUSTOMER:
         items.push(
           {
@@ -223,6 +244,8 @@ const HeaderLayout = () => {
         return "Nhân viên";
       case UserRole.CONSULTANT:
         return "Tư vấn viên";
+      case UserRole.INSTRUCTOR:
+        return "Giảng viên";
       case UserRole.CUSTOMER:
         return "Khách hàng";
       default:

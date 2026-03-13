@@ -32,7 +32,15 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
       setLoading(true);
       try {
         const res = await UserService.getUserById({ userId: instructorId });
-        const raw: any = res.data?.data;
+        const raw = res.data?.data as {
+          _id?: string;
+          id?: string;
+          name?: string;
+          fullName?: string;
+          email?: string;
+          avatar?: string;
+          profilePicUrl?: string;
+        } | null;
 
         if (raw) {
           setInstructor({

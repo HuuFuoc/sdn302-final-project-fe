@@ -38,23 +38,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const mapBackendRoleToUserRole = (backendRole: any): UserRole | null => {
-  // Backend currently sends numeric roles, e.g. 0 for customer
+  // Backend numeric enum: Admin=0, Staff=1, User=2, Instructor=3
   switch (backendRole) {
     case 0:
-    case "Customer":
-      return UserRole.CUSTOMER;
+    case "Admin":
+      return UserRole.ADMIN;
     case 1:
     case "Staff":
       return UserRole.STAFF;
     case 2:
-    case "Manager":
-      return UserRole.MANAGER;
+    case "User":
+      return UserRole.CUSTOMER;
     case 3:
-    case "Consultant":
-      return UserRole.CONSULTANT;
-    case 4:
-    case "Admin":
-      return UserRole.ADMIN;
+    case "Instructor":
+      return UserRole.INSTRUCTOR;
     default:
       return null;
   }
