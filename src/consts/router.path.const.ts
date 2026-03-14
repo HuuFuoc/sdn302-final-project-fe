@@ -36,6 +36,7 @@ export const ROUTER_URL = {
   CONSULTANT: {
     BASE: "/instructor",
     OVERVIEW: "/instructor/tong-quan",
+    COURSES: "/instructor/khoa-hoc",
     USERS: "/instructor/khach-hang",
     SETTINGS: "/instructor/cai-dat",
     APPOINTMENTS: "/instructor/lich-hen-tu-van",

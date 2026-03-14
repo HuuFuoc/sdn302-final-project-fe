@@ -11,18 +11,12 @@ export interface CourseRequest {
 }
 export interface CreateCourseRequest {
   name: string;
-  categoryId: string;
+  slug: string;
+  user_id: string;
+  category_id: string;
   content: string;
-  status: CourseStatus;
-  targetAudience: CourseTargetAudience;
-  videoUrls: string[];
-  imageUrls: string[];
   price: number;
   discount: number;
-  createdAt: string;
-  updatedAt: string;
-  slug: string;
-  riskLevel: RiskLevel;
 }
 
 export interface UpdateCourseRequest {
