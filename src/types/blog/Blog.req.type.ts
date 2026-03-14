@@ -21,3 +21,8 @@ export interface DeleteBlogRequest {
 export interface GetBlogByIdRequest {
   id: string;
 }
+
+export interface GetBlogByUserIdRequest {
+  userId?: string;
+  user_id?: string;
+}
