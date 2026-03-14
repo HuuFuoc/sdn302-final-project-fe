@@ -14,6 +14,7 @@ import {
 import type { Course } from "../../../../types/course/Course.res.type";
 import { formatCurrency } from "../../../../utils/helper";
 import AddToCartButton from "../../../common/addToCartButton.com";
+import noImage from "../../../../assets/images/no-image.svg";
 
 const { Title, Text } = Typography;
 
@@ -73,11 +74,13 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
           {/* Course Image */}
           <div className="relative">
             <img
-              src={course.imageUrls?.[0] || "/no-image.png"}
+              src={course.imageUrls?.[0] || noImage}
               alt={course.name}
               className="w-full h-48 object-cover"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+                const image = e.currentTarget as HTMLImageElement;
+                image.onerror = null;
+                image.src = noImage;
               }}
             />
             {discountPercentage > 0 && (

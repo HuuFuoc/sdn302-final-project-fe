@@ -12,6 +12,7 @@ import type { Course } from "../../../../types/course/Course.res.type";
 import { ROUTER_URL } from "../../../../consts/router.path.const";
 import { formatCurrency } from "../../../../utils/helper";
 import AddToCartButton from "../../../common/addToCartButton.com";
+import noImage from "../../../../assets/images/no-image.svg";
 
 const { Paragraph, Text } = Typography;
 
@@ -71,11 +72,13 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({
         {/* Header Image */}
         <div className="relative h-48 overflow-hidden">
           <img
-            src={course.imageUrls?.[0] || "/no-image.png"}
+            src={course.imageUrls?.[0] || noImage}
             alt={course.name}
             className="w-full h-full object-cover"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+              const image = e.currentTarget as HTMLImageElement;
+              image.onerror = null;
+              image.src = noImage;
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

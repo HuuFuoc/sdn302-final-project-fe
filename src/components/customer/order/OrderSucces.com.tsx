@@ -6,6 +6,7 @@ import { CourseService } from "../../../services/course/course.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
 import { OrderStatus } from "../../../app/enums/orderStatus.enum";
 import CustomSearch from "../../common/CustomSearch.com";
+import noImage from "../../../assets/images/no-image.svg";
 
 const PAGE_SIZE = 8;
 
@@ -281,8 +282,13 @@ const OrderSuccessList: React.FC = () => {
                       }}
                     >
                       <img
-                        src={course?.imageUrls?.[0] || "/no-image.png"}
+                        src={course?.imageUrls?.[0] || noImage}
                         alt={d.courseName}
+                        onError={(e) => {
+                          const image = e.currentTarget as HTMLImageElement;
+                          image.onerror = null;
+                          image.src = noImage;
+                        }}
                         style={{
                           width: 56,
                           height: 56,

@@ -7,6 +7,7 @@ import { helpers } from "../utils";
 import { HttpException } from "../app/exceptions/http.exception";
 import { HTTP_STATUS } from "../app/enums/http.enum";
 import { clearLocalStorage } from "../utils/storage";
+import noImage from "../assets/images/no-image.svg";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -62,7 +63,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           courseImageUrl:
             item.course?.imageUrl ||
             item.course?.imageUrls?.[0] ||
-            "/no-image.png",
+            noImage,
           price: item.price,
           discount: item.discount,
           status: "PENDING" as any,

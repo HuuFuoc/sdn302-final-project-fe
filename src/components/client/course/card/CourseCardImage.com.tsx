@@ -2,6 +2,7 @@ import React from "react";
 import { Badge } from "antd";
 import { PlayCircleOutlined } from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
+import noImage from "../../../../assets/images/no-image.svg";
 
 interface CourseCardImageProps {
   course: Course;
@@ -32,10 +33,12 @@ const CourseCardImage: React.FC<CourseCardImageProps> = ({
       ) : null}
       <img
         alt={course.name}
-        src={course.imageUrls?.[0] || "/no-image.png"}
+        src={course.imageUrls?.[0] || noImage}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         onError={(e) => {
-          (e.currentTarget as HTMLImageElement).src = "/no-image.png";
+          const image = e.currentTarget as HTMLImageElement;
+          image.onerror = null;
+          image.src = noImage;
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
