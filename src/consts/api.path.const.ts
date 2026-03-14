@@ -27,11 +27,11 @@ export const API_PATH = {
     DELETE_PRODUCT: (id: string) => `/products/delete/${id}`,
   },
   BLOG: {
-    GET_ALL_BLOGS: "/blog",
+    GET_ALL_BLOGS: "/api/blog",
     CREATE_BLOG: "/blog/create",
     DELETE_BLOG: (id: string) => `/blog/${id}`,
     UPDATE_BLOG: (id: string) => `/blog/${id}`,
-    GET_BLOG_BY_ID: (id: string) => `/blog/${id}`,
+    GET_BLOG_BY_ID: (id: string) => `/api/blog/${id}`,
     GET_BLOG_BY_USER_ID: (userId: string) => `/blog/user/${userId}`,
   },
   APPOINTMENT: {
