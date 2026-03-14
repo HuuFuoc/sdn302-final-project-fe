@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import type { Course } from "../../../types/course/Course.res.type";
 import { useUpdateCourse } from "../../../hooks/useCourse";
 import { BaseService } from "../../../app/api/base.service";
-import { CategoryService } from "../../../services/category/category.service";
-import type { Category } from "../../../types/category/Category.res.type";
 import { CourseStatus } from "../../../app/enums/courseStatus.enum";
 import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
 import { RiskLevel } from "../../../app/enums/riskLevel.enum";
@@ -27,52 +25,24 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   const [videoUrls, setVideoUrls] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState("");
-  const [categoryId, setCategoryId] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
-  const [riskLevel, setRiskLevel] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [status, setStatus] = useState<CourseStatus>(CourseStatus.DRAFT);
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [catLoading, setCatLoading] = useState(false);
-
-  // Đồng bộ props.course vào state khi có thay đổi
   useEffect(() => {
     if (course) {
       setTitle(course.name || "");
       setContent(course.content || "");
       setImageUrls(course.imageUrls || []);
       setVideoUrls(course.videoUrls || []);
-      setCategoryId(course.categoryId || "");
       setTargetAudience(course.targetAudience || "");
-      setRiskLevel(course.riskLevel ?? "");
       setPrice(course.price || 0);
       setDiscount(course.discount || 0);
-      // Luôn lấy ảnh đầu tiên của course khi mở form
       setPreviewImage(course.imageUrls?.[0] || "");
       setStatus(course.status || CourseStatus.DRAFT);
     }
   }, [course]);
-
-  // Load danh mục
-  useEffect(() => {
-    const fetchCategories = async () => {
-      setCatLoading(true);
-      try {
-        const res = await CategoryService.getAllCategories({
-          pageNumber: 1,
-          pageSize: 100,
-        });
-        setCategories(res.data?.data || []);
-      } catch {
-        message.error("Không thể tải danh mục!");
-      } finally {
-        setCatLoading(false);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -81,7 +51,6 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       setPreviewImage(URL.createObjectURL(selected));
     } else {
       setFile(null);
-      // Nếu không chọn file mới, luôn lấy ảnh đầu tiên của course
       setPreviewImage(course.imageUrls?.[0] || "");
     }
   };
@@ -89,14 +58,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !title.trim() ||
-      !content.trim() ||
-      !categoryId ||
-      !targetAudience ||
-      !riskLevel ||
-      !status
-    ) {
+    if (!title.trim() || !content.trim() || !targetAudience || !status) {
       message.warning("Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
@@ -119,9 +81,9 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         id: course.id,
         name: title,
         content,
-        categoryId,
+        categoryId: course.categoryId,
         targetAudience: targetAudience as CourseTargetAudience,
-        riskLevel: riskLevel as RiskLevel,
+        riskLevel: (course.riskLevel || RiskLevel.LOW) as RiskLevel,
         imageUrls: updatedImageUrls,
         videoUrls,
         price,
@@ -146,16 +108,14 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl mx-auto p-6 bg-white rounded-xl   space-y-6"
+      className="max-w-xl mx-auto p-6 bg-white rounded-xl space-y-6"
     >
       <h2 className="text-2xl font-bold text-blue-800 text-center">
         Cập nhật khóa học
       </h2>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Tên khóa học
-        </label>
+        <label className="block mb-2 font-semibold text-gray-700">Tên khóa học</label>
         <input
           type="text"
           value={title}
@@ -166,68 +126,8 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       </div>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Nội dung khóa học
-        </label>
-
+        <label className="block mb-2 font-semibold text-gray-700">Nội dung khóa học</label>
         <Editor value={content} onChange={(value) => setContent(value)} />
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Danh mục
-        </label>
-        <select
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-          disabled={catLoading}
-          required
-        >
-          <option value="">-- Chọn danh mục --</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Đối tượng
-        </label>
-        <select
-          value={targetAudience}
-          onChange={(e) => setTargetAudience(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-          required
-        >
-          <option value="">-- Chọn đối tượng --</option>
-          <option value={CourseTargetAudience.STUDENT}>Học sinh</option>
-          <option value={CourseTargetAudience.UNIVERSITY_STUDENT}>
-            Sinh viên
-          </option>
-          <option value={CourseTargetAudience.PARENT}>Phụ huynh</option>
-          <option value={CourseTargetAudience.GENERAL_PUBLIC}>Cộng đồng</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Mức độ rủi ro
-        </label>
-        <select
-          value={riskLevel}
-          onChange={(e) => setRiskLevel(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-          required
-        >
-          <option value="">-- Chọn mức độ rủi ro --</option>
-          <option value={RiskLevel.LOW}>Thấp</option>
-          <option value={RiskLevel.MEDIUM}>Trung bình</option>
-          <option value={RiskLevel.HIGH}>Cao</option>
-        </select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -241,9 +141,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
           />
         </div>
         <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Giảm giá
-          </label>
+          <label className="block mb-2 font-semibold text-gray-700">Giảm giá</label>
           <input
             type="number"
             value={discount}
@@ -254,9 +152,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       </div>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Ảnh minh họa
-        </label>
+        <label className="block mb-2 font-semibold text-gray-700">Ảnh minh họa</label>
         <div className="flex items-center gap-4 flex-wrap">
           <input
             type="file"
@@ -275,9 +171,23 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       </div>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">
-          Trạng thái khóa học
-        </label>
+        <label className="block mb-2 font-semibold text-gray-700">Đối tượng</label>
+        <select
+          value={targetAudience}
+          onChange={(e) => setTargetAudience(e.target.value)}
+          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
+          required
+        >
+          <option value="">-- Chọn đối tượng --</option>
+          <option value={CourseTargetAudience.STUDENT}>Học sinh</option>
+          <option value={CourseTargetAudience.UNIVERSITY_STUDENT}>Sinh viên</option>
+          <option value={CourseTargetAudience.PARENT}>Phụ huynh</option>
+          <option value={CourseTargetAudience.GENERAL_PUBLIC}>Cộng đồng</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block mb-2 font-semibold text-gray-700">Trạng thái khóa học</label>
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value as CourseStatus)}
@@ -285,9 +195,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
           required
         >
           <option value={CourseStatus.DRAFT}>Nháp (draft)</option>
-          <option value={CourseStatus.PUBLISHED}>
-            Đã xuất bản (published)
-          </option>
+          <option value={CourseStatus.PUBLISHED}>Đã xuất bản (published)</option>
           <option value={CourseStatus.ARCHIVED}>Lưu trữ (archived)</option>
         </select>
       </div>

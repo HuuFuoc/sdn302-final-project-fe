@@ -3,6 +3,18 @@ import type { PromiseState } from "../../app/api/base.service";
 import { axiosInstance } from "../../app/api/base.service";
 import type { ResponseSuccess } from "../../app/interface";
 import type { Consultant } from "../../types/consultant/consultant.res.type";
+import type {
+  InstructorCourseSalesSummaryResponseData,
+  InstructorOrderHistoryResponseData,
+} from "../../types/consultant/instructorRevenue.res.type";
+import type {
+  CourseDetailRequest,
+  CourseRequest,
+  CreateCourseRequest,
+  DeleteCourseRequest,
+  UpdateCourseRequest,
+} from "../../types/course/Course.req.type";
+import type { Course, CourseDetailResponse } from "../../types/course/Course.res.type";
 import { API_PATH } from "../../consts/api.path.const";
 import type {
   BecomeInstructorRequest,
@@ -76,6 +88,53 @@ export const ConsultantService = {
     return BaseService.get<ResponseSuccess<any[]>>({
       url: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_REQUESTS,
       payload: params,
+    });
+  },
+
+  getInstructorOrderHistory() {
+    return BaseService.get<ResponseSuccess<InstructorOrderHistoryResponseData>>({
+      url: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_ORDER_HISTORY,
+    });
+  },
+
+  getInstructorCourseSalesSummary() {
+    return BaseService.get<ResponseSuccess<InstructorCourseSalesSummaryResponseData>>({
+      url: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_COURSE_SALES_SUMMARY,
+    });
+  },
+
+  getInstructorCourses(params: CourseRequest) {
+    return BaseService.get<ResponseSuccess<Course[]>>({
+      url: API_PATH.COURSE.GET_ALL_COURSES,
+      payload: params,
+    });
+  },
+
+  createInstructorCourse(params: CreateCourseRequest) {
+    return BaseService.post<ResponseSuccess<Course>>({
+      url: API_PATH.INSTRUCTOR.CREATE_INSTRUCTOR_COURSE,
+      payload: params,
+    });
+  },
+
+  updateInstructorCourse(params: UpdateCourseRequest) {
+    return BaseService.put<ResponseSuccess<Course>>({
+      url: API_PATH.INSTRUCTOR.UPDATE_INSTRUCTOR_COURSE(params.id),
+      payload: params,
+    });
+  },
+
+  deleteInstructorCourse(params: DeleteCourseRequest) {
+    return BaseService.remove<ResponseSuccess<void>>({
+      url: API_PATH.INSTRUCTOR.DELETE_INSTRUCTOR_COURSE(params.id),
+      payload: params,
+    });
+  },
+
+  getInstructorCourseById(param: CourseDetailRequest) {
+    return BaseService.get<ResponseSuccess<CourseDetailResponse>>({
+      url: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_COURSE_DETAIL(param.id),
+      payload: param,
     });
   },
 
