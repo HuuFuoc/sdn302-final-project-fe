@@ -1,5 +1,6 @@
 import React from "react";
-import { Row, Col, Card, Image, Typography, Spin, Pagination, Select, Button, Modal, Tag } from "antd";
+import { Row, Col, Card, Image, Typography, Pagination, Select, Button, Modal, Tag } from "antd";
+import { SectionLoader } from "../../../components/common/loaders";
 import { PlayCircleOutlined, CheckCircleOutlined, LockOutlined, CalendarOutlined, UserOutlined, TagOutlined, FireOutlined, HeartOutlined, BookOutlined, MessageOutlined } from "@ant-design/icons";
 import { ProgramService } from "../../../services/program/program.service";
 import type { Program, ProgramEnrollment } from "../../../types/program/Program.type";
@@ -210,66 +211,41 @@ const ClientProgramPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* Hero Section with Hyperspeed Effect */}
-      <div className="relative h-[500px] bg-black overflow-hidden hyperspeed-container">
-        {/* Hyperspeed Lines */}
-        <div className="hyperspeed-lines">
-          {Array.from({ length: 200 }, (_, i) => (
-            <div key={i} className="hyperspeed-line" style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              animationDuration: `${0.5 + Math.random() * 1}s`
-            }}></div>
-          ))}
-        </div>
-
-        {/* Floating Stars */}
-        <div className="stars">
-          {Array.from({ length: 100 }, (_, i) => (
-            <div key={i} className="star" style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 2}s`
-            }}></div>
-          ))}
-        </div>
-
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 to-indigo-900/80"></div>
-
-        {/* Center Glow Effect */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+    <div className="min-h-screen bg-gradient-to-br from-[#e8f4fc] via-white to-[#efe6fc]/50">
+      {/* Hero Section - creative, kid-friendly */}
+      <div className="relative h-[420px] bg-gradient-to-br from-[#1A8FE3] via-[#6610F2] to-[#6610F2] overflow-hidden rounded-b-3xl">
+        {/* Soft decorative circles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[10%] left-[5%] w-40 h-40 rounded-full bg-white/10" />
+          <div className="absolute top-[20%] right-[10%] w-24 h-24 rounded-full bg-[#E6C229]/20" />
+          <div className="absolute bottom-[15%] left-[15%] w-32 h-32 rounded-full bg-white/5" />
+          <div className="absolute bottom-[25%] right-[20%] w-20 h-20 rounded-full bg-[#F17105]/15" />
         </div>
 
         {/* Content */}
         <div className="relative z-10 flex items-center justify-center h-full px-6">
           <div className="text-center max-w-4xl mx-auto">
             <div className="hero-title-container mb-6">
-              <Title level={1} className="!text-white !mb-0 !text-5xl !font-bold hero-title">
-                Khám Phá Chương Trình Nổi Bật
+              <Title level={1} className="!text-white !mb-0 !text-4xl md:!text-5xl !font-bold hero-title">
+                Hoạt Động Sáng Tạo
               </Title>
               <div className="hero-title-glow"></div>
             </div>
 
             <div className="hero-subtitle-container">
-              <Paragraph className="!text-white/90 !text-xl !mb-8 max-w-3xl mx-auto hero-subtitle">
-                Tham gia hành trình phát triển bản thân với các chương trình chất lượng cao,
-                được thiết kế đặc biệt để giúp bạn đạt được mục tiêu của mình.
+              <Paragraph className="!text-white/95 !text-lg md:!text-xl !mb-8 max-w-3xl mx-auto hero-subtitle">
+                Cùng bé tham gia các chương trình vẽ, sáng tạo và giao lưu với bạn bè. 
+                Nội dung phong phú, an toàn và vui nhộn dành cho thiếu nhi.
               </Paragraph>
             </div>
 
-            {/* Floating Action Button */}
             <div className="floating-cta">
               <Button
                 type="primary"
                 size="large"
-                className="bg-primary border-0 px-8 py-6 h-auto text-lg font-semibold rounded-full shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105 transition-all duration-300"
+                className="bg-[#E6C229] hover:bg-[#c9a822] border-0 text-gray-800 px-8 py-6 h-auto text-lg font-semibold rounded-2xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
               >
-                Bắt đầu ngay
+                Khám phá ngay
               </Button>
             </div>
           </div>
@@ -304,7 +280,7 @@ const ClientProgramPage: React.FC = () => {
               ))}
             </Select>
             <Select
-              placeholder="⚡ Mức độ nguy hiểm"
+              placeholder="⚡ Mức độ phù hợp"
               style={{ width: "100%" }}
               size="large"
               onChange={(value) => setRiskFilter(value as RiskLevel)}
@@ -326,12 +302,9 @@ const ClientProgramPage: React.FC = () => {
 
         {/* Programs Grid */}
         {loading ? (
-          <div className="flex justify-center items-center py-32">
-            <div className="text-center">
-              <Spin size="large" />
-              <div className="mt-4 text-gray-500">Đang tải chương trình...</div>
-            </div>
-          </div>
+          <SectionLoader className="py-32">
+            <div className="text-gray-500">Đang tải chương trình...</div>
+          </SectionLoader>
         ) : (
           <Row gutter={[24, 24]}>
             {programs.map((p) => {
@@ -404,7 +377,7 @@ const ClientProgramPage: React.FC = () => {
                       <Meta
                         title={
                           <div className="mb-2">
-                            <span className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+                            <span className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-[#1A8FE3] transition-colors duration-300">
                               {p.name}
                             </span>
                           </div>
@@ -505,7 +478,7 @@ const ClientProgramPage: React.FC = () => {
                 setTypeFilter(undefined);
                 setRiskFilter(undefined);
               }}
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-[#1A8FE3] hover:bg-[#1572b6] rounded-xl"
             >
               Xóa bộ lọc
             </Button>
@@ -586,7 +559,7 @@ const ClientProgramPage: React.FC = () => {
         .hero-title {
           position: relative;
           z-index: 2;
-          text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+          text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
           animation: hero-title-glow 3s ease-in-out infinite alternate;
         }
 
@@ -597,18 +570,18 @@ const ClientProgramPage: React.FC = () => {
           transform: translateX(-50%);
           width: 100%;
           height: 100%;
-          background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+          background: linear-gradient(45deg, #1A8FE3, #6610F2, #E6C229);
           filter: blur(20px);
-          opacity: 0.3;
+          opacity: 0.25;
           animation: hero-glow-pulse 2s ease-in-out infinite;
         }
 
         @keyframes hero-title-glow {
           0% {
-            text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
           }
           100% {
-            text-shadow: 0 0 30px rgba(96, 165, 250, 0.8), 0 0 40px rgba(139, 92, 246, 0.3);
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 0 0 40px rgba(230, 194, 41, 0.2);
           }
         }
 
@@ -658,11 +631,11 @@ const ClientProgramPage: React.FC = () => {
           border: 1px solid #e5e7eb;
         }
         .custom-pagination .ant-pagination-item:hover {
-          border-color: #3b82f6;
+          border-color: #1A8FE3;
         }
         .custom-pagination .ant-pagination-item-active {
-          background: linear-gradient(135deg, #3b82f6, #6366f1);
-          border-color: #3b82f6;
+          background: linear-gradient(135deg, #1A8FE3, #6610F2);
+          border-color: #1A8FE3;
         }
         .custom-pagination .ant-pagination-item-active a {
           color: white;

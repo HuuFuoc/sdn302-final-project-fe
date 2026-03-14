@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Row, Col, Spin, Button, Typography, message } from "antd";
+import { Row, Col, Button, Typography, message } from "antd";
+import { SectionLoader } from "../../common/loaders";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 import { CourseService } from "../../../services/course/course.service";
 import { ReviewService } from "../../../services/review/review.service";
@@ -325,11 +326,7 @@ const CourseDetail: React.FC = () => {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spin size="large" />
-      </div>
-    );
+    return <SectionLoader className="min-h-screen" />;
   }
 
   // Error state

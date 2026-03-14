@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import CounselCard from "./CounselCard.com";
 import type { Consultant } from "../../../types/consultant/consultant.res.type";
-import { Spin, Empty } from "antd";
+import { Empty } from "antd";
+import { SectionLoader } from "../../common/loaders";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
 import CustomPagination from "../../common/Pagiation.com";
 
@@ -56,9 +57,7 @@ export default function CounselList() {
 
       <div className="space-y-6">
         {loading ? (
-          <div className="flex justify-center py-8">
-            <Spin size="large" />
-          </div>
+          <SectionLoader className="min-h-0 py-8" />
         ) : consultants.length === 0 ? (
           <Empty description="Không có giảng viên nào" />
         ) : (

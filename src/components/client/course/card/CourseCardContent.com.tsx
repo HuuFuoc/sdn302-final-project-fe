@@ -44,7 +44,7 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({
       <div>
         <div className="flex items-center justify-between mb-3">
           <Tag
-            color="blue"
+            color="#1A8FE3"
             className="text-xs font-medium px-3 py-1 rounded-full"
           >
             <UserOutlined className="mr-1" />
@@ -56,7 +56,7 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({
           </div>
         </div>
 
-        <h3 className="text-lg font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem] leading-tight group-hover:text-blue-600 transition-colors duration-300">
+        <h3 className="text-lg font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem] leading-tight group-hover:text-[#1A8FE3] transition-colors duration-300">
           {course.name}
         </h3>
 
@@ -84,14 +84,14 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({
                 </span>
               </>
             ) : (
-              <span className="text-xl font-bold text-blue-600">
+              <span className="text-xl font-bold text-[#1A8FE3]">
                 {formatCurrency(course.price)}
               </span>
             )}
           </div>
         </div>
 
-        <div className="mt-3 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+        <div className="mt-3 h-1 bg-gradient-to-r from-[#1A8FE3] to-[#6610F2] rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
       </div>
     </div>
   );

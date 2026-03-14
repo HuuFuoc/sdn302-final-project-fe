@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Modal,
   Typography,
-  Spin,
   Image,
   Tag,
   Avatar,
@@ -12,6 +11,7 @@ import {
   Col,
   Statistic,
 } from "antd";
+import { InlineLoader } from "../../../common/loaders";
 import {
   BookOutlined,
   PlayCircleOutlined,
@@ -187,9 +187,7 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
       }
     >
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Spin size="large" />
-        </div>
+        <InlineLoader />
       ) : lesson ? (
         <div className="space-y-8">
           {/* Header Section */}

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   Modal,
   Typography,
-  Spin,
   message,
   Card,
   Row,
@@ -11,6 +10,7 @@ import {
   Avatar,
   Tag,
 } from "antd";
+import { InlineLoader } from "../../../common/loaders";
 import {
   BookOutlined,
   ClockCircleOutlined,
@@ -101,9 +101,7 @@ const ViewSession: React.FC<ViewSessionProps> = ({
       }
     >
       {loading ? (
-        <div className="flex justify-center py-16">
-          <Spin size="large" />
-        </div>
+        <InlineLoader />
       ) : session ? (
         <div className="space-y-8">
           {/* Header Section */}

@@ -173,7 +173,7 @@ const SidebarLayout: React.FC = () => {
                 </div>
                 <div className="text-white">
                   <div className="text-sm font-medium">Khách hàng</div>
-                  <div className="text-xs text-gray-300">Phòng ngừa ma túy</div>
+                  <div className="text-xs text-gray-300">Mỹ thuật thiếu nhi</div>
                 </div>
               </div>
             </Link>

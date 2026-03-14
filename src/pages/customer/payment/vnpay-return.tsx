@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Spin } from "antd";
+import { SectionLoader } from "../../../components/common/loaders";
 import { BaseService } from "../../../app/api/base.service";
 import { API_PATH } from "../../../consts/api.path.const";
 import { ROUTER_URL } from "../../../consts/router.path.const";
@@ -41,13 +41,12 @@ const VnpayReturnPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="flex flex-col items-center space-y-4">
-        <Spin size="large" />
+    <div className="min-h-screen">
+      <SectionLoader className="min-h-screen">
         <p className="text-gray-600 text-base">
           Đang xử lý kết quả thanh toán VNPAY, vui lòng chờ trong giây lát...
         </p>
-      </div>
+      </SectionLoader>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Spin, message, Button, Input } from "antd";
+import { Row, Col, message, Button, Input } from "antd";
+import { SectionLoader } from "../../../components/common/loaders";
 import { SearchOutlined, ReloadOutlined } from "@ant-design/icons";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
 import type { Consultant } from "../../../types/consultant/consultant.res.type";
@@ -89,10 +90,9 @@ const ConsultantShowcase: React.FC<ConsultantShowcaseProps> = ({ onBookAppointme
 
                 {/* Consultants Grid */}
                 {loading ? (
-                    <div className="text-center py-12">
-                        <Spin size="large" />
-                        <p className="mt-4 text-gray-600">Đang tải danh sách giảng viên...</p>
-                    </div>
+                    <SectionLoader className="py-12 min-h-0">
+                        <p className="text-gray-600">Đang tải danh sách giảng viên...</p>
+                    </SectionLoader>
                 ) : filteredConsultants.length > 0 ? (
                     <Row gutter={[24, 24]}>
                         {filteredConsultants.map((consultant) => (

@@ -92,7 +92,7 @@ const navSections = [
         to: ROUTER_URL.ADMIN.MANAGER_COURSE,
         icon: <BookOutlined />,
         badge: "23",
-        description: "Khóa học phòng chống ma túy",
+        description: "Khóa học vẽ & mỹ thuật",
       },
       {
         name: "Quản Lý Danh Mục",

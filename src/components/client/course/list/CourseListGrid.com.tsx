@@ -1,5 +1,6 @@
 import React from "react";
-import { Spin, Empty, Row, Col } from "antd";
+import { Empty, Row, Col } from "antd";
+import { SectionLoader } from "../../../common/loaders";
 import { motion } from "framer-motion";
 import type { Course } from "../../../../types/course/Course.res.type";
 import CourseCard from "../card/CourseCardMain.com.tsx";
@@ -25,11 +26,7 @@ const CourseListGrid: React.FC<CourseListGridProps> = ({
   onPageChange,
 }) => {
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Spin size="large" />
-      </div>
-    );
+    return <SectionLoader className="min-h-0 py-20" />;
   }
 
   if (courses.length === 0) {

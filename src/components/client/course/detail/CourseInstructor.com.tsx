@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Card, Avatar, Spin } from "antd";
+import { Typography, Card, Avatar } from "antd";
+import { InlineLoader } from "../../../../components/common/loaders";
 import {
   UserOutlined,
   MailOutlined,
@@ -64,7 +65,7 @@ const CourseInstructor: React.FC<CourseInstructorProps> = ({
   if (loading) {
     return (
       <Card className="border-0 shadow-sm" style={{ borderRadius: 16 }}>
-        <Spin />
+        <InlineLoader />
       </Card>
     );
   }

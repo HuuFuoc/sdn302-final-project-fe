@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Select, message, Spin } from "antd";
+import { Form, Input, Button, Select, message } from "antd";
+import { InlineLoaderSmall } from "../../../common/loaders";
 import { ConsultantService } from "../../../../services/consultant/consultant.service";
 import { UserService } from "../../../../services/user/user.service";
 import type { UserResponse } from "../../../../types/user/User.res.type";
@@ -87,7 +88,7 @@ const AdminCreateConsultantForm: React.FC<{ onSuccess?: () => void }> = ({
           rules={[{ required: true, message: "Vui lòng chọn người dùng" }]}
         >
           {loadingUsers ? (
-            <Spin />
+            <InlineLoaderSmall />
           ) : (
             <Select
               placeholder="Chọn người dùng"

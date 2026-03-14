@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Typography, Spin, Button, Tag, Space } from 'antd';
+import { Card, Typography, Button, Tag, Space } from 'antd';
+import { SectionLoader } from '../../../components/common/loaders';
 import { SurveyService } from '../../../services/survey/survey.service';
 import { QuestionService } from '../../../services/question/question.service';
 import { SurveyType } from '../../../app/enums/surveyType.enum';
@@ -35,7 +36,7 @@ const ClientSurvey: React.FC = () => {
     }, [surveyId]);
 
     if (loading) {
-        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}><Spin size="large" /></div>;
+        return <SectionLoader />;
     }
 
     if (!survey) {

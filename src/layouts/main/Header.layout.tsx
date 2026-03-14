@@ -1,4 +1,4 @@
-﻿import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SearchCom from "../../components/common/search.com";
 import { useAuth } from "../../contexts/Auth.context";
@@ -41,9 +41,9 @@ const HeaderLayout = () => {
   const navItems = [
     { name: "Trang Chủ", path: "/" },
     { name: "Khóa Học", path: ROUTER_URL.CLIENT.COURSE },
-    { name: "Đánh Giá Nguy Cơ", path: ROUTER_URL.CLIENT.ASSESSMENT },
-    { name: "Tư Vấn", path: ROUTER_URL.CLIENT.APPOINTMENTS },
-    { name: "Chương Trình Cộng Đồng", path: ROUTER_URL.CLIENT.PROGRAM },
+    { name: "Khám Phá Năng Khiếu", path: ROUTER_URL.CLIENT.ASSESSMENT },
+    { name: "Gặp Giáo Viên", path: ROUTER_URL.CLIENT.APPOINTMENTS },
+    { name: "Hoạt Động Sáng Tạo", path: ROUTER_URL.CLIENT.PROGRAM },
     { name: "Blog", path: ROUTER_URL.CLIENT.BLOG },
     { name: "Về Chúng Tôi", path: ROUTER_URL.COMMON.ABOUT },
   ];
@@ -405,14 +405,13 @@ const HeaderLayout = () => {
       <div className="bg-white p-4 flex justify-between items-center shadow-md">
         <div className="flex items-center transition-transform hover:scale-105 duration-300">
           <div className="mr-2">
-            <div className="bg-primary rounded p-2 text-white font-bold transform hover:rotate-3 transition-transform">
-              PDP
+            <div className="bg-primary rounded-xl p-2 text-white font-bold transform hover:rotate-3 transition-transform shadow-md">
+              Art
             </div>
-            {/* Prevention Drug Program */}
           </div>
           <div className="text-gray-700 font-title">
-            <div className="text-lg font-medium">Phòng Ngừa</div>
-            <div className="text-md">Ma Túy Cộng Đồng</div>
+            <div className="text-lg font-medium">Học Vẽ</div>
+            <div className="text-md">Mỹ Thuật Thiếu Nhi</div>
           </div>
         </div>
 
@@ -420,7 +419,7 @@ const HeaderLayout = () => {
           <SearchCom />
 
           {/* Cart Icon */}
-          <Badge count={cartCount} size="small" color="#f50">
+          <Badge count={cartCount} size="small" color="#F17105">
             <Link
               to={ROUTER_URL.CLIENT.CART}
               className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md transition-colors"
@@ -450,13 +449,13 @@ const HeaderLayout = () => {
             <div className="flex gap-2">
               <Link
                 to={ROUTER_URL.AUTH.LOGIN}
-                className="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors"
+                className="px-4 py-2 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-white transition-colors font-medium"
               >
                 Đăng Nhập
               </Link>
               <Link
                 to={ROUTER_URL.AUTH.SIGN_UP}
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-secondary transition-colors"
+                className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-secondary transition-colors font-medium shadow-md"
               >
                 Đăng Ký
               </Link>
@@ -485,7 +484,7 @@ const HeaderLayout = () => {
                     <span
                       className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-full w-0 h-0 
           border-l-[10px] border-l-transparent 
-          border-t-[10px] border-t-[#153759]
+          border-t-[10px] border-t-[#6610F2]
           border-r-[10px] border-r-transparent"
                     ></span>
                   )}

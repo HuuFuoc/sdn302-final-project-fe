@@ -5,11 +5,11 @@ import {
   Divider,
   Typography,
   List,
-  Spin,
   Image,
   message,
   Button,
 } from "antd";
+import { InlineLoader } from "../../common/loaders";
 import { CourseService } from "../../../services/course/course.service";
 import type { CourseDetailResponse } from "../../../types/course/Course.res.type";
 import { CourseStatus } from "../../../app/enums/courseStatus.enum";
@@ -96,9 +96,7 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
       className="rounded-lg shadow-xl"
     >
       {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Spin size="large" />
-        </div>
+        <InlineLoader />
       ) : !data ? (
         <div className="text-center text-red-600 py-12 font-semibold text-lg">
           Không tìm thấy dữ liệu khóa học.

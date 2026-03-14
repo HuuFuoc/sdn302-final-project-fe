@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Descriptions, Avatar, Spin, message, Tag } from "antd";
+import { Modal, Descriptions, Avatar, message, Tag } from "antd";
+import { InlineLoader } from "../../../common/loaders";
 import { ConsultantService } from "../../../../services/consultant/consultant.service";
 import type { Consultant } from "../../../../types/consultant/consultant.res.type";
 
@@ -68,7 +69,7 @@ const AdminViewConsultant: React.FC<AdminViewConsultantProps> = ({
       centered
     >
       {loading ? (
-        <Spin className="flex justify-center py-10" />
+        <InlineLoader />
       ) : consultant ? (
         <Descriptions bordered column={1}>
           <Descriptions.Item label="Ảnh đại diện">

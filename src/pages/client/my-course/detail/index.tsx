@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Spin, Typography } from "antd";
+import { Button, Typography } from "antd";
+import { SectionLoader } from "../../../../components/common/loaders";
 import { CourseService } from "../../../../services/course/course.service";
 import { CourseStatus } from "../../../../app/enums/courseStatus.enum";
 import { CourseTargetAudience } from "../../../../app/enums/courseTargetAudience.enum";
@@ -202,11 +203,7 @@ const MyCourseDetailPage: React.FC = () => {
   }, [courseId]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spin size="large" />
-      </div>
-    );
+    return <SectionLoader className="min-h-screen" />;
   }
 
   if (!course) {

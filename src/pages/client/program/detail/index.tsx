@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Layout, Typography, Spin, Button, Drawer, Breadcrumb } from "antd";
+import { Layout, Typography, Button, Drawer, Breadcrumb } from "antd";
+import { SectionLoader } from "../../../../components/common/loaders";
 import { ProgramService } from "../../../../services/program/program.service";
 import { SurveyService } from "../../../../services/survey/survey.service";
 import type { Program, ProgramEnrollment } from "../../../../types/program/Program.type";
@@ -243,8 +244,8 @@ const ProgramDetail: React.FC = () => {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-                <Spin size="large" />
+            <div className="min-h-screen bg-[#f8f9fa]">
+                <SectionLoader className="min-h-screen" />
             </div>
         );
     }

@@ -60,13 +60,13 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
     switch (variant) {
       case "primary":
-        return `${baseStyles} w-full h-12 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-[#20558A] hover:bg-[#153759] text-white`;
+        return `${baseStyles} w-full h-12 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-[#1A8FE3] hover:bg-[#1572b6] text-white`;
       case "secondary":
-        return `${baseStyles} w-full h-10 rounded-lg text-base shadow-md hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white`;
+        return `${baseStyles} w-full h-10 rounded-lg text-base shadow-md hover:shadow-lg bg-[#1A8FE3] hover:bg-[#1572b6] text-white`;
       case "compact":
-        return `${baseStyles} h-8 px-4 rounded-lg text-sm shadow-sm hover:shadow-md bg-[#20558A] hover:bg-[#153759] text-white`;
+        return `${baseStyles} h-8 px-4 rounded-lg text-sm shadow-sm hover:shadow-md bg-[#1A8FE3] hover:bg-[#1572b6] text-white`;
       default:
-        return `${baseStyles} w-full h-12 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-[#20558A] hover:bg-[#153759] text-white`;
+        return `${baseStyles} w-full h-12 rounded-xl text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02] bg-[#1A8FE3] hover:bg-[#1572b6] text-white`;
     }
   };
 

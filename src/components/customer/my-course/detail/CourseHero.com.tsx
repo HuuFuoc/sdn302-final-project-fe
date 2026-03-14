@@ -45,7 +45,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({
           margin: "0 auto",
           background: "#fff",
           borderRadius: 20,
-          boxShadow: "0 4px 24px 0 rgba(32,85,138,0.08)",
+          boxShadow: "0 4px 24px 0 rgba(26,143,227,0.12)",
           padding: "40px 48px",
         }}
       >
@@ -64,7 +64,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({
                 aspectRatio: "16/9",
                 objectFit: "cover",
                 borderRadius: 16,
-                boxShadow: "0 2px 12px 0 rgba(32,85,138,0.10)",
+                boxShadow: "0 2px 12px 0 rgba(26,143,227,0.15)",
                 marginBottom: 16,
               }}
             />
@@ -75,12 +75,12 @@ const CourseHero: React.FC<CourseHeroProps> = ({
             <div style={{ marginBottom: 12 }}>
               <Text
                 style={{
-                  color: "#2563eb",
+                  color: "#1A8FE3",
                   fontWeight: 600,
                   cursor: "pointer",
                 }}
               >
-                Phòng chống ma túy
+                Khóa học vẽ
               </Text>
               <Text style={{ color: "#bdbdbd", margin: "0 8px" }}>›</Text>
               <Text style={{ color: "#64748b", fontWeight: 500 }}>
@@ -90,7 +90,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({
             {/* Title */}
             <h1
               style={{
-                color: "#20558A",
+                color: "#1A8FE3",
                 fontWeight: 900,
                 fontSize: 42,
                 margin: 0,
@@ -130,11 +130,11 @@ const CourseHero: React.FC<CourseHeroProps> = ({
                   disabled
                   value={averageRating || 0}
                   allowHalf
-                  style={{ color: "#faad14", fontSize: 22 }}
+                  style={{ color: "#E6C229", fontSize: 22 }}
                 />
                 <span
                   style={{
-                    color: "#faad14",
+                    color: "#E6C229",
                     fontWeight: 700,
                     fontSize: 20,
                   }}
@@ -174,13 +174,13 @@ const CourseHero: React.FC<CourseHeroProps> = ({
               >
                 <span>
                   <CalendarOutlined
-                    style={{ marginRight: 4, color: "#2563eb" }}
+                    style={{ marginRight: 4, color: "#1A8FE3" }}
                   />
                   {formatDate(course.createdAt)}
                 </span>
                 <span>
                   <ClockCircleOutlined
-                    style={{ marginRight: 4, color: "#2563eb" }}
+                    style={{ marginRight: 4, color: "#1A8FE3" }}
                   />
                   Tiếng Việt
                 </span>

@@ -33,7 +33,7 @@ export const ScrollTopButton = () => {
     isVisible && (
       <button
         onClick={handleScrollTop}
-        className="fixed bottom-8 right-8 bg-[#20558A] border border-white text-white py-2 px-4 rounded-md shadow-md hover:bg-[#153759] transition-colors duration-300 flex items-center"
+        className="fixed bottom-8 right-8 bg-[#1A8FE3] border border-white text-white py-2 px-4 rounded-xl shadow-md hover:bg-[#1572b6] transition-colors duration-300 flex items-center"
       >
         <span className="font-medium mr-1">Back to Top</span>
         <svg 

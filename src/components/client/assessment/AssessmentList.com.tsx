@@ -6,8 +6,8 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   InfoCircleOutlined,
-  LoadingOutlined
 } from '@ant-design/icons';
+import { SectionLoader } from '../../../components/common/loaders';
 import { SurveyService } from '../../../services/survey/survey.service';
 import { QuestionService } from '../../../services/question/question.service';
 import type { SurveyResponse } from '../../../types/survey/Survey.res.type';
@@ -228,10 +228,9 @@ export default function AssessmentList({ onStartAssessment, onViewResult }: Asse
 
         {/* Loading State */}
         {loading && (
-          <div className="flex justify-center items-center py-12">
-            <LoadingOutlined className="text-4xl text-blue-600" />
-            <span className="ml-3 text-lg text-gray-600">Đang tải bài đánh giá rủi ro...</span>
-          </div>
+          <SectionLoader className="min-h-0 py-12">
+            <span className="text-lg text-gray-600">Đang tải bài đánh giá rủi ro...</span>
+          </SectionLoader>
         )}
 
         {/* Assessment Grid */}

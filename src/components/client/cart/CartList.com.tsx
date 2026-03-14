@@ -1,6 +1,7 @@
 // ViewCartPage.tsx
 import React, { useEffect } from "react";
-import { Typography, Empty, Button, Spin } from "antd";
+import { Typography, Empty, Button } from "antd";
+import { SectionLoader } from "../../common/loaders";
 import {
   ShoppingOutlined,
   CreditCardOutlined,
@@ -111,11 +112,10 @@ const ViewCartPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <div className="text-center">
-          <Spin size="large" />
-          <p className="mt-4 text-gray-600">Đang tải giỏ hàng...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <SectionLoader className="min-h-screen">
+          <p className="text-gray-600">Đang tải giỏ hàng...</p>
+        </SectionLoader>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Typography, Avatar, Divider, Spin, message } from "antd";
+import { Button, Typography, Avatar, Divider, message } from "antd";
+import { SectionLoader } from "../../../../components/common/loaders";
 import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import { BlogService } from "../../../../services/blog/blog.service";
 import type { Blog } from "../../../../types/blog/Blog.res.type";
@@ -40,10 +41,9 @@ const BlogDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
-        <span className="ml-3 text-lg">Đang tải bài viết...</span>
-      </div>
+      <SectionLoader className="min-h-screen">
+        <span className="text-lg text-gray-500">Đang tải bài viết...</span>
+      </SectionLoader>
     );
   }
 

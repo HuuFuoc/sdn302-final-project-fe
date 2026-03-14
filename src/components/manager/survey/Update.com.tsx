@@ -1,5 +1,6 @@
 import React from "react";
-import { Modal, Form, Input, Select, Spin, Tag, Divider } from "antd";
+import { Modal, Form, Input, Select, Tag, Divider } from "antd";
+import { InlineLoader } from "../../common/loaders";
 import { SurveyType } from "../../../app/enums/surveyType.enum";
 import { SurveyService } from "../../../services/survey/survey.service";
 import type { SurveyResponse } from "../../../types/survey/Survey.res.type";
@@ -198,8 +199,8 @@ const SurveyUpdateModal: React.FC<Props> = ({ open, initialData, onClose, onSucc
             }}
         >
             {loading ? (
-                <div className="flex items-center justify-center h-64">
-                    <Spin size="large" />
+                <div className="h-64 flex items-center justify-center">
+                    <InlineLoader />
                 </div>
             ) : surveyData ? (
                 <div className="space-y-6">
