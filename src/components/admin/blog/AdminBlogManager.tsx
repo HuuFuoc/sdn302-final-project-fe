@@ -47,15 +47,36 @@ const AdminBlogManager = () => {
       userIds.map((id) => UserService.getUserById({ userId: id })),
     );
 
+    const extractUserPayload = (response: any) => {
+      const data = response?.data;
+      if (!data) return {};
+      return data.data || data.user || data;
+    };
+
+    const extractUserFullName = (rawUser: any) => {
+      const directName =
+        rawUser?.fullName || rawUser?.full_name || rawUser?.name || "";
+      if (directName && String(directName).trim()) return String(directName).trim();
+
+      const firstName = rawUser?.firstName || rawUser?.first_name || "";
+      const lastName = rawUser?.lastName || rawUser?.last_name || "";
+      return `${firstName} ${lastName}`.trim();
+    };
+
+    const extractUserAvatar = (rawUser: any) =>
+      rawUser?.profilePicUrl ||
+      rawUser?.profile_pic_url ||
+      rawUser?.avatar ||
+      rawUser?.avatarUrl ||
+      "";
+
     userResults.forEach((result, index) => {
       if (result.status !== "fulfilled") return;
 
       const userId = userIds[index];
-      const rawUser = (result.value as any)?.data?.data || {};
-      const fullName =
-        rawUser.fullName ||
-        `${rawUser.firstName || ""} ${rawUser.lastName || ""}`.trim();
-      const userAvatar = rawUser.profilePicUrl || rawUser.avatar || "";
+      const rawUser = extractUserPayload(result.value);
+      const fullName = extractUserFullName(rawUser);
+      const userAvatar = extractUserAvatar(rawUser);
 
       userMap.set(userId, { fullName, userAvatar });
     });
@@ -132,7 +153,14 @@ const AdminBlogManager = () => {
     setViewLoading(true);
     try {
       const res = await BlogService.getBlogById({ id });
-      setViewingBlog(res.data?.data || null);
+      const rawBlog = (res.data?.data || null) as Blog | null;
+      if (!rawBlog) {
+        setViewingBlog(null);
+        return;
+      }
+
+      const enriched = await enrichBlogsWithUserInfo([rawBlog]);
+      setViewingBlog(enriched[0] || rawBlog);
     } catch {
       setViewingBlog(null);
       message.error("Không thể tải chi tiết blog!");
@@ -178,19 +206,26 @@ const AdminBlogManager = () => {
       title: "Người đăng",
       dataIndex: "user_id",
       key: "user_id",
-      render: (_: string, record: Blog) => (
-        <div className="flex items-center gap-2">
-          <img
-            src={record.userAvatar || "/no-avatar.png"}
-            alt={record.fullName || "Không rõ"}
-            className="w-8 h-8 rounded-full object-cover border"
-          />
-          <div className="flex flex-col">
-            <span>{record.fullName || "Không rõ"}</span>
-            <span className="text-xs text-gray-500">{record.user_id || record.userId}</span>
+      render: (_: string, record: Blog) => {
+        const displayName = (record.fullName || "").trim();
+        const fallbackId = record.user_id || record.userId || "";
+
+        return (
+          <div className="flex items-center gap-2">
+            <img
+              src={record.userAvatar || "/no-avatar.png"}
+              alt={displayName || fallbackId || "Không rõ"}
+              className="w-8 h-8 rounded-full object-cover border"
+            />
+            <div className="flex flex-col">
+              <span>{displayName || fallbackId || "Không rõ"}</span>
+              {!displayName && fallbackId ? (
+                <span className="text-xs text-gray-500">{fallbackId}</span>
+              ) : null}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: "Ngày tạo",
@@ -375,12 +410,21 @@ const AdminBlogManager = () => {
             <div>
               <strong>Người đăng:</strong>
               <div className="flex items-center gap-2">
-                <img
-                  src={viewingBlog.userAvatar || "/no-avatar.png"}
-                  alt={viewingBlog.fullName || "Không rõ"}
-                  className="w-8 h-8 rounded-full object-cover border"
-                />
-                <span>{viewingBlog.fullName || "Không rõ"}</span>
+                {(() => {
+                  const displayName = (viewingBlog.fullName || "").trim();
+                  const fallbackId = viewingBlog.user_id || viewingBlog.userId || "";
+
+                  return (
+                    <>
+                      <img
+                        src={viewingBlog.userAvatar || "/no-avatar.png"}
+                        alt={displayName || fallbackId || "Không rõ"}
+                        className="w-8 h-8 rounded-full object-cover border"
+                      />
+                      <span>{displayName || fallbackId || "Không rõ"}</span>
+                    </>
+                  );
+                })()}
               </div>
             </div>
             <div>

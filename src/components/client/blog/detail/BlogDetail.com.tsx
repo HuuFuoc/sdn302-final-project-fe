@@ -4,6 +4,7 @@ import { Button, Typography, Avatar, Divider, message } from "antd";
 import { SectionLoader } from "../../../../components/common/loaders";
 import { CalendarOutlined, UserOutlined } from "@ant-design/icons";
 import { BlogService } from "../../../../services/blog/blog.service";
+import { UserService } from "../../../../services/user/user.service";
 import type { Blog } from "../../../../types/blog/Blog.res.type";
 
 const { Title, Text } = Typography;
@@ -14,6 +15,28 @@ const BlogDetail: React.FC = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const extractUserPayload = (response: any) => {
+    const data = response?.data;
+    if (!data) return {};
+    return data.data || data.user || data;
+  };
+
+  const extractUserFullName = (rawUser: any) => {
+    const directName = rawUser?.fullName || rawUser?.full_name || rawUser?.name || "";
+    if (directName && String(directName).trim()) return String(directName).trim();
+
+    const firstName = rawUser?.firstName || rawUser?.first_name || "";
+    const lastName = rawUser?.lastName || rawUser?.last_name || "";
+    return `${firstName} ${lastName}`.trim();
+  };
+
+  const extractUserAvatar = (rawUser: any) =>
+    rawUser?.profilePicUrl ||
+    rawUser?.profile_pic_url ||
+    rawUser?.avatar ||
+    rawUser?.avatarUrl ||
+    "";
+
   useEffect(() => {
     const fetchBlog = async () => {
       if (!blogId) return;
@@ -22,7 +45,30 @@ const BlogDetail: React.FC = () => {
       try {
         const res = await BlogService.getBlogById({ id: blogId });
         if (res.data?.success && res.data?.data) {
-          setBlog(res.data.data as Blog);
+          const blogData = res.data.data as Blog;
+          const authorId = blogData.user_id || blogData.userId || "";
+
+          if (!authorId) {
+            setBlog(blogData);
+          } else {
+            try {
+              const userRes = await UserService.getUserById({ userId: authorId });
+              const rawUser = extractUserPayload(userRes);
+              const fullName = extractUserFullName(rawUser);
+              const userAvatar = extractUserAvatar(rawUser);
+
+              setBlog({
+                ...blogData,
+                fullName: blogData.fullName || fullName || authorId,
+                userAvatar: blogData.userAvatar || userAvatar || "",
+              });
+            } catch {
+              setBlog({
+                ...blogData,
+                fullName: blogData.fullName || authorId || "TÃ¡c giáº£",
+              });
+            }
+          }
         } else {
           message.error("Không tìm thấy bài viết");
           navigate("/blog");
