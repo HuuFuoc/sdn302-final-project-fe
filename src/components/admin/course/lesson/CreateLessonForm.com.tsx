@@ -21,7 +21,7 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null
+    null,
   );
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
 
@@ -83,13 +83,17 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
   const effectiveCourses: Course[] =
     courseOptions.length > 0 ? courseOptions : courses;
 
-  const resolveCourseId = (course: Course | (Course & { _id?: string; course_id?: string })) => {
+  const resolveCourseId = (
+    course: Course | (Course & { _id?: string; course_id?: string }),
+  ) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyCourse = course as any;
     return course.id || anyCourse._id || anyCourse.course_id || "";
   };
 
-  const resolveSessionId = (session: Session | (Session & { _id?: string; session_id?: string })) => {
+  const resolveSessionId = (
+    session: Session | (Session & { _id?: string; session_id?: string }),
+  ) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anySession = session as any;
     return session.id || anySession._id || anySession.session_id || "";
@@ -208,8 +212,8 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
       courseId: selectedCourseId,
       sessionId: selectedSessionId,
       lessonType,
-      imageUrl: lessonType === "image" ? uploadedImageUrl : "",
-      videoUrl: lessonType === "video" ? uploadedVideoUrl : "",
+      imageUrl: uploadedImageUrl,
+      videoUrl: uploadedVideoUrl,
       userId,
     };
 

@@ -105,14 +105,45 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
     if (!lesson) return null;
     switch (lesson.lessonType.toLowerCase()) {
       case "video":
-        return lesson.videoUrl ? (
-          <div className="bg-black rounded-lg overflow-hidden">
-            <video controls width="100%" src={lesson.videoUrl} className="rounded-lg" />
-          </div>
-        ) : (
-          <div className="bg-gray-100 rounded-lg p-8 text-center">
-            <PlayCircleOutlined className="text-4xl text-gray-400 mb-2" />
-            <Text type="secondary" className="text-lg">Không có video</Text>
+        if (!lesson.videoUrl && !lesson.imageUrl) {
+          return (
+            <div className="bg-gray-100 rounded-lg p-8 text-center">
+              <PlayCircleOutlined className="text-4xl text-gray-400 mb-2" />
+              <Text type="secondary" className="text-lg">
+                Không có video hoặc hình ảnh
+              </Text>
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-4">
+            {lesson.videoUrl && (
+              <div className="bg-black rounded-lg overflow-hidden">
+                <video
+                  controls
+                  width="100%"
+                  src={lesson.videoUrl}
+                  className="rounded-lg"
+                />
+              </div>
+            )}
+            {lesson.imageUrl && (
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <Image
+                  src={lesson.imageUrl}
+                  width="100%"
+                  className="rounded-lg shadow-sm"
+                  preview={{
+                    mask: (
+                      <div className="flex items-center gap-2">
+                        <EyeOutlined /> Xem ảnh
+                      </div>
+                    ),
+                  }}
+                />
+              </div>
+            )}
           </div>
         );
       case "image":

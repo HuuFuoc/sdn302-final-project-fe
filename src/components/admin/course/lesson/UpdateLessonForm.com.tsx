@@ -26,12 +26,12 @@ const UpdateLessonForm = ({
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
-    null
+    null,
   );
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
 
   const [lessonType, setLessonType] = useState<"text" | "image" | "video">(
-    "text"
+    "text",
   );
   const [fileImage, setFileImage] = useState<File | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState("");
@@ -73,7 +73,7 @@ const UpdateLessonForm = ({
         const data = res.data || [];
         setFilteredSessions(data.data);
         setSelectedSessionId(
-          selectedCourseId === lesson.courseId ? lesson.sessionId : null
+          selectedCourseId === lesson.courseId ? lesson.sessionId : null,
         );
       })
       .catch(() => {
@@ -172,8 +172,8 @@ const UpdateLessonForm = ({
         courseId: values.courseId,
         sessionId: values.sessionId,
         lessonType: values.lessonType,
-        imageUrl: lessonType === "image" ? uploadedImageUrl : "",
-        videoUrl: lessonType === "video" ? uploadedVideoUrl : "",
+        imageUrl: uploadedImageUrl,
+        videoUrl: uploadedVideoUrl,
       },
       {
         onSuccess: () => {
@@ -183,7 +183,7 @@ const UpdateLessonForm = ({
         onError: () => {
           message.error("Cập nhật thất bại.");
         },
-      }
+      },
     );
   };
 
