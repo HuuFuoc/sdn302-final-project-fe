@@ -12,6 +12,8 @@ import CustomSearch from "../../common/CustomSearch.com";
 import ViewCourse from "./ViewCourse.com";
 import { useAuth } from "../../../contexts/Auth.context";
 import { UserRole } from "../../../app/enums";
+import { DOMAIN_API } from "../../../consts/domain.const";
+import noImage from "../../../assets/images/no-image.svg";
 
 const { Option } = Select;
 
@@ -19,15 +21,52 @@ type CourseApiModel = Course & {
   _id?: string;
   course_id?: string;
   imageUrl?: string;
+  image?: string;
+  courseImage?: string;
+  course_image?: string;
+  thumbnail?: string;
   imageUrls?: string[];
 };
 
+const toAbsoluteMediaUrl = (url: string) => {
+  const normalized = url.trim().replace(/\\/g, "/");
+  if (!normalized) return "";
+  if (/^(https?:)?\/\//i.test(normalized)) return normalized;
+  if (normalized.startsWith("data:") || normalized.startsWith("blob:")) {
+    return normalized;
+  }
+
+  const base = DOMAIN_API.replace(/\/+$/, "");
+  if (normalized.startsWith("/")) return `${base}${normalized}`;
+  return `${base}/${normalized}`;
+};
+
+const extractCourseImageUrls = (course: CourseApiModel): string[] => {
+  const images: string[] = [];
+
+  if (Array.isArray(course.imageUrls)) {
+    images.push(...course.imageUrls);
+  }
+
+  const singleImageFields = [
+    course.imageUrl,
+    course.image,
+    course.courseImage,
+    course.course_image,
+    course.thumbnail,
+  ];
+
+  singleImageFields.forEach((field) => {
+    if (typeof field === "string" && field.trim()) {
+      images.push(field);
+    }
+  });
+
+  return [...new Set(images.map(toAbsoluteMediaUrl).filter(Boolean))];
+};
+
 const normalizeCourse = (course: CourseApiModel): Course => {
-  const imageUrls = Array.isArray(course.imageUrls)
-    ? course.imageUrls
-    : course.imageUrl
-      ? [course.imageUrl]
-      : [];
+  const imageUrls = extractCourseImageUrls(course);
 
   return {
     ...course,
@@ -120,7 +159,7 @@ const AdminCourseManager = () => {
         const src =
           Array.isArray(imageUrls) && imageUrls.length > 0
             ? imageUrls[0]
-            : "https://via.placeholder.com/120x80.png?text=Course";
+            : noImage;
 
         return (
           <Image
@@ -129,7 +168,7 @@ const AdminCourseManager = () => {
             width={96}
             height={72}
             className="thumb-course"
-            fallback="https://via.placeholder.com/120x80.png?text=Course"
+            fallback={noImage}
             preview={false}
           />
         );

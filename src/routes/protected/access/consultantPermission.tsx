@@ -5,11 +5,12 @@ import AppointmentDetail from "../../../components/customer/appointment/Detail.c
 
 // Lazy load consultant pages
 const ConsultantLayout = lazy(() => import("../../../layouts/consultant/Consultant.layout"));
-const OverviewPage = lazy(() => import("../../../pages/admin/overview")); // Temporary, use admin overview
+const OverviewPage = lazy(() => import("../../../pages/consultant/overview"));
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const AppointmentPage = lazy(() => import("../../../pages/customer/appointment"));
 const RevenuePage = lazy(() => import("../../../pages/consultant/revenue"));
 const CourseManagementPage = lazy(() => import("../../../pages/consultant/course"));
+const ClientsPage = lazy(() => import("../../../pages/consultant/clients"));
 // Consultant routes with layout protection
 export const ConsultantRoutes: RouteObject[] = [
     {
@@ -18,6 +19,10 @@ export const ConsultantRoutes: RouteObject[] = [
         children: [
             {
                 index: true,
+                element: <OverviewPage />,
+            },
+            {
+                path: ROUTER_URL.CONSULTANT.OVERVIEW,
                 element: <OverviewPage />,
             },
             {
@@ -33,8 +38,8 @@ export const ConsultantRoutes: RouteObject[] = [
                 element: <AppointmentDetail />,
             },
             {
-                path: "clients",
-                element: <OverviewPage />, // Temporary placeholder
+                path: ROUTER_URL.CONSULTANT.CLIENTS,
+                element: <ClientsPage />,
             },
             {
                 path: "consultations",

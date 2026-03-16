@@ -81,6 +81,7 @@ export const API_PATH = {
     GET_ALL_INSTRUCTORS: "/api/instructor",
     GET_INSTRUCTOR_ORDER_HISTORY: "/api/instructor/order-history",
     GET_INSTRUCTOR_COURSE_SALES_SUMMARY: "/api/instructor/course-sales-summary",
+    GET_INSTRUCTOR_DASHBOARD_SUMMARY: "/api/instructor/dashboard-summary",
     CREATE_INSTRUCTOR_COURSE: "/api/course/create",
     UPDATE_INSTRUCTOR_COURSE: (id: string) => `/api/course/${id}`,
     DELETE_INSTRUCTOR_COURSE: (id: string) => `/api/course/${id}`,

@@ -4,6 +4,8 @@ import { axiosInstance } from "../../app/api/base.service";
 import type { ResponseSuccess } from "../../app/interface";
 import type { Consultant } from "../../types/consultant/consultant.res.type";
 import type {
+  InstructorDashboardSummaryRange,
+  InstructorDashboardSummaryResponseData,
   InstructorCourseSalesSummaryResponseData,
   InstructorOrderHistoryResponseData,
 } from "../../types/consultant/instructorRevenue.res.type";
@@ -100,6 +102,13 @@ export const ConsultantService = {
   getInstructorCourseSalesSummary() {
     return BaseService.get<ResponseSuccess<InstructorCourseSalesSummaryResponseData>>({
       url: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_COURSE_SALES_SUMMARY,
+    });
+  },
+
+  getInstructorDashboardSummary(range: InstructorDashboardSummaryRange = "30d") {
+    return BaseService.get<ResponseSuccess<InstructorDashboardSummaryResponseData>>({
+      url: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_DASHBOARD_SUMMARY,
+      payload: { range },
     });
   },
 

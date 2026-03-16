@@ -59,3 +59,36 @@ export interface InstructorCourseSalesSummaryResponseData {
   items?: InstructorCourseSalesSummaryItem[];
   summary?: InstructorCourseSalesSummaryOverview;
 }
+
+export type InstructorDashboardSummaryRange = "7d" | "30d" | "90d" | "all";
+
+export interface InstructorDashboardSummaryOverview {
+  totalCoursesCreated: number;
+  totalPublishedCourses: number;
+  totalDraftCourses: number;
+  totalArchivedCourses: number;
+  totalPaidOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+}
+
+export interface InstructorDashboardSummaryTopCourse {
+  courseId: string;
+  courseName: string;
+  totalPaidOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+}
+
+export interface InstructorDashboardSummaryTrendItem {
+  date: string;
+  totalPaidOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+}
+
+export interface InstructorDashboardSummaryResponseData {
+  overview: InstructorDashboardSummaryOverview;
+  topCourses: InstructorDashboardSummaryTopCourse[];
+  trend: InstructorDashboardSummaryTrendItem[];
+}

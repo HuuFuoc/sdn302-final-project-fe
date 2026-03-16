@@ -1,194 +1,131 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { Alert, Card, Col, Empty, Row, Spin, Table, Typography } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import { Alert, Card, Col, Empty, Row, Select, Spin, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { DollarCircleOutlined, ShoppingCartOutlined, BookOutlined } from "@ant-design/icons";
+import { DollarCircleOutlined, ShoppingCartOutlined, BookOutlined, LineChartOutlined } from "@ant-design/icons";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
 import { formatCurrency } from "../../../utils/helper";
 import type {
-  InstructorCourseSalesSummaryItem,
-  InstructorCourseSalesSummaryOverview,
-  InstructorOrderHistoryItem,
-  InstructorOrderHistorySummary,
+  InstructorDashboardSummaryRange,
+  InstructorDashboardSummaryResponseData,
+  InstructorDashboardSummaryTopCourse,
+  InstructorDashboardSummaryTrendItem,
 } from "../../../types/consultant/instructorRevenue.res.type";
 
 const { Title, Text } = Typography;
 
-interface OrderHistoryUI {
-  key: string;
-  orderId: string;
-  courseName: string;
-  buyerId: string;
-  finalPrice: number;
-  earnedAmount: number;
-  orderDate: string;
-}
-
-interface CourseSalesUI {
+interface TopCourseUI {
   key: string;
   courseName: string;
-  totalRevenue: number;
-  totalOrders: number;
-  totalEarned: number;
+  totalPaidOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
 }
 
-const parseArray = <T,>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+interface TrendUI {
+  key: string;
+  date: string;
+  totalPaidOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+}
 
-const firstString = (item: Record<string, unknown>, keys: string[], fallback = "-") => {
-  for (const key of keys) {
-    const value = item[key];
-    if (typeof value === "string" && value.trim()) return value;
-  }
-  return fallback;
-};
+const RANGE_OPTIONS: { label: string; value: InstructorDashboardSummaryRange }[] = [
+  { label: "7 ngày", value: "7d" },
+  { label: "30 ngày", value: "30d" },
+  { label: "90 ngày", value: "90d" },
+  { label: "Toàn thời gian", value: "all" },
+];
 
-const firstNumber = (item: Record<string, unknown>, keys: string[], fallback = 0) => {
-  for (const key of keys) {
-    const value = item[key];
-    if (typeof value === "number" && Number.isFinite(value)) return value;
-  }
-  return fallback;
-};
-
-const formatDateTime = (raw: string) => {
+const formatDate = (raw: string) => {
   const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString("vi-VN");
+  if (Number.isNaN(date.getTime())) return raw;
+  return date.toLocaleDateString("vi-VN");
 };
 
 const ConsultantRevenuePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [orderHistory, setOrderHistory] = useState<InstructorOrderHistoryItem[]>([]);
-  const [courseSalesSummary, setCourseSalesSummary] = useState<InstructorCourseSalesSummaryItem[]>([]);
-  const [orderSummary, setOrderSummary] = useState<InstructorOrderHistorySummary | null>(null);
-  const [salesSummary, setSalesSummary] = useState<InstructorCourseSalesSummaryOverview | null>(null);
+  const [range, setRange] = useState<InstructorDashboardSummaryRange>("30d");
+  const [summary, setSummary] = useState<InstructorDashboardSummaryResponseData | null>(null);
 
   useEffect(() => {
-    const fetchRevenueData = async () => {
+    const fetchDashboardSummary = async () => {
       setLoading(true);
       setError(null);
       try {
-        const [orderRes, summaryRes] = await Promise.all([
-          ConsultantService.getInstructorOrderHistory(),
-          ConsultantService.getInstructorCourseSalesSummary(),
-        ]);
-
-        const orderData = (orderRes.data?.data || {}) as Record<string, unknown>;
-        const summaryData = (summaryRes.data?.data || {}) as Record<string, unknown>;
-
-        setOrderHistory(parseArray<InstructorOrderHistoryItem>(orderData.items));
-        setCourseSalesSummary(parseArray<InstructorCourseSalesSummaryItem>(summaryData.items));
-        setOrderSummary((orderData.summary as InstructorOrderHistorySummary | undefined) || null);
-        setSalesSummary((summaryData.summary as InstructorCourseSalesSummaryOverview | undefined) || null);
+        const res = await ConsultantService.getInstructorDashboardSummary(range);
+        setSummary(res.data?.data || null);
       } catch (e) {
-        const message = e instanceof Error ? e.message : "Không thể tải dữ liệu.";
+        const message = e instanceof Error ? e.message : "Không thể tải dữ liệu dashboard.";
         setError(message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRevenueData();
-  }, []);
+    fetchDashboardSummary();
+  }, [range]);
 
-  const orderHistoryData: OrderHistoryUI[] = useMemo(
+  const overview = summary?.overview;
+
+  const topCoursesData: TopCourseUI[] = useMemo(
     () =>
-      orderHistory.map((entry, index) => {
-        const item = entry as Record<string, unknown>;
-        const orderId = firstString(item, ["orderId", "id", "order_id"], "-");
-        const courseName = firstString(item, ["courseName", "course_title"], "-");
-        const buyerId = firstString(item, ["buyerId", "buyer_id"], "-");
-        const orderDate = firstString(item, ["purchasedAt", "orderDate", "createdAt"], "");
-        const finalPrice = firstNumber(item, ["finalPrice", "totalAmount", "amount"], 0);
-        const earnedAmount = firstNumber(item, ["earnedAmount"], 0);
-
-        return {
-          key: `${orderId}-${index}`,
-          orderId,
-          courseName,
-          buyerId,
-          finalPrice,
-          earnedAmount,
-          orderDate: formatDateTime(orderDate),
-        };
-      }),
-    [orderHistory]
+      (summary?.topCourses || []).map((item: InstructorDashboardSummaryTopCourse, index) => ({
+        key: `${item.courseId}-${index}`,
+        courseName: item.courseName,
+        totalPaidOrders: item.totalPaidOrders,
+        grossRevenue: item.grossRevenue,
+        netRevenue: item.netRevenue,
+      })),
+    [summary?.topCourses]
   );
 
-  const courseSalesData: CourseSalesUI[] = useMemo(
+  const trendData: TrendUI[] = useMemo(
     () =>
-      courseSalesSummary.map((entry, index) => {
-        const item = entry as Record<string, unknown>;
-        const courseName = firstString(item, ["courseName"], `Khóa học ${index + 1}`);
-        const totalRevenue = firstNumber(item, ["totalRevenue", "revenue"], 0);
-        const totalOrders = firstNumber(item, ["totalOrders", "orderCount"], 0);
-        const totalEarned = firstNumber(item, ["totalEarned"], 0);
-
-        return {
-          key: `${courseName}-${index}`,
-          courseName,
-          totalRevenue,
-          totalOrders,
-          totalEarned,
-        };
-      }),
-    [courseSalesSummary]
+      (summary?.trend || []).map((item: InstructorDashboardSummaryTrendItem, index) => ({
+        key: `${item.date}-${index}`,
+        date: formatDate(item.date),
+        totalPaidOrders: item.totalPaidOrders,
+        grossRevenue: item.grossRevenue,
+        netRevenue: item.netRevenue,
+      })),
+    [summary?.trend]
   );
 
-  const dashboardStats = useMemo(() => {
-    const totalRevenue =
-      salesSummary?.totalRevenue ??
-      orderSummary?.totalRevenue ??
-      courseSalesData.reduce((sum, item) => sum + item.totalRevenue, 0);
-    const totalOrders =
-      salesSummary?.totalOrders ??
-      orderSummary?.totalOrders ??
-      courseSalesData.reduce((sum, item) => sum + item.totalOrders, 0);
-    const totalCourses = salesSummary?.totalCoursesSold ?? courseSalesData.length;
-    const totalEarned =
-      salesSummary?.totalEarned ??
-      orderSummary?.totalEarned ??
-      courseSalesData.reduce((sum, item) => sum + item.totalEarned, 0);
-
-    return { totalRevenue, totalOrders, totalCourses, totalEarned };
-  }, [courseSalesData, orderSummary, salesSummary]);
-
-  const orderColumns: ColumnsType<OrderHistoryUI> = [
-    { title: "Mã đơn hàng", dataIndex: "orderId", key: "orderId", width: 170 },
+  const topCoursesColumns: ColumnsType<TopCourseUI> = [
     { title: "Khóa học", dataIndex: "courseName", key: "courseName" },
-    { title: "Buyer ID", dataIndex: "buyerId", key: "buyerId", width: 180 },
+    { title: "Đơn đã thanh toán", dataIndex: "totalPaidOrders", key: "totalPaidOrders", width: 170 },
     {
-      title: "Giá trị đơn",
-      dataIndex: "finalPrice",
-      key: "finalPrice",
-      width: 150,
-      render: (value: number) => <Text strong className="text-green-600">{formatCurrency(value)}</Text>,
-    },
-    {
-      title: "Thực nhận",
-      dataIndex: "earnedAmount",
-      key: "earnedAmount",
-      width: 150,
-      render: (value: number) => <Text strong className="text-blue-600">{formatCurrency(value)}</Text>,
-    },
-    { title: "Ngày đặt", dataIndex: "orderDate", key: "orderDate", width: 190 },
-  ];
-
-  const summaryColumns: ColumnsType<CourseSalesUI> = [
-    { title: "Khóa học", dataIndex: "courseName", key: "courseName" },
-    {
-      title: "Doanh thu",
-      dataIndex: "totalRevenue",
-      key: "totalRevenue",
+      title: "Doanh thu gộp",
+      dataIndex: "grossRevenue",
+      key: "grossRevenue",
       width: 180,
       render: (value: number) => <Text strong className="text-blue-600">{formatCurrency(value)}</Text>,
     },
-    { title: "Số đơn", dataIndex: "totalOrders", key: "totalOrders", width: 120 },
     {
-      title: "Thực nhận",
-      dataIndex: "totalEarned",
-      key: "totalEarned",
-      width: 160,
+      title: "Doanh thu ròng",
+      dataIndex: "netRevenue",
+      key: "netRevenue",
+      width: 180,
+      render: (value: number) => <Text strong className="text-green-600">{formatCurrency(value)}</Text>,
+    },
+  ];
+
+  const trendColumns: ColumnsType<TrendUI> = [
+    { title: "Ngày", dataIndex: "date", key: "date", width: 140 },
+    { title: "Đơn đã thanh toán", dataIndex: "totalPaidOrders", key: "totalPaidOrders", width: 170 },
+    {
+      title: "Doanh thu gộp",
+      dataIndex: "grossRevenue",
+      key: "grossRevenue",
+      width: 180,
+      render: (value: number) => <Text strong className="text-blue-600">{formatCurrency(value)}</Text>,
+    },
+    {
+      title: "Doanh thu ròng",
+      dataIndex: "netRevenue",
+      key: "netRevenue",
+      width: 180,
       render: (value: number) => <Text strong className="text-green-600">{formatCurrency(value)}</Text>,
     },
   ];
@@ -203,9 +140,20 @@ const ConsultantRevenuePage = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Title level={2} style={{ marginBottom: 8 }}>Báo cáo doanh thu</Title>
-        <Text type="secondary">Dữ liệu từ lịch sử đơn hàng và doanh thu theo từng khóa học.</Text>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <Title level={2} style={{ marginBottom: 8 }}>Tổng quan giảng viên</Title>
+          <Text type="secondary">Dữ liệu lấy từ endpoint dashboard summary.</Text>
+        </div>
+        <div>
+          <Text type="secondary" style={{ marginRight: 8 }}>Khoảng thời gian:</Text>
+          <Select
+            value={range}
+            onChange={(value) => setRange(value)}
+            options={RANGE_OPTIONS}
+            style={{ width: 180 }}
+          />
+        </div>
       </div>
 
       {error && <Alert type="error" message={error} showIcon />}
@@ -214,10 +162,10 @@ const ConsultantRevenuePage = () => {
         <Col xs={24} md={6}>
           <Card>
             <div className="flex items-center gap-3">
-              <DollarCircleOutlined className="text-2xl text-green-600" />
+              <BookOutlined className="text-2xl text-amber-600" />
               <div>
-                <Text type="secondary">Tổng doanh thu</Text>
-                <div className="text-xl font-bold">{formatCurrency(dashboardStats.totalRevenue)}</div>
+                <Text type="secondary">Tổng khóa học</Text>
+                <div className="text-xl font-bold">{overview?.totalCoursesCreated ?? 0}</div>
               </div>
             </div>
           </Card>
@@ -227,8 +175,8 @@ const ConsultantRevenuePage = () => {
             <div className="flex items-center gap-3">
               <ShoppingCartOutlined className="text-2xl text-blue-600" />
               <div>
-                <Text type="secondary">Tổng đơn hàng</Text>
-                <div className="text-xl font-bold">{dashboardStats.totalOrders}</div>
+                <Text type="secondary">Đơn đã thanh toán</Text>
+                <div className="text-xl font-bold">{overview?.totalPaidOrders ?? 0}</div>
               </div>
             </div>
           </Card>
@@ -236,10 +184,10 @@ const ConsultantRevenuePage = () => {
         <Col xs={24} md={6}>
           <Card>
             <div className="flex items-center gap-3">
-              <BookOutlined className="text-2xl text-amber-600" />
+              <DollarCircleOutlined className="text-2xl text-green-600" />
               <div>
-                <Text type="secondary">Số khóa học có doanh thu</Text>
-                <div className="text-xl font-bold">{dashboardStats.totalCourses}</div>
+                <Text type="secondary">Doanh thu gộp</Text>
+                <div className="text-xl font-bold">{formatCurrency(overview?.grossRevenue ?? 0)}</div>
               </div>
             </div>
           </Card>
@@ -249,32 +197,33 @@ const ConsultantRevenuePage = () => {
             <div className="flex items-center gap-3">
               <DollarCircleOutlined className="text-2xl text-purple-600" />
               <div>
-                <Text type="secondary">Tổng thực nhận</Text>
-                <div className="text-xl font-bold">{formatCurrency(dashboardStats.totalEarned)}</div>
+                <Text type="secondary">Doanh thu ròng</Text>
+                <div className="text-xl font-bold">{formatCurrency(overview?.netRevenue ?? 0)}</div>
               </div>
             </div>
           </Card>
         </Col>
       </Row>
 
-      <Card title="Lịch sử đơn hàng đã bán">
-        <Table<OrderHistoryUI>
+      <Card title="Top khóa học theo doanh thu gộp">
+        <Table<TopCourseUI>
           rowKey="key"
-          columns={orderColumns}
-          dataSource={orderHistoryData}
-          locale={{ emptyText: <Empty description="Chưa có lịch sử đơn hàng" /> }}
+          columns={topCoursesColumns}
+          dataSource={topCoursesData}
+          locale={{ emptyText: <Empty description="Chưa có dữ liệu top khóa học" /> }}
           pagination={{ pageSize: 10, showSizeChanger: false }}
-          scroll={{ x: 960 }}
+          scroll={{ x: 860 }}
         />
       </Card>
 
-      <Card title="Tổng hợp doanh thu theo khóa học">
-        <Table<CourseSalesUI>
+      <Card title={<span><LineChartOutlined className="mr-2" />Xu hướng doanh thu / đơn hàng</span>}>
+        <Table<TrendUI>
           rowKey="key"
-          columns={summaryColumns}
-          dataSource={courseSalesData}
-          locale={{ emptyText: <Empty description="Chưa có dữ liệu doanh thu khóa học" /> }}
+          columns={trendColumns}
+          dataSource={trendData}
+          locale={{ emptyText: <Empty description="Chưa có dữ liệu xu hướng trong khoảng thời gian đã chọn" /> }}
           pagination={{ pageSize: 10, showSizeChanger: false }}
+          scroll={{ x: 860 }}
         />
       </Card>
     </div>
