@@ -93,45 +93,45 @@ export default function AssessmentResult({
         switch (riskLevel) {
             case RiskLevel.NONE:
                 return {
-                    label: 'Không có nguy cơ',
+                    label: 'Phù hợp cao',
                     color: 'text-green-600',
                     bgColor: 'bg-green-100',
-                    description: 'Bạn không có dấu hiệu sử dụng chất gây nghiện. Hãy duy trì lối sống lành mạnh này!'
+                    description: 'Bé có nền tảng tốt để bắt đầu lộ trình mỹ thuật cơ bản và phát triển sáng tạo đều đặn.'
                 };
             case RiskLevel.LOW:
                 return {
-                    label: 'Nguy cơ thấp',
+                    label: 'Phù hợp tốt',
                     color: 'text-blue-600',
                     bgColor: 'bg-blue-100',
-                    description: 'Bạn có một số dấu hiệu nhẹ. Hãy tham gia các khóa học phòng ngừa để nâng cao nhận thức.'
+                    description: 'Bé đã có hứng thú với mỹ thuật. Nên tham gia lớp nhập môn để hình thành kỹ năng nền tảng.'
                 };
             case RiskLevel.MEDIUM:
                 return {
-                    label: 'Nguy cơ trung bình',
+                    label: 'Phù hợp trung bình',
                     color: 'text-yellow-600',
                     bgColor: 'bg-yellow-100',
-                    description: 'Bạn có dấu hiệu sử dụng chất gây nghiện ở mức độ trung bình. Cần can thiệp sớm.'
+                    description: 'Bé có tiềm năng nhưng cần lộ trình rõ ràng và thực hành thường xuyên để phát triển ổn định.'
                 };
             case RiskLevel.HIGH:
                 return {
-                    label: 'Nguy cơ cao',
+                    label: 'Cần tăng cường định hướng',
                     color: 'text-orange-600',
                     bgColor: 'bg-orange-100',
-                    description: 'Bạn có dấu hiệu sử dụng chất gây nghiện ở mức độ cao. Cần can thiệp chuyên môn.'
+                    description: 'Nên ưu tiên các hoạt động trải nghiệm, tăng tương tác và hướng dẫn sát để bé tự tin hơn.'
                 };
             case RiskLevel.VERY_HIGH:
                 return {
-                    label: 'Nguy cơ rất cao',
+                    label: 'Cần hỗ trợ chuyên sâu',
                     color: 'text-red-600',
                     bgColor: 'bg-red-100',
-                    description: 'Bạn có dấu hiệu nghiện nặng. Cần can thiệp y tế và tư vấn chuyên môn ngay lập tức.'
+                    description: 'Bé cần kế hoạch học cá nhân hóa và theo dõi tiến độ chặt chẽ để tìm đúng hướng phát triển.'
                 };
             default:
                 return {
                     label: 'Không xác định',
                     color: 'text-gray-600',
                     bgColor: 'bg-gray-100',
-                    description: 'Không thể xác định mức độ nguy cơ.'
+                    description: 'Chưa đủ dữ liệu để đánh giá mức độ phù hợp.'
                 };
         }
     };
@@ -308,14 +308,14 @@ export default function AssessmentResult({
                             Kết quả khảo sát
                         </h1>
                         <p className="text-xl text-gray-600">
-                            Cảm ơn bạn đã hoàn thành bài khảo sát. Dưới đây là kết quả và khuyến nghị dành cho bạn.
+                            Cảm ơn bạn đã hoàn thành bài khảo sát. Dưới đây là kết quả và định hướng học mỹ thuật phù hợp.
                         </p>
                     </div>
 
                     {/* Risk Level Card */}
                     <div className={`max-w-2xl mx-auto p-8 rounded-2xl shadow-lg ${riskInfo.bgColor} border-2 border-current ${riskInfo.color}`}>
                         <div className="text-center">
-                            <h2 className="text-2xl font-bold mb-4">Mức độ nguy cơ</h2>
+                            <h2 className="text-2xl font-bold mb-4">Mức độ phù hợp</h2>
                             <div className="text-4xl font-bold mb-4">{riskInfo.label}</div>
                             <p className="text-lg mb-6">{riskInfo.description}</p>
 
@@ -372,7 +372,7 @@ export default function AssessmentResult({
                                 Không có đề xuất phù hợp
                             </h3>
                             <p className="text-gray-600">
-                                Hiện tại chưa có khóa học hoặc chương trình phù hợp với mức độ nguy cơ của bạn.
+                                Hiện tại chưa có khóa học hoặc chương trình phù hợp với kết quả khảo sát của bé.
                             </p>
                         </div>
                     ) : (
@@ -533,10 +533,10 @@ export default function AssessmentResult({
                                 <BookOutlined className="h-8 w-8 text-blue-600" />
                             </div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Tài liệu giáo dục
+                                Tài liệu mỹ thuật
                             </h3>
                             <p className="text-gray-600">
-                                Truy cập thư viện tài liệu về phòng chống ma túy và lối sống lành mạnh.
+                                Tham khảo tài liệu về màu sắc, bố cục và phương pháp học mỹ thuật theo độ tuổi.
                             </p>
                         </div>
                         <div className="text-center">
@@ -544,10 +544,10 @@ export default function AssessmentResult({
                                 <TeamOutlined className="h-8 w-8 text-purple-600" />
                             </div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                Tư vấn chuyên môn
+                                Định hướng học tập
                             </h3>
                             <p className="text-gray-600">
-                                Kết nối với các chuyên gia tư vấn để được hỗ trợ cá nhân.
+                                Nhận gợi ý lộ trình phù hợp để phát triển năng khiếu mỹ thuật bền vững.
                             </p>
                         </div>
                         <div className="text-center">

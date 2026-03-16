@@ -15,8 +15,8 @@ const Cover: React.FC<CoverProps> = ({
   subtitle = "sắc màu cùng bé",
   buttonText = "Xem khóa học",
   buttonLink = "/khoa-hoc",
-  secondButtonText = "Hoạt động sáng tạo",
-  secondButtonLink = "/chuong-trinh-cong-dong",
+  secondButtonText = "Gặp giảng viên",
+  secondButtonLink = "/lich-hen-tu-van",
 }) => {
   return (
     <>
@@ -61,7 +61,6 @@ const Cover: React.FC<CoverProps> = ({
       </style>
 
       <section className="relative w-screen overflow-hidden flex items-center justify-center ml-[calc(-50vw+50%)] min-h-[90vh] bg-gradient-to-br from-[#e8f4fc] via-white to-[#efe6fc]">
-        {/* Decorative shapes - soft, kid-friendly */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-[15%] left-[10%] w-24 h-24 rounded-full bg-[#1A8FE3]/10 float-soft" style={{ animationDelay: '0s' }} />
           <div className="absolute top-[25%] right-[12%] w-16 h-16 rounded-full bg-[#E6C229]/20 float-soft" style={{ animationDelay: '1s' }} />
@@ -80,7 +79,8 @@ const Cover: React.FC<CoverProps> = ({
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Nền tảng khóa học vẽ và mỹ thuật cho thiếu nhi — sáng tạo, vui nhộn và an toàn. Cùng bé khám phá màu sắc và phát triển năng khiếu.
+              Nền tảng khóa học vẽ và mỹ thuật cho thiếu nhi — sáng tạo, vui nhộn và an toàn.
+              Chọn khóa học phù hợp hoặc gặp giảng viên để tìm hiểu lộ trình học cho bé.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-16">

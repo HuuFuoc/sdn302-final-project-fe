@@ -15,6 +15,8 @@ import type { CourseDetailResponse } from "../../../types/course/Course.res.type
 import { CourseStatus } from "../../../app/enums/courseStatus.enum";
 import { CourseTargetAudience } from "../../../app/enums/courseTargetAudience.enum";
 import { RiskLevel } from "../../../app/enums/riskLevel.enum";
+import { DOMAIN_API } from "../../../consts/domain.const";
+import noImage from "../../../assets/images/no-image.svg";
 
 const { Title, Text } = Typography;
 
@@ -49,6 +51,19 @@ function getWordsFromHTML(html: string) {
   const text = html.replace(/<[^>]+>/g, " ");
   return text.split(/\s+/).filter(Boolean);
 }
+
+const toAbsoluteMediaUrl = (url: string) => {
+  const normalized = url.trim().replace(/\\/g, "/");
+  if (!normalized) return "";
+  if (/^(https?:)?\/\//i.test(normalized)) return normalized;
+  if (normalized.startsWith("data:") || normalized.startsWith("blob:")) {
+    return normalized;
+  }
+
+  const base = DOMAIN_API.replace(/\/+$/, "");
+  if (normalized.startsWith("/")) return `${base}${normalized}`;
+  return `${base}/${normalized}`;
+};
 
 const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
   const [data, setData] = useState<CourseDetailResponse | null>(null);
@@ -197,7 +212,10 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
                 Ảnh khóa học:
               </Text>
               <div className="flex gap-3 mt-3 flex-wrap">
-                {data.imageUrls.map((url, idx) => (
+                {data.imageUrls
+                  .map((url) => toAbsoluteMediaUrl(url))
+                  .filter(Boolean)
+                  .map((url, idx) => (
                   <Image
                     key={idx}
                     src={url}
@@ -205,8 +223,9 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
                     height={90}
                     className="rounded-md shadow-sm hover:shadow-md transition-shadow"
                     style={{ objectFit: "cover" }}
+                    fallback={noImage}
                   />
-                ))}
+                  ))}
               </div>
             </div>
           )}
