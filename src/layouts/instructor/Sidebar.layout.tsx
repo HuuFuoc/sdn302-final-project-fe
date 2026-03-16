@@ -20,21 +20,6 @@ import { ROUTER_URL } from "../../consts/router.path.const";
 
 const { Sider } = Layout;
 
-const createFocusHandlers = (itemName: string) => ({
-  onFocus: (e: any) => {
-    e.target.style.transform = "scale(1.01)";
-    e.target.style.transition = "all 0.15s ease";
-    e.target.style.backgroundColor = "rgba(245, 158, 11, 0.1)";
-    e.target.style.borderRadius = "6px";
-    console.log(`${itemName} item focused`);
-  },
-  onBlur: (e: any) => {
-    e.target.style.transform = "scale(1)";
-    e.target.style.backgroundColor = "transparent";
-    console.log(`${itemName} item blurred`);
-  },
-});
-
 const SidebarLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,43 +63,36 @@ const SidebarLayout: React.FC = () => {
       key: ROUTER_URL.INSTRUCTOR.BASE,
       icon: <DashboardOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.BASE}>Tổng quan</Link>,
-      ...createFocusHandlers("Dashboard"),
     },
     {
       key: ROUTER_URL.INSTRUCTOR.COURSES,
       icon: <BookOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.COURSES}>Khóa học của tôi</Link>,
-      ...createFocusHandlers("Courses"),
     },
     {
       key: ROUTER_URL.INSTRUCTOR.LESSONS,
       icon: <PlayCircleOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.LESSONS}>Bài học</Link>,
-      ...createFocusHandlers("Lessons"),
     },
     {
       key: ROUTER_URL.INSTRUCTOR.STUDENTS,
       icon: <TeamOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.STUDENTS}>Học viên</Link>,
-      ...createFocusHandlers("Students"),
     },
     {
       key: ROUTER_URL.INSTRUCTOR.REVIEWS,
       icon: <StarOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.REVIEWS}>Đánh giá</Link>,
-      ...createFocusHandlers("Reviews"),
     },
     {
       key: ROUTER_URL.INSTRUCTOR.REVENUE,
       icon: <DollarOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.REVENUE}>Doanh thu</Link>,
-      ...createFocusHandlers("Revenue"),
     },
     {
       key: ROUTER_URL.INSTRUCTOR.SETTINGS,
       icon: <SettingOutlined />,
       label: <Link to={ROUTER_URL.INSTRUCTOR.SETTINGS}>Cài đặt</Link>,
-      ...createFocusHandlers("Settings"),
     },
   ];
 
@@ -135,26 +113,32 @@ const SidebarLayout: React.FC = () => {
       collapsible
       collapsed={collapsed}
       width={250}
+      className="instructor-sider"
       style={{
-        background: "#1a1a2e",
         position: "fixed",
         height: "100vh",
         left: 0,
         top: 0,
         bottom: 0,
+        borderRight: "1px solid rgba(226,232,240,0.7)",
+        background: "#FFF9DD",
       }}
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
+      <div className="instructor-sider-header">
         <div className="flex items-center justify-between">
           {!collapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="bg-amber-500 rounded p-2 text-white font-bold">
+            <div className="instructor-sider-logo">
+              <div className="bg-amber-500 rounded-xl p-2.5 text-white font-bold shadow-sm">
                 GV
               </div>
               <div className="text-white">
-                <div className="text-sm font-medium">Giảng viên</div>
-                <div className="text-xs text-gray-300">Mỹ thuật thiếu nhi</div>
+                <div className="text-sm font-semibold tracking-wide">
+                  Giảng viên
+                </div>
+                <div className="text-[11px] text-gray-300">
+                  Khóa học vẽ &amp; mỹ thuật
+                </div>
               </div>
             </div>
           )}
@@ -174,29 +158,29 @@ const SidebarLayout: React.FC = () => {
 
       {/* Navigation Menu */}
       <Menu
-        theme="dark"
+        theme="light"
         mode="inline"
         selectedKeys={[getSelectedKey()]}
         items={menuItems}
-        style={{ border: "none", paddingTop: "16px", background: "#1a1a2e" }}
+        className="instructor-sider-menu"
       />
 
       {/* User Profile */}
       {!collapsed && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+        <div className="instructor-sider-footer">
           <Dropdown menu={userMenu} trigger={["click"]} placement="topLeft">
-            <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded">
+            <div className="instructor-sider-footer-inner">
               <Avatar
                 src={userInfo?.profilePicUrl}
                 icon={!userInfo?.profilePicUrl && <UserOutlined />}
                 size="small"
                 style={{ backgroundColor: "#f59e0b" }}
               />
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">
+              <div className="text-slate-800 flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate">
                   {userInfo?.firstName} {userInfo?.lastName}
                 </div>
-                <div className="text-xs text-gray-300 truncate">
+                <div className="text-xs text-slate-500 truncate">
                   {userInfo?.email}
                 </div>
               </div>

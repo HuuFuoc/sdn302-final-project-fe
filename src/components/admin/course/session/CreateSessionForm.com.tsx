@@ -2,7 +2,8 @@ import { Form, Input, Button, message, Select } from "antd";
 import { useCreateSession } from "../../../../hooks/useSession";
 import type { CreateSessionRequest } from "../../../../types/session/Session.req.type";
 import type { Course } from "../../../../types/course/Course.res.type";
-import Editor from "../../../common/Editor.com";
+import { useMemo } from "react";
+import { useAuth } from "../../../../contexts/Auth.context";
 
 interface CreateSessionFormProps {
   courses: Course[];
@@ -13,25 +14,73 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
   const [form] = Form.useForm();
   const createSessionMutation = useCreateSession();
 
-  const onFinish = (values: any) => {
-    const storedUser = localStorage.getItem("userInfo");
-    let userId = "";
+  const { userInfo } = useAuth();
 
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        userId = user.id || "";
-      } catch (e) {
-        console.error("Lỗi khi parse dữ liệu user từ localStorage:", e);
-      }
+  const resolveCourseId = (course: Course | (Course & { _id?: string; course_id?: string })) => {
+    // Ưu tiên field id theo type, fallback _id / course_id nếu backend trả khác
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyCourse = course as any;
+    return (
+      course.id ||
+      anyCourse._id ||
+      anyCourse.course_id ||
+      ""
+    );
+  };
+
+  const userId = useMemo(() => {
+    const typed = userInfo?.id || "";
+    const anyUser = userInfo as unknown as { _id?: string } | null;
+    const fromContext = typed || anyUser?._id || "";
+    if (fromContext) return fromContext;
+
+    try {
+      const raw = localStorage.getItem("userInfo");
+      if (!raw) return "";
+      const parsed = JSON.parse(raw) as { id?: string; _id?: string };
+      return parsed.id || parsed._id || "";
+    } catch {
+      return "";
     }
+  }, [userInfo]);
+
+  const toVietnameseSlug = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+  type SessionFormValues = {
+    courseId: string;
+    name: string;
+    positionOrder: string;
+  };
+
+  const onFinish = (values: SessionFormValues) => {
+    if (!userId) {
+      message.error("Không xác định được người dùng hiện tại.");
+      return;
+    }
+
+    if (!values.courseId) {
+      message.error("Vui lòng chọn khóa học.");
+      return;
+    }
+
+    const slug = toVietnameseSlug(values.name || "");
 
     const payload: CreateSessionRequest = {
       courseId: values.courseId,
       name: values.name,
       userId,
-      slug: "",
-      content: values.content,
+      slug,
+      content: "",
       positionOrder: values.positionOrder,
     };
 
@@ -41,8 +90,8 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
         form.resetFields();
         onSuccess();
       },
-      onError: (error: any) => {
-        message.error("Tạo phiên học thất bại: " + error.message);
+      onError: (error) => {
+        message.error("Tạo phiên học thất bại: " + (error as Error).message);
       },
     });
   };
@@ -58,11 +107,15 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
         rules={[{ required: true, message: "Vui lòng chọn khóa học" }]}
       >
         <Select placeholder="Chọn khóa học">
-          {courses.map((course) => (
-            <Select.Option key={course.id} value={course.id}>
-              {course.name}
-            </Select.Option>
-          ))}
+          {courses.map((course) => {
+            const id = resolveCourseId(course);
+            if (!id) return null;
+            return (
+              <Select.Option key={id} value={id}>
+                {course.name || id}
+              </Select.Option>
+            );
+          })}
         </Select>
       </Form.Item>
 
@@ -75,19 +128,15 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
       </Form.Item>
 
       <Form.Item
-        label="Nội dung"
-        name="content"
-        rules={[{ required: true, message: "Vui lòng nhập nội dung" }]}
-      >
-        <Editor />
-      </Form.Item>
-
-      <Form.Item
         label="Thứ tự"
         name="positionOrder"
         rules={[{ required: true, message: "Vui lòng nhập thứ tự" }]}
       >
-        <Input placeholder="Nhập thứ tự" />
+        <Input type="number" min={0} placeholder="Nhập thứ tự" />
+      </Form.Item>
+
+      <Form.Item label="User ID (tự động)" tooltip="Lấy từ tài khoản đang đăng nhập">
+        <Input value={userId} disabled />
       </Form.Item>
 
       <Form.Item>

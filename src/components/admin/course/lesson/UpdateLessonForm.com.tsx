@@ -252,41 +252,37 @@ const UpdateLessonForm = ({
         <Editor />
       </Form.Item>
 
-      {lessonType === "image" && (
-        <Form.Item label="Upload ảnh" required>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      <Form.Item label="Upload ảnh">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {previewImageUrl && (
+          <img
+            src={previewImageUrl}
+            alt="preview"
+            className="mt-2 w-32 h-20 object-cover rounded border"
           />
-          {previewImageUrl && (
-            <img
-              src={previewImageUrl}
-              alt="preview"
-              className="mt-2 w-32 h-20 object-cover rounded border"
-            />
-          )}
-        </Form.Item>
-      )}
+        )}
+      </Form.Item>
 
-      {lessonType === "video" && (
-        <Form.Item label="Upload video" required>
-          <input
-            type="file"
-            accept="video/*"
-            onChange={handleVideoChange}
-            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      <Form.Item label="Upload video">
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleVideoChange}
+          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {previewVideoUrl && (
+          <video
+            controls
+            src={previewVideoUrl}
+            className="mt-2 w-64 h-36 rounded border"
           />
-          {previewVideoUrl && (
-            <video
-              controls
-              src={previewVideoUrl}
-              className="mt-2 w-64 h-36 rounded border"
-            />
-          )}
-        </Form.Item>
-      )}
+        )}
+      </Form.Item>
 
       <Form.Item
         name="positionOrder"

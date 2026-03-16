@@ -2,16 +2,7 @@ import { useEffect, useState } from "react";
 import { CourseService } from "../../../services/course/course.service";
 import type { CourseRequest } from "../../../types/course/Course.req.type";
 import type { Course } from "../../../types/course/Course.res.type";
-import {
-  Table,
-  Button,
-  message,
-  Image,
-  Modal,
-  Tooltip,
-  Tag,
-  Select,
-} from "antd";
+import { Table, Button, message, Image, Modal, Tooltip, Select } from "antd";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import CreateCourseForm from "./CreateCourseForm.com";
 import UpdateCourseForm from "./UpdateCourseForm.com";
@@ -19,6 +10,8 @@ import DeleteCourse from "./DeleteCourse.com";
 import CustomPagination from "../../common/Pagiation.com";
 import CustomSearch from "../../common/CustomSearch.com";
 import ViewCourse from "./ViewCourse.com";
+import { useAuth } from "../../../contexts/Auth.context";
+import { UserRole } from "../../../app/enums";
 
 const { Option } = Select;
 
@@ -35,12 +28,21 @@ const AdminCourseManager = () => {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [viewingCourseId, setViewingCourseId] = useState<string | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
+  const { userInfo } = useAuth();
+
+  const isInstructorView =
+    userInfo?.role === UserRole.INSTRUCTOR || userInfo?.role === UserRole.CONSULTANT;
+
+  const currentUserId =
+    (userInfo?.id as string | undefined) ||
+    ((userInfo as unknown as { _id?: string } | null)?._id ?? "");
   const fetchCourses = async () => {
     setLoading(true);
     const params: CourseRequest = {
       pageNumber: current,
       pageSize: pageSize,
       filterByName: searchKeyword,
+      userId: isInstructorView && currentUserId ? currentUserId : undefined,
     };
     try {
       const res = await CourseService.getAllCourses(params);
@@ -89,25 +91,33 @@ const AdminCourseManager = () => {
       title: "Ảnh",
       dataIndex: "imageUrls",
       key: "imageUrl",
-      render: (url: string) =>
-        url ? (
+      render: (url: string) => {
+        const src =
+          typeof url === "string" && url.length > 0
+            ? url
+            : "https://via.placeholder.com/120x80.png?text=Course";
+
+        return (
           <Image
-            src={url}
-            alt="course"
-            width={80}
-            height={60}
-            style={{ objectFit: "cover" }}
+            src={src}
+            alt="course thumbnail"
+            width={96}
+            height={72}
+            className="thumb-course"
+            fallback="https://via.placeholder.com/120x80.png?text=Course"
+            preview={false}
           />
-        ) : (
-          <span>Không có ảnh</span>
-        ),
+        );
+      },
     },
     {
       title: "Tên khóa học",
       dataIndex: "name",
       key: "name",
       render: (text: string) => (
-        <div style={{ maxWidth: 200, fontWeight: 600 }}>{text}</div>
+        <div className="max-w-xs font-semibold text-slate-800 leading-snug">
+          {text || "--"}
+        </div>
       ),
     },
 
@@ -117,9 +127,11 @@ const AdminCourseManager = () => {
       key: "discount",
       render: (discount: number) =>
         discount > 0 ? (
-          <Tag color="red">-{discount?.toLocaleString("vi-VN")}%</Tag>
+          <span className="badge-soft-danger">
+            -{discount?.toLocaleString("vi-VN")}% học phí
+          </span>
         ) : (
-          <span>Không</span>
+          <span className="text-slate-400 text-xs">Không</span>
         ),
     },
     {
@@ -127,17 +139,17 @@ const AdminCourseManager = () => {
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <Tag
-          color={
-            status === "published"
-              ? "green"
-              : status === "archived"
-                ? "orange"
-                : "default"
-          }
-        >
-          {status?.toUpperCase()}
-        </Tag>
+        <>
+          {status === "published" && (
+            <span className="badge-soft-success">Đã xuất bản</span>
+          )}
+          {status === "archived" && (
+            <span className="badge-soft-primary">Đã lưu trữ</span>
+          )}
+          {status !== "published" && status !== "archived" && (
+            <span className="badge-soft-primary">Nháp</span>
+          )}
+        </>
       ),
     },
     {
@@ -145,19 +157,22 @@ const AdminCourseManager = () => {
       dataIndex: "price",
       key: "price",
       render: (price: number) => (
-        <div className="text-right">{price?.toLocaleString("vi-VN")}₫</div>
+        <div className="text-right font-semibold text-slate-900">
+          {typeof price === "number"
+            ? `${price.toLocaleString("vi-VN")}₫`
+            : "--"}
+        </div>
       ),
     },
     {
       title: "Hành động",
       key: "action",
       render: (_: any, record: Course) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-end">
           <Tooltip title="Xem chi tiết">
             <Button
               icon={<EyeOutlined />}
-              shape="circle"
-              type="default"
+              className="dash-icon-button !w-8 !h-8"
               size="small"
               onClick={() => {
                 setViewingCourseId(record.id);
@@ -168,8 +183,7 @@ const AdminCourseManager = () => {
           <Tooltip title="Cập nhật">
             <Button
               icon={<EditOutlined />}
-              shape="circle"
-              type="default"
+              className="dash-icon-button !w-8 !h-8"
               size="small"
               onClick={() => openUpdateModal(record)}
             />
@@ -180,10 +194,8 @@ const AdminCourseManager = () => {
               onDeleted={fetchCourses}
               buttonProps={{
                 icon: <DeleteOutlined />,
-                shape: "circle",
-                danger: true,
                 size: "small",
-                style: { borderColor: "#ff4d4f", color: "#ff4d4f" },
+                className: "dash-icon-button-danger !w-8 !h-8",
               }}
             />
           </Tooltip>
@@ -193,10 +205,10 @@ const AdminCourseManager = () => {
   ];
 
   return (
-    <div className="p-6 bg-white rounded shadow relative">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
+    <div className="dash-card p-6 relative">
+      <div className="dash-toolbar">
         {/* Bên trái: Search + Filter */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="dash-toolbar-left">
           <CustomSearch
             onSearch={(keyword) => {
               setCurrent(1);
@@ -222,7 +234,7 @@ const AdminCourseManager = () => {
         {/* Bên phải: Nút tạo mới */}
         <Button
           type="primary"
-          className="bg-primary"
+          className="bg-primary px-4 h-10 rounded-full shadow-sm hover:shadow transition-shadow duration-200"
           onClick={() => setShowCreateModal(true)}
         >
           Tạo khóa học mới
@@ -230,14 +242,17 @@ const AdminCourseManager = () => {
       </div>
 
       {/* Bảng danh sách khóa học */}
-      <Table
-        columns={columns}
-        dataSource={filteredCourses}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-        bordered
-      />
+      <div className="dash-table-wrapper">
+        <Table
+          columns={columns}
+          dataSource={filteredCourses}
+          rowKey="id"
+          loading={loading}
+          pagination={false}
+          bordered={false}
+          size="middle"
+        />
+      </div>
 
       {/* Phân trang */}
       <CustomPagination

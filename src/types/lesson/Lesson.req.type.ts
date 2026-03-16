@@ -2,6 +2,7 @@ export interface LessonRequest {
   pageNumber: number;
   pageSize: number;
   filterByName?: string;
+  userId?: string;
 }
 export interface CreateLessonRequest {
   name: string;
@@ -13,6 +14,7 @@ export interface CreateLessonRequest {
   positionOrder: number;
   sessionId: string;
   courseId: string;
+  userId: string;
 }
 export interface UpdateLessonRequest {
   id: string;

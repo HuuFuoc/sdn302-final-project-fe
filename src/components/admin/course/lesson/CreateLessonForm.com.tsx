@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input, Form, Button, message, Select } from "antd";
 import { useCreateLesson } from "../../../../hooks/useLesson";
 import { BaseService } from "../../../../app/api/base.service";
 import { SessionService } from "../../../../services/session/session.service";
+import { CourseService } from "../../../../services/course/course.service";
 import type { CreateLessonRequest } from "../../../../types/lesson/Lesson.req.type";
 import type { Course } from "../../../../types/course/Course.res.type";
 import type { Session } from "../../../../types/session/Session.res.type";
 import Editor from "../../../common/Editor.com";
+import { useAuth } from "../../../../contexts/Auth.context";
 const { Option } = Select;
 
 interface CreateLessonFormProps {
@@ -23,23 +25,74 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
   );
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
 
-  const [lessonType, setLessonType] = useState<"text" | "image" | "video">(
-    "text"
-  );
-
-  const [file, setFile] = useState<File | null>(null);
-  const [previewFileUrl, setPreviewFileUrl] = useState<string>("");
+  const [fileImage, setFileImage] = useState<File | null>(null);
+  const [previewImageUrl, setPreviewImageUrl] = useState<string>("");
+  const [fileVideo, setFileVideo] = useState<File | null>(null);
+  const [previewVideoUrl, setPreviewVideoUrl] = useState<string>("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createLesson = useCreateLesson();
 
-  // Reset form fields when lesson type changes
-  const handleLessonTypeChange = (type: "text" | "image" | "video") => {
-    setLessonType(type);
-    setFile(null);
-    setPreviewFileUrl("");
-    form.setFieldValue('content', ''); // Reset content field
+  const { userInfo } = useAuth();
+
+  const userId = useMemo(() => {
+    const typed = userInfo?.id || "";
+    const anyUser = userInfo as unknown as { _id?: string } | null;
+    const fromContext = typed || anyUser?._id || "";
+    if (fromContext) return fromContext;
+
+    try {
+      const raw = localStorage.getItem("userInfo");
+      if (!raw) return "";
+      const parsed = JSON.parse(raw) as { id?: string; _id?: string };
+      return parsed.id || parsed._id || "";
+    } catch {
+      return "";
+    }
+  }, [userInfo]);
+
+  // danh sách khóa học cho giảng viên (ưu tiên fetch từ API, fallback prop)
+  const [courseOptions, setCourseOptions] = useState<Course[]>([]);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      if (!userId) return;
+      try {
+        const res = await CourseService.getAllCourses({
+          pageNumber: 1,
+          pageSize: 100,
+          userId,
+        });
+        const payload = res.data as any;
+        const list: Course[] = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : [];
+        if (list.length) {
+          setCourseOptions(list);
+        }
+      } catch {
+        // nếu lỗi, giữ nguyên courses từ props
+      }
+    };
+    loadCourses();
+  }, [userId]);
+
+  const effectiveCourses: Course[] =
+    courseOptions.length > 0 ? courseOptions : courses;
+
+  const resolveCourseId = (course: Course | (Course & { _id?: string; course_id?: string })) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyCourse = course as any;
+    return course.id || anyCourse._id || anyCourse.course_id || "";
+  };
+
+  const resolveSessionId = (session: Session | (Session & { _id?: string; session_id?: string })) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anySession = session as any;
+    return session.id || anySession._id || anySession.session_id || "";
   };
 
   useEffect(() => {
@@ -56,7 +109,12 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
       const res = await SessionService.getSessionByCourseId({
         CourseId: courseId,
       });
-      const data = res.data?.data || [];
+      const payload = res.data as any;
+      const data: Session[] = Array.isArray(payload?.data?.items)
+        ? payload.data.items
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : [];
       setFilteredSessions(data);
       setSelectedSessionId(null);
     } catch {
@@ -64,18 +122,33 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
-      setFile(selected);
-      setPreviewFileUrl(URL.createObjectURL(selected));
+      setFileImage(selected);
+      setPreviewImageUrl(URL.createObjectURL(selected));
     } else {
-      setFile(null);
-      setPreviewFileUrl("");
+      setFileImage(null);
+      setPreviewImageUrl("");
+    }
+  };
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (selected) {
+      setFileVideo(selected);
+      setPreviewVideoUrl(URL.createObjectURL(selected));
+    } else {
+      setFileVideo(null);
+      setPreviewVideoUrl("");
     }
   };
 
   const handleSubmit = async (values: any) => {
+    if (!userId) {
+      message.error("Không xác định được user hiện tại.");
+      return;
+    }
     if (!selectedCourseId) {
       message.error("Vui lòng chọn khóa học");
       return;
@@ -85,55 +158,70 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
       return;
     }
 
-    // Validation theo lesson type
-    if (lessonType === "text") {
-      if (!values.content || values.content.trim() === "") {
-        message.error("Vui lòng nhập mô tả bài học");
-        return;
-      }
-    } else if (lessonType === "image" || lessonType === "video") {
-      if (!file) {
-        message.error(`Vui lòng upload file ${lessonType === "image" ? "ảnh" : "video"}`);
-        return;
-      }
+    // Nội dung luôn bắt buộc
+    if (!values.content || values.content.trim() === "") {
+      message.error("Vui lòng nhập nội dung bài học");
+      return;
     }
 
     setIsSubmitting(true);
 
-    let uploadedUrl = "";
+    let uploadedImageUrl = "";
+    let uploadedVideoUrl = "";
 
-    if (file) {
+    if (fileImage) {
       try {
-        const url = await BaseService.uploadFile(file);
-        if (!url) throw new Error("Upload thất bại");
-        uploadedUrl = url;
+        const url = await BaseService.uploadFile(fileImage);
+        if (!url) throw new Error("Upload ảnh thất bại");
+        uploadedImageUrl = url;
       } catch {
-        message.error("Upload file thất bại.");
+        message.error("Upload ảnh thất bại.");
         setIsSubmitting(false);
         return;
       }
     }
 
+    if (fileVideo) {
+      try {
+        const url = await BaseService.uploadFile(fileVideo);
+        if (!url) throw new Error("Upload video thất bại");
+        uploadedVideoUrl = url;
+      } catch {
+        message.error("Upload video thất bại.");
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
+    let lessonType: string = "text";
+    if (uploadedVideoUrl || fileVideo) {
+      lessonType = "video";
+    } else if (uploadedImageUrl || fileImage) {
+      lessonType = "image";
+    }
+
     const payload: CreateLessonRequest = {
       name: values.name,
-      content: lessonType === "text" ? (values.content || "") : "",
-      positionOrder: values.positionOrder || 0,
-      fullTime: 0,
+      content: values.content || "",
+      positionOrder: Number(values.positionOrder) || 0,
+      fullTime: Number(values.fullTime) || 0,
       courseId: selectedCourseId,
       sessionId: selectedSessionId,
       lessonType,
-      imageUrl: lessonType === "image" ? uploadedUrl : "",
-      videoUrl: lessonType === "video" ? uploadedUrl : "",
+      imageUrl: lessonType === "image" ? uploadedImageUrl : "",
+      videoUrl: lessonType === "video" ? uploadedVideoUrl : "",
+      userId,
     };
 
     createLesson.mutate(payload, {
       onSuccess: () => {
         form.resetFields();
-        setFile(null);
-        setPreviewFileUrl("");
+        setFileImage(null);
+        setPreviewImageUrl("");
+        setFileVideo(null);
+        setPreviewVideoUrl("");
         setSelectedCourseId(null);
         setSelectedSessionId(null);
-        setLessonType("text");
         setIsSubmitting(false);
         onSuccess();
       },
@@ -157,11 +245,15 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
           value={selectedCourseId || undefined}
           onChange={setSelectedCourseId}
         >
-          {courses.map((c) => (
-            <Option key={c.id} value={c.id}>
-              {c.name}
-            </Option>
-          ))}
+          {effectiveCourses.map((c) => {
+            const id = resolveCourseId(c);
+            if (!id) return null;
+            return (
+              <Option key={id} value={id}>
+                {c.name || id}
+              </Option>
+            );
+          })}
         </Select>
       </Form.Item>
 
@@ -173,19 +265,15 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
           onChange={setSelectedSessionId}
           disabled={!selectedCourseId}
         >
-          {filteredSessions.map((s) => (
-            <Option key={s.id} value={s.id}>
-              {s.name}
-            </Option>
-          ))}
-        </Select>
-      </Form.Item>
-
-      <Form.Item label="Loại bài học" required>
-        <Select value={lessonType} onChange={handleLessonTypeChange}>
-          <Option value="text">Text</Option>
-          <Option value="image">Image</Option>
-          <Option value="video">Video</Option>
+          {filteredSessions.map((s) => {
+            const id = resolveSessionId(s);
+            if (!id) return null;
+            return (
+              <Option key={id} value={id}>
+                {s.name || id}
+              </Option>
+            );
+          })}
         </Select>
       </Form.Item>
 
@@ -197,54 +285,48 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
         <Input />
       </Form.Item>
 
-      {/* Chỉ hiển thị description cho text type */}
-      {lessonType === "text" && (
-        <Form.Item
-          label="Mô tả"
-          name="content"
-          rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
-        >
-          <Editor />
-        </Form.Item>
-      )}
+      {/* Nội dung bài học – luôn hiển thị cho mọi loại bài học */}
+      <Form.Item
+        label="Nội dung"
+        name="content"
+        rules={[{ required: true, message: "Vui lòng nhập nội dung bài học" }]}
+      >
+        <Editor />
+      </Form.Item>
 
-      {/* Chỉ hiển thị image upload cho image type */}
-      {lessonType === "image" && (
-        <Form.Item label="Upload ảnh" required>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      {/* Upload ảnh (tùy chọn) */}
+      <Form.Item label="Upload ảnh (tùy chọn)">
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {previewImageUrl && (
+          <img
+            src={previewImageUrl}
+            alt="preview"
+            className="mt-2 w-32 h-20 object-cover rounded border"
           />
-          {previewFileUrl && (
-            <img
-              src={previewFileUrl}
-              alt="preview"
-              className="mt-2 w-32 h-20 object-cover rounded border"
-            />
-          )}
-        </Form.Item>
-      )}
+        )}
+      </Form.Item>
 
-      {/* Chỉ hiển thị video upload cho video type */}
-      {lessonType === "video" && (
-        <Form.Item label="Upload video" required>
-          <input
-            type="file"
-            accept="video/*"
-            onChange={handleFileChange}
-            className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+      {/* Upload video (tùy chọn) */}
+      <Form.Item label="Upload video (tùy chọn)">
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleVideoChange}
+          className="block file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+        {previewVideoUrl && (
+          <video
+            controls
+            src={previewVideoUrl}
+            className="mt-2 w-64 h-36 rounded border"
           />
-          {previewFileUrl && (
-            <video
-              controls
-              src={previewFileUrl}
-              className="mt-2 w-64 h-36 rounded border"
-            />
-          )}
-        </Form.Item>
-      )}
+        )}
+      </Form.Item>
 
       <Form.Item
         label="Thứ tự hiển thị"
@@ -260,6 +342,25 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
         ]}
       >
         <Input type="number" min={0} />
+      </Form.Item>
+
+      <Form.Item
+        label="Thời lượng (phút)"
+        name="fullTime"
+        rules={[
+          {
+            type: "number",
+            min: 0,
+            transform: (value) => (value ? Number(value) : 0),
+            message: "Thời lượng phải là số >= 0",
+          },
+        ]}
+      >
+        <Input type="number" min={0} />
+      </Form.Item>
+
+      <Form.Item label="User ID (tự động)">
+        <Input value={userId} disabled />
       </Form.Item>
 
       <Form.Item>

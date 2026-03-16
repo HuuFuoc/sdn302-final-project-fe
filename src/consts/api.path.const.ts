@@ -113,21 +113,21 @@ export const API_PATH = {
     CLEAR_CART: "/api/cart/clear",
   },
   SESSION: {
-    GET_ALL_SESSIONS: "/session/all",
-    GET_SESSION_BY_ID: (id: string) => `/session/${id}`,
-    CREATE_SESSION: "/session",
-    UPDATE_SESSION: (id: string) => `/session/${id}`,
-    DELETE_SESSION: (id: string) => `/session/${id}`,
+    GET_ALL_SESSIONS: "/api/session/all",
+    GET_SESSION_BY_ID: (id: string) => `/api/session/${id}`,
+    CREATE_SESSION: "/api/session",
+    UPDATE_SESSION: (id: string) => `/api/session/${id}`,
+    DELETE_SESSION: (id: string) => `/api/session/${id}`,
     GET_SESSION_BY_COURSE_ID: (courseId: string) =>
       `/api/session/course/${courseId}`,
   },
   LESSON: {
-    GET_ALL_LESSONS: "/lesson/paged",
+    GET_ALL_LESSONS: "/api/lesson/paged",
     // Backend lesson detail API (used on lesson page)
     GET_LESSON_BY_ID: (id: string) => `/api/lesson/${id}`,
-    CREATE_LESSON: "/lesson",
-    UPDATE_LESSON: (id: string) => `/lesson/${id}`,
-    DELETE_LESSON: (id: string) => `/lesson/${id}`,
+    CREATE_LESSON: "/api/lesson",
+    UPDATE_LESSON: (id: string) => `/api/lesson/${id}`,
+    DELETE_LESSON: (id: string) => `/api/lesson/${id}`,
     GET_LESSON_BY_SESSION_ID: (sessionId: string) =>
       `/api/lesson/session/${sessionId}`,
   },

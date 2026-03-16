@@ -20,6 +20,8 @@ import UpdateSessionForm from "./UpdateSessionForm.com";
 import DeleteSession from "./DeleteSession.com";
 import CustomSearch from "../../../common/CustomSearch.com";
 import ViewSession from "./ViewSession.com";
+import { useAuth } from "../../../../contexts/Auth.context";
+import { UserRole } from "../../../../app/enums";
 const { Option } = Select;
 
 const SessionManager = () => {
@@ -36,12 +38,20 @@ const SessionManager = () => {
   const [viewSessionId, setViewSessionId] = useState<string | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
 
+  const { userInfo } = useAuth();
+  const isInstructorView =
+    userInfo?.role === UserRole.INSTRUCTOR || userInfo?.role === UserRole.CONSULTANT;
+  const currentUserId =
+    (userInfo?.id as string | undefined) ||
+    ((userInfo as unknown as { _id?: string } | null)?._id ?? "");
+
   useEffect(() => {
     const loadAll = async () => {
       try {
         const courseRes = await CourseService.getAllCourses({
           pageNumber: 1,
           pageSize: 100,
+          userId: isInstructorView && currentUserId ? currentUserId : undefined,
         });
         const courseList = courseRes.data?.data || [];
         setCourses(courseList);
@@ -62,6 +72,7 @@ const SessionManager = () => {
         pageNumber: 1,
         pageSize: 1000,
         name: searchKeyword,
+        userId: isInstructorView && currentUserId ? currentUserId : undefined,
       });
       const rawSessions: Session[] = Array.isArray(res.data?.data)
         ? res.data.data
@@ -122,7 +133,9 @@ const SessionManager = () => {
       title: "Tên buổi học",
       dataIndex: "name",
       key: "name",
-      render: (text) => <strong>{text}</strong>,
+      render: (text) => (
+        <span className="font-semibold text-slate-800">{text || "--"}</span>
+      ),
     },
     {
       title: "Khóa học",
@@ -132,12 +145,12 @@ const SessionManager = () => {
         record.courseId ? (
           <Link
             to={`/courses/${record.courseId}`}
-            className="text-blue-600 hover:underline"
+            className="text-primary hover:underline"
           >
-            {record.courseName}
+            {record.courseName || "--"}
           </Link>
         ) : (
-          "-"
+          <span className="text-slate-400 text-xs">--</span>
         ),
     },
     {
@@ -149,7 +162,9 @@ const SessionManager = () => {
           <span
             dangerouslySetInnerHTML={{
               __html:
-                text?.length > 50 ? text.slice(0, 50) + "..." : text || "-",
+                text && text.length > 50
+                  ? text.slice(0, 50) + "..."
+                  : text || "--",
             }}
           />
         </Tooltip>
@@ -159,21 +174,20 @@ const SessionManager = () => {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2 justify-end">
           <Tooltip title="Xem chi tiết">
             <Button
               icon={<EyeOutlined />}
-              shape="circle"
               size="small"
+              className="dash-icon-button !w-8 !h-8"
               onClick={() => openViewModal(record.id)}
             />
           </Tooltip>
           <Tooltip title="Cập nhật">
             <Button
               icon={<EditOutlined />}
-              shape="circle"
-              type="default"
               size="small"
+              className="dash-icon-button !w-8 !h-8"
               onClick={() => openUpdateModal(record)}
             />
           </Tooltip>
@@ -183,10 +197,8 @@ const SessionManager = () => {
               onDeleted={() => fetchSessions()}
               buttonProps={{
                 icon: <DeleteOutlined />,
-                shape: "circle",
-                danger: true,
                 size: "small",
-                style: { borderColor: "#ff4d4f", color: "#ff4d4f" },
+                className: "dash-icon-button-danger !w-8 !h-8",
               }}
             />
           </Tooltip>
@@ -196,9 +208,9 @@ const SessionManager = () => {
   ];
 
   return (
-    <div className="p-6 bg-white rounded shadow">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div className="dash-card p-6">
+      <div className="dash-toolbar">
+        <div className="dash-toolbar-left">
           <CustomSearch
             onSearch={handleSearch}
             placeholder="Tìm kiếm theo tên buổi học"
@@ -224,7 +236,7 @@ const SessionManager = () => {
         </div>
 
         <Button
-          className="bg-[#20558A] hover-primary"
+          className="bg-primary px-4 h-10 rounded-full shadow-sm hover:shadow transition-shadow duration-200 text-white"
           icon={<PlusOutlined />}
           type="primary"
           onClick={() => setShowCreateModal(true)}
@@ -233,14 +245,17 @@ const SessionManager = () => {
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={filteredSessions}
-        rowKey="id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-        bordered
-      />
+      <div className="dash-table-wrapper">
+        <Table
+          columns={columns}
+          dataSource={filteredSessions}
+          rowKey="id"
+          loading={loading}
+          pagination={{ pageSize: 10 }}
+          bordered={false}
+          size="middle"
+        />
+      </div>
 
       <Modal
         open={showCreateModal}

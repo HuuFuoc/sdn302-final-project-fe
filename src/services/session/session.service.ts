@@ -13,15 +13,27 @@ import { API_PATH } from "../../consts/api.path.const";
 
 export const SessionService = {
   getAllSessions(params: SessionRequest) {
+    const payload: any = { ...params };
+    if (params.userId) {
+      payload.user_id = params.userId;
+      delete payload.userId;
+    }
     return BaseService.get<ResponseSuccess<Session[]>>({
       url: API_PATH.SESSION.GET_ALL_SESSIONS,
-      payload: params,
+      payload,
     });
   },
   createSession(params: CreateSessionRequest) {
+    const payload: any = {
+      ...params,
+      course_id: params.courseId,
+      user_id: params.userId,
+    };
+    delete payload.courseId;
+    delete payload.userId;
     return BaseService.post<ResponseSuccess<Session>>({
       url: API_PATH.SESSION.CREATE_SESSION,
-      payload: params,
+      payload,
     });
   },
   deleteSession(params: DeleteSessionRequest) {

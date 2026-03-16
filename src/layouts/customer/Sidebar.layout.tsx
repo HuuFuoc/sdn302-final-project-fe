@@ -22,14 +22,14 @@ const { Sider } = Layout;
 
 // Hàm dùng chung cho focus effects
 const createFocusHandlers = (itemName: string) => ({
-  onFocus: (e: any) => {
+  onFocus: (e: React.FocusEvent<HTMLElement>) => {
     e.target.style.transform = "scale(1.01)";
     e.target.style.transition = "all 0.15s ease";
     e.target.style.backgroundColor = "rgba(24, 144, 255, 0.1)";
     e.target.style.borderRadius = "6px";
     console.log(`${itemName} item focused`);
   },
-  onBlur: (e: any) => {
+  onBlur: (e: React.FocusEvent<HTMLElement>) => {
     e.target.style.transform = "scale(1)";
     e.target.style.backgroundColor = "transparent";
     console.log(`${itemName} item blurred`);

@@ -17,6 +17,8 @@ export interface CreateCourseRequest {
   content: string;
   price: number;
   discount: number;
+  imageUrl: string;
+  imageUrls: string[];
 }
 
 export interface UpdateCourseRequest {

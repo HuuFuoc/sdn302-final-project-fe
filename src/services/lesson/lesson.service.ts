@@ -13,15 +13,39 @@ import { API_PATH } from "../../consts/api.path.const";
 
 export const LessonService = {
   getAllLessons(params: LessonRequest) {
+    const payload: any = { ...params };
+    if (params.userId) {
+      payload.user_id = params.userId;
+      delete payload.userId;
+    }
     return BaseService.get<ResponseSuccess<Lesson[]>>({
       url: API_PATH.LESSON.GET_ALL_LESSONS,
-      payload: params,
+      payload,
     });
   },
   createLesson(params: CreateLessonRequest) {
+    const payload: any = {
+      ...params,
+    };
+
+    if ((params as any).courseId) {
+      payload.course_id = (params as any).courseId;
+      delete payload.courseId;
+    }
+
+    if ((params as any).sessionId) {
+      payload.session_id = (params as any).sessionId;
+      delete payload.sessionId;
+    }
+
+    if ((params as any).userId) {
+      payload.user_id = (params as any).userId;
+      delete payload.userId;
+    }
+
     return BaseService.post<ResponseSuccess<Lesson>>({
       url: API_PATH.LESSON.CREATE_LESSON,
-      payload: params,
+      payload,
     });
   },
   deleteLesson(params: DeleteLessonRequest) {

@@ -15,9 +15,14 @@ import type {
 
 export const CourseService = {
   getAllCourses(params: CourseRequest) {
+    const payload: any = { ...params };
+    if (params.userId) {
+      payload.user_id = params.userId;
+      delete payload.userId;
+    }
     return BaseService.get<ResponseSuccess<Course[]>>({
       url: API_PATH.COURSE.GET_ALL_COURSES,
-      payload: params,
+      payload,
     });
   },
   createCourse(params: CreateCourseRequest) {

@@ -2,6 +2,7 @@ export interface SessionRequest {
   pageNumber: number;
   pageSize: number;
   name?: string;
+  userId?: string;
 }
 export interface CreateSessionRequest {
   courseId: string;
