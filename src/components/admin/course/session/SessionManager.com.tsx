@@ -24,6 +24,28 @@ import { useAuth } from "../../../../contexts/Auth.context";
 import { UserRole } from "../../../../app/enums";
 const { Option } = Select;
 
+type CourseApiModel = Course & {
+  _id?: string;
+  course_id?: string;
+};
+
+type SessionApiModel = Session & {
+  _id?: string;
+  session_id?: string;
+  course_id?: string;
+};
+
+const normalizeCourse = (course: CourseApiModel): Course => ({
+  ...course,
+  id: course.id || course._id || course.course_id || "",
+});
+
+const normalizeSession = (session: SessionApiModel): Session => ({
+  ...session,
+  id: session.id || session._id || session.session_id || "",
+  courseId: session.courseId || session.course_id || "",
+});
+
 const SessionManager = () => {
   const [sessions, setSessions] = useState<
     (Session & { courseName?: string; courseId: string })[]
@@ -40,7 +62,8 @@ const SessionManager = () => {
 
   const { userInfo } = useAuth();
   const isInstructorView =
-    userInfo?.role === UserRole.INSTRUCTOR || userInfo?.role === UserRole.CONSULTANT;
+    userInfo?.role === UserRole.INSTRUCTOR ||
+    userInfo?.role === UserRole.CONSULTANT;
   const currentUserId =
     (userInfo?.id as string | undefined) ||
     ((userInfo as unknown as { _id?: string } | null)?._id ?? "");
@@ -53,7 +76,9 @@ const SessionManager = () => {
           pageSize: 100,
           userId: isInstructorView && currentUserId ? currentUserId : undefined,
         });
-        const courseList = courseRes.data?.data || [];
+        const courseList: Course[] = Array.isArray(courseRes.data?.data)
+          ? (courseRes.data.data as CourseApiModel[]).map(normalizeCourse)
+          : [];
         setCourses(courseList);
         await fetchSessions(courseList);
       } catch {
@@ -75,7 +100,7 @@ const SessionManager = () => {
         userId: isInstructorView && currentUserId ? currentUserId : undefined,
       });
       const rawSessions: Session[] = Array.isArray(res.data?.data)
-        ? res.data.data
+        ? (res.data.data as SessionApiModel[]).map(normalizeSession)
         : [];
 
       const sessionsWithCourseNames = rawSessions.map((session) => {
@@ -152,23 +177,6 @@ const SessionManager = () => {
         ) : (
           <span className="text-slate-400 text-xs">--</span>
         ),
-    },
-    {
-      title: "Nội dung",
-      dataIndex: "content",
-      key: "content",
-      render: (text) => (
-        <Tooltip title={text}>
-          <span
-            dangerouslySetInnerHTML={{
-              __html:
-                text && text.length > 50
-                  ? text.slice(0, 50) + "..."
-                  : text || "--",
-            }}
-          />
-        </Tooltip>
-      ),
     },
     {
       title: "Hành động",

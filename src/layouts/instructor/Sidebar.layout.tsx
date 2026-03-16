@@ -120,8 +120,6 @@ const SidebarLayout: React.FC = () => {
         left: 0,
         top: 0,
         bottom: 0,
-        borderRight: "1px solid rgba(226,232,240,0.7)",
-        background: "#FFF9DD",
       }}
     >
       {/* Header */}
@@ -129,14 +127,39 @@ const SidebarLayout: React.FC = () => {
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="instructor-sider-logo">
-              <div className="bg-amber-500 rounded-xl p-2.5 text-white font-bold shadow-sm">
+              <div
+                style={{
+                  background: "linear-gradient(135deg, #F59E0B, #EA580C)",
+                  borderRadius: "12px",
+                  padding: "8px 10px",
+                  color: "white",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  letterSpacing: "0.03em",
+                  boxShadow: "0 2px 8px rgba(245,158,11,0.35)",
+                  flexShrink: 0,
+                }}
+              >
                 GV
               </div>
-              <div className="text-white">
-                <div className="text-sm font-semibold tracking-wide">
+              <div>
+                <div
+                  style={{
+                    fontSize: "13.5px",
+                    fontWeight: 700,
+                    color: "#78350F",
+                    lineHeight: 1.3,
+                  }}
+                >
                   Giảng viên
                 </div>
-                <div className="text-[11px] text-gray-300">
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#B45309",
+                    marginTop: "1px",
+                  }}
+                >
                   Khóa học vẽ &amp; mỹ thuật
                 </div>
               </div>
@@ -150,7 +173,7 @@ const SidebarLayout: React.FC = () => {
               fontSize: "16px",
               width: 32,
               height: 32,
-              color: "white",
+              color: "#92400E",
             }}
           />
         </div>
@@ -173,14 +196,25 @@ const SidebarLayout: React.FC = () => {
               <Avatar
                 src={userInfo?.profilePicUrl}
                 icon={!userInfo?.profilePicUrl && <UserOutlined />}
-                size="small"
-                style={{ backgroundColor: "#f59e0b" }}
+                size="default"
+                style={{
+                  backgroundColor: "#FDE68A",
+                  color: "#92400E",
+                  border: "2px solid #F59E0B",
+                  flexShrink: 0,
+                }}
               />
               <div className="text-slate-800 flex-1 min-w-0">
-                <div className="text-sm font-semibold truncate">
+                <div
+                  className="text-sm truncate"
+                  style={{ fontWeight: 600, color: "#44403C" }}
+                >
                   {userInfo?.firstName} {userInfo?.lastName}
                 </div>
-                <div className="text-xs text-slate-500 truncate">
+                <div
+                  className="text-xs truncate"
+                  style={{ color: "#A8A29E", marginTop: "1px" }}
+                >
                   {userInfo?.email}
                 </div>
               </div>

@@ -15,6 +15,27 @@ import { UserRole } from "../../../app/enums";
 
 const { Option } = Select;
 
+type CourseApiModel = Course & {
+  _id?: string;
+  course_id?: string;
+  imageUrl?: string;
+  imageUrls?: string[];
+};
+
+const normalizeCourse = (course: CourseApiModel): Course => {
+  const imageUrls = Array.isArray(course.imageUrls)
+    ? course.imageUrls
+    : course.imageUrl
+      ? [course.imageUrl]
+      : [];
+
+  return {
+    ...course,
+    id: course.id || course._id || course.course_id || "",
+    imageUrls,
+  };
+};
+
 const AdminCourseManager = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(false);
@@ -31,7 +52,8 @@ const AdminCourseManager = () => {
   const { userInfo } = useAuth();
 
   const isInstructorView =
-    userInfo?.role === UserRole.INSTRUCTOR || userInfo?.role === UserRole.CONSULTANT;
+    userInfo?.role === UserRole.INSTRUCTOR ||
+    userInfo?.role === UserRole.CONSULTANT;
 
   const currentUserId =
     (userInfo?.id as string | undefined) ||
@@ -47,7 +69,10 @@ const AdminCourseManager = () => {
     try {
       const res = await CourseService.getAllCourses(params);
       const data = res.data as any;
-      setCourses(Array.isArray(data?.data) ? data.data : []);
+      const rawCourses: CourseApiModel[] = Array.isArray(data?.data)
+        ? data.data
+        : [];
+      setCourses(rawCourses.map(normalizeCourse));
       setTotal(data?.totalCount || 0);
     } catch (err) {
       setCourses([]);
@@ -91,10 +116,10 @@ const AdminCourseManager = () => {
       title: "Ảnh",
       dataIndex: "imageUrls",
       key: "imageUrl",
-      render: (url: string) => {
+      render: (imageUrls: string[]) => {
         const src =
-          typeof url === "string" && url.length > 0
-            ? url
+          Array.isArray(imageUrls) && imageUrls.length > 0
+            ? imageUrls[0]
             : "https://via.placeholder.com/120x80.png?text=Course";
 
         return (

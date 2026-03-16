@@ -5,16 +5,16 @@
 /* Design system: Nền tảng học vẽ & mỹ thuật thiếu nhi */
 :root {
   /* Core palette - map từ màu sẵn có */
-  --color-primary: #1A8FE3;
+  --color-primary: #1a8fe3;
   --color-primary-hover: #1572b6;
   --color-primary-soft: rgba(26, 143, 227, 0.06);
 
-  --color-secondary: #6610F2;
+  --color-secondary: #6610f2;
   --color-secondary-soft: rgba(102, 16, 242, 0.06);
 
-  --color-accent: #F17105;
-  --color-fun: #E6C229;
-  --color-strong: #D11149;
+  --color-accent: #f17105;
+  --color-fun: #e6c229;
+  --color-strong: #d11149;
 
   --color-sidebar: #1a1a2e;
   --color-sidebar-active: #273352;
@@ -111,84 +111,145 @@
   background: linear-gradient(135deg, #e5f2ff, #f9fafb);
 }
 
-/* Instructor sidebar */
-/* Ant Design add class .ant-layout-sider and .ant-layout-sider-dark with a dark background.
-   Chúng ta override trực tiếp trên selector cụ thể để đảm bảo nền sáng luôn thắng. */
+/* ============================================================
+   Instructor Sidebar — "Friendly Art Platform" theme
+   Palette: warm cream · pastel amber · soft teal accent
+   ============================================================ */
+
+/* Base sider background */
 .instructor-sider.ant-layout-sider,
 .instructor-sider.ant-layout-sider-dark {
-  background-color: #fff9dd !important;
-  background-image: linear-gradient(180deg, #fff9dd 0%, #fde68a 40%, #e0f2ff 100%) !important;
-  transition: width 0.25s ease, background 0.25s ease;
+  background: #fffdf5 !important;
+  border-right: 1.5px solid #fde68a !important;
+  box-shadow: 2px 0 12px rgba(245, 158, 11, 0.06) !important;
+  transition: width 0.25s ease;
 }
 
 .instructor-sider .ant-layout-sider-children {
   background: transparent !important;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ---- Header ---- */
 .instructor-sider-header {
-  @apply p-4 border-b border-gray-700/50;
+  padding: 18px 16px 14px;
+  border-bottom: 1.5px solid #fde68a;
+  background: linear-gradient(135deg, #fffbea 0%, #fff8d6 100%);
+  flex-shrink: 0;
 }
 
 .instructor-sider-logo {
-  @apply flex items-center space-x-3;
-}
-
-.instructor-sider-menu {
-  border: none !important;
-  background: transparent !important;
-}
-
-.instructor-sider-menu .ant-menu-item {
-  margin-inline: 10px !important;
-  border-radius: 999px !important;
-  height: 40px !important;
-  line-height: 40px !important;
-  padding-inline: 12px !important;
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: background-color 0.18s ease, color 0.18s ease, padding-inline 0.18s ease;
-  color: #0f172a;
+  text-decoration: none;
 }
 
-.instructor-sider-menu .ant-menu-item-icon {
-  font-size: 16px;
+/* ---- Navigation Menu ---- */
+.instructor-sider-menu {
+  border: none !important;
+  background: transparent !important;
+  padding: 10px 0 !important;
+  flex: 1;
+  overflow-y: auto;
 }
 
-.instructor-sider-menu .ant-menu-title-content a {
-  font-size: 13px;
+/* Scrollbar inside menu */
+.instructor-sider-menu::-webkit-scrollbar {
+  width: 4px;
+}
+.instructor-sider-menu::-webkit-scrollbar-thumb {
+  background: #fde68a;
+  border-radius: 99px;
+}
+
+.instructor-sider-menu .ant-menu-item {
+  margin: 3px 10px !important;
+  border-radius: 14px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  padding-inline: 14px !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #78716c !important; /* warm-gray-500 */
+  transition: all 0.18s ease;
   font-weight: 500;
 }
 
+.instructor-sider-menu .ant-menu-item .ant-menu-item-icon {
+  font-size: 16px !important;
+  color: #a8a29e !important; /* warm-gray-400 */
+  transition: color 0.18s ease;
+  flex-shrink: 0;
+}
+
+.instructor-sider-menu .ant-menu-title-content a {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #57534e; /* warm-gray-600 */
+  transition: color 0.18s ease;
+}
+
+/* Active item */
 .instructor-sider-menu .ant-menu-item-selected {
-  background: linear-gradient(
-    90deg,
-    rgba(230, 194, 41, 0.32),
-    rgba(26, 143, 227, 0.18)
-  ) !important;
-  box-shadow: none;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.22) !important;
 }
 
 .instructor-sider-menu .ant-menu-item-selected .ant-menu-title-content a {
-  color: #111827 !important;
+  color: #92400e !important; /* amber-800 */
+  font-weight: 600 !important;
 }
 
 .instructor-sider-menu .ant-menu-item-selected .ant-menu-item-icon {
-  color: #111827 !important;
+  color: #d97706 !important; /* amber-600 */
 }
 
-.instructor-sider-menu .ant-menu-item:hover {
-  background: rgba(230, 194, 41, 0.18) !important;
+/* Hover state */
+.instructor-sider-menu .ant-menu-item:not(.ant-menu-item-selected):hover {
+  background: #fff8e6 !important;
 }
 
+.instructor-sider-menu
+  .ant-menu-item:not(.ant-menu-item-selected):hover
+  .ant-menu-item-icon {
+  color: #f59e0b !important;
+}
+
+.instructor-sider-menu
+  .ant-menu-item:not(.ant-menu-item-selected):hover
+  .ant-menu-title-content
+  a {
+  color: #44403c !important; /* warm-gray-700 */
+}
+
+/* ---- Footer Account Card ---- */
 .instructor-sider-footer {
-  @apply absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700/50;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px 12px;
+  border-top: 1.5px solid #fde68a;
+  background: linear-gradient(to top, #fffbea 60%, transparent 100%);
+  flex-shrink: 0;
 }
 
 .instructor-sider-footer-inner {
-  @apply flex items-center space-x-3 cursor-pointer p-2.5 rounded-2xl transition-colors duration-200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
 }
 
 .instructor-sider-footer-inner:hover {
-  background-color: rgba(255, 255, 255, 0.7);
+  background: rgba(253, 230, 138, 0.35);
+  border-color: #fde68a;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.12);
 }

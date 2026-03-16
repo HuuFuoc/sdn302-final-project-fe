@@ -121,8 +121,8 @@ const SidebarLayout: React.FC = () => {
       collapsible
       collapsed={collapsed}
       width={250}
+      className="instructor-sider"
       style={{
-        background: "#001529",
         position: "fixed",
         height: "100vh",
         left: 0,
@@ -130,16 +130,35 @@ const SidebarLayout: React.FC = () => {
         bottom: 0,
       }}
     >
-      <div className="p-4 border-b border-gray-700">
+      <div className="instructor-sider-header">
         <div className="flex items-center justify-between">
           {!collapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="bg-blue-500 rounded p-2 text-white font-bold">TVC</div>
-              <div className="text-white">
-                <div className="text-sm font-medium">Giảng viên</div>
-                <div className="text-xs text-gray-300">Mỹ thuật thiếu nhi</div>
+            <Link to={ROUTER_URL.COMMON.HOME} className="instructor-sider-logo">
+              <div className="bg-amber-500 rounded-xl p-2.5 text-white font-bold shadow-sm">
+                ART
               </div>
-            </div>
+              <div>
+                <div
+                  style={{
+                    fontSize: "13.5px",
+                    fontWeight: 700,
+                    color: "#78350F",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Tư vấn viên
+                </div>
+                <div
+                  style={{
+                    fontSize: "11px",
+                    color: "#B45309",
+                    marginTop: "1px",
+                  }}
+                >
+                  Mỹ thuật thiếu nhi
+                </div>
+              </div>
+            </Link>
           )}
           <Button
             type="text"
@@ -149,34 +168,37 @@ const SidebarLayout: React.FC = () => {
               fontSize: "16px",
               width: 32,
               height: 32,
-              color: "white",
+              color: "#92400E",
             }}
           />
         </div>
       </div>
 
       <Menu
-        theme="dark"
+        theme="light"
         mode="inline"
         selectedKeys={[getSelectedKey()]}
         items={menuItems}
-        style={{ border: "none", paddingTop: "16px" }}
+        className="instructor-sider-menu"
       />
 
       {!collapsed && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
+        <div className="instructor-sider-footer">
           <Dropdown menu={userMenu} trigger={["click"]} placement="topLeft">
-            <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded">
+            <div className="instructor-sider-footer-inner">
               <Avatar
                 src={userInfo?.profilePicUrl}
                 icon={!userInfo?.profilePicUrl && <UserOutlined />}
                 size="small"
+                style={{ backgroundColor: "#f59e0b" }}
               />
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">
+              <div className="text-slate-800 flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate">
                   {userInfo?.firstName} {userInfo?.lastName}
                 </div>
-                <div className="text-xs text-gray-300 truncate">{userInfo?.email}</div>
+                <div className="text-xs text-slate-500 truncate">
+                  {userInfo?.email}
+                </div>
               </div>
             </div>
           </Dropdown>

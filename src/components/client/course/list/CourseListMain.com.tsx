@@ -51,26 +51,9 @@ const CourseList = () => {
   const fetchCourses = useCallback(
     async (page = 1, size = itemsPerPage) => {
       setLoading(true);
-
-      // Lấy userId từ localStorage
-      let userId: string | undefined = undefined;
-      const userInfoStr = localStorage.getItem("userInfo");
-      if (userInfoStr) {
-        try {
-          const userInfo = JSON.parse(userInfoStr) as { id?: string };
-          if (userInfo && typeof userInfo.id === "string") {
-            userId = userInfo.id;
-          }
-        } catch {
-          userId = undefined;
-        }
-      }
-
-      // CHỈ GỬI CÁC PARAM CƠ BẢN LÊN API
       const params = {
         pageNumber: 1,
         pageSize: 50,
-        userId,
       };
 
       try {

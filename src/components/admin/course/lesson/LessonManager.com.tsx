@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Modal, Tooltip, message, Tag, Select } from "antd";
+import { Table, Button, Modal, Tooltip, message, Select } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
@@ -20,26 +20,53 @@ import { LessonService } from "../../../../services/lesson/lesson.service";
 import CreateLessonForm from "./CreateLessonForm.com";
 import UpdateLessonForm from "./UpdateLessonForm.com";
 import DeleteLesson from "./DeleteLesson.com";
-import { formatDate } from "../../../../utils/helper";
 import CustomSearch from "../../../common/CustomSearch.com";
 import ViewLesson from "./ViewLesson.com";
 import { useAuth } from "../../../../contexts/Auth.context";
 import { UserRole } from "../../../../app/enums";
 const { Option } = Select;
 
-const formatStatusTag = (value: string) => {
-  if (!value) return <span className="badge-soft-primary">--</span>;
-
-  return (
-    <span className="badge-soft-primary">
-      {value === "video"
-        ? "Video"
-        : value === "image"
-          ? "Hình ảnh"
-          : "Nội dung"}
-    </span>
-  );
+type CourseApiModel = Course & {
+  _id?: string;
+  course_id?: string;
 };
+
+type SessionApiModel = Session & {
+  _id?: string;
+  session_id?: string;
+  course_id?: string;
+};
+
+type LessonApiModel = Lesson & {
+  _id?: string;
+  lesson_id?: string;
+  session_id?: string;
+  course_id?: string;
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string;
+};
+
+const normalizeCourse = (course: CourseApiModel): Course => ({
+  ...course,
+  id: course.id || course._id || course.course_id || "",
+});
+
+const normalizeSession = (session: SessionApiModel): Session => ({
+  ...session,
+  id: session.id || session._id || session.session_id || "",
+  courseId: session.courseId || session.course_id || "",
+});
+
+const normalizeLesson = (lesson: LessonApiModel): Lesson => ({
+  ...lesson,
+  id: lesson.id || lesson._id || lesson.lesson_id || "",
+  sessionId: lesson.sessionId || lesson.session_id || "",
+  courseId: lesson.courseId || lesson.course_id || "",
+  createdAt: lesson.createdAt || lesson.created_at || "",
+  updatedAt: lesson.updatedAt || lesson.updated_at || "",
+  userId: lesson.userId || lesson.user_id || "",
+});
 
 const LessonManager = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -62,7 +89,8 @@ const LessonManager = () => {
 
   const { userInfo } = useAuth();
   const isInstructorView =
-    userInfo?.role === UserRole.INSTRUCTOR || userInfo?.role === UserRole.CONSULTANT;
+    userInfo?.role === UserRole.INSTRUCTOR ||
+    userInfo?.role === UserRole.CONSULTANT;
   const currentUserId =
     (userInfo?.id as string | undefined) ||
     ((userInfo as unknown as { _id?: string } | null)?._id ?? "");
@@ -73,21 +101,29 @@ const LessonManager = () => {
           CourseService.getAllCourses({
             pageNumber: 1,
             pageSize: 100,
-            userId: isInstructorView && currentUserId ? currentUserId : undefined,
+            userId:
+              isInstructorView && currentUserId ? currentUserId : undefined,
           }),
           SessionService.getAllSessions({
             pageNumber: 1,
             pageSize: 100,
-            userId: isInstructorView && currentUserId ? currentUserId : undefined,
+            userId:
+              isInstructorView && currentUserId ? currentUserId : undefined,
           }),
         ]);
 
         const courseData = courseRes.data || [];
         const sessionData = sessionRes.data || [];
+        const normalizedCourses: Course[] = Array.isArray(courseData.data)
+          ? (courseData.data as CourseApiModel[]).map(normalizeCourse)
+          : [];
+        const normalizedSessions: Session[] = Array.isArray(sessionData.data)
+          ? (sessionData.data as SessionApiModel[]).map(normalizeSession)
+          : [];
 
-        setCourses(courseData.data);
-        setSessions(sessionData.data);
-        await fetchLessons(courseData.data, sessionData.data);
+        setCourses(normalizedCourses);
+        setSessions(normalizedSessions);
+        await fetchLessons(normalizedCourses, normalizedSessions);
       } catch {
         message.error("Lỗi khi tải dữ liệu");
       }
@@ -98,7 +134,7 @@ const LessonManager = () => {
 
   const fetchLessons = async (
     coursesData: Course[] = courses,
-    sessionsData: Session[] = sessions
+    sessionsData: Session[] = sessions,
   ) => {
     setLoading(true);
     try {
@@ -110,9 +146,9 @@ const LessonManager = () => {
       });
       const payload = res.data as any;
       const rawLessons: Lesson[] = Array.isArray(payload?.data?.items)
-        ? payload.data.items
+        ? (payload.data.items as LessonApiModel[]).map(normalizeLesson)
         : Array.isArray(payload?.data)
-          ? payload.data
+          ? (payload.data as LessonApiModel[]).map(normalizeLesson)
           : [];
 
       const lessonsWithNames = rawLessons.map((lesson) => {
@@ -192,39 +228,6 @@ const LessonManager = () => {
       dataIndex: "sessionName",
       key: "sessionName",
       render: (value: string) => value || "--",
-    },
-    {
-      title: "Loại bài học",
-      dataIndex: "lessonType",
-      key: "lessonType",
-      render: (value: string) => formatStatusTag(value),
-    },
-    {
-      title: "Nội dung",
-      dataIndex: "content",
-      key: "content",
-      render: (text) => (
-        <Tooltip title={text}>
-          <span
-            dangerouslySetInnerHTML={{
-              __html:
-                text && text.length > 50
-                  ? text.slice(0, 50) + "..."
-                  : text || "--",
-            }}
-          />
-        </Tooltip>
-      ),
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => (
-        <Tag color="cyan">
-          {date ? formatDate(new Date(date)) : "--"}
-        </Tag>
-      ),
     },
     {
       title: "Hành động",
