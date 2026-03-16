@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
 
@@ -20,6 +21,10 @@ export const CustomerRoutes: RouteObject[] = [
     element: <CustomerLayout />,
     children: [
       {
+        index: true,
+        element: <Navigate to={ROUTER_URL.CUSTOMER.MY_COURSE} replace />,
+      },
+      {
         path: ROUTER_URL.CUSTOMER.SETTINGS,
         element: <SettingsPage />,
       },
@@ -30,10 +35,6 @@ export const CustomerRoutes: RouteObject[] = [
       {
         path: ROUTER_URL.CUSTOMER.APPOINTMENT_DETAIL,
         element: <AppointmentDetail />,
-      },
-      {
-        path: ROUTER_URL.CUSTOMER.SETTINGS,
-        element: <SettingsPage />,
       },
       {
         path: ROUTER_URL.CUSTOMER.MY_COURSE,

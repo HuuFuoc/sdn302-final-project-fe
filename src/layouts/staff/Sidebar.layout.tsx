@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Button, message } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -6,17 +6,13 @@ import {
   DashboardOutlined,
   BookOutlined,
   TeamOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
   SettingOutlined,
   LogoutOutlined,
   UserOutlined,
   EditOutlined,
-  BulbOutlined,
   BarChartOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  CommentOutlined,
   AuditOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/Auth.context";
@@ -38,12 +34,6 @@ const SidebarLayout: React.FC = () => {
 
   const userMenu: MenuProps = {
     items: [
-      {
-        key: "profile",
-        icon: <UserOutlined />,
-        label: "Hồ sơ cá nhân",
-        onClick: () => navigate(ROUTER_URL.STAFF.PROFILE),
-      },
       {
         key: "settings",
         icon: <SettingOutlined />,
@@ -79,29 +69,9 @@ const SidebarLayout: React.FC = () => {
       label: <Link to={ROUTER_URL.STAFF.CONTENT}>Quản lý nội dung</Link>,
     },
     {
-      key: ROUTER_URL.STAFF.COMMUNITY_PROGRAMS,
-      icon: <CommentOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.COMMUNITY_PROGRAMS}>Chương trình cộng đồng</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.ASSESSMENTS,
-      icon: <FileTextOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.ASSESSMENTS}>Bài đánh giá</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.EVENTS,
-      icon: <CalendarOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.EVENTS}>Sự kiện</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.RESOURCES,
-      icon: <BulbOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.RESOURCES}>Tài nguyên</Link>,
-    },
-    {
       key: ROUTER_URL.STAFF.USERS,
       icon: <TeamOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.USERS}>Người dùng</Link>,
+      label: <Link to={ROUTER_URL.STAFF.USERS}>Quản lý tài khoản</Link>,
     },
     {
       key: ROUTER_URL.STAFF.INSTRUCTORS,
@@ -111,7 +81,7 @@ const SidebarLayout: React.FC = () => {
     {
       key: ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS,
       icon: <AuditOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS}>Yêu cầu giảng viên</Link>,
+      label: <Link to={ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS}>Duyệt yêu cầu giảng viên</Link>,
     },
     {
       key: ROUTER_URL.STAFF.REPORTS,
