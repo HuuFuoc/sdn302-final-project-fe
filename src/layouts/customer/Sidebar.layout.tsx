@@ -1,14 +1,12 @@
-﻿import React, { useState } from "react";
-import { Layout, Menu, Avatar, Dropdown, Button, message } from "antd";
+import React, { useState } from "react";
+import { Layout, Avatar, Dropdown, Button, message } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   DashboardOutlined,
   UserOutlined,
-  ShoppingCartOutlined,
   BookOutlined,
   FileTextOutlined,
-  CalendarOutlined,
   SettingOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -55,37 +53,27 @@ const SidebarLayout: React.FC = () => {
     {
       key: ROUTER_URL.CUSTOMER.BASE,
       icon: <DashboardOutlined />,
-      label: <Link to={ROUTER_URL.CUSTOMER.BASE}>Tổng quan</Link>,
+      label: "Tổng quan",
     },
     {
       key: ROUTER_URL.CUSTOMER.MY_COURSE,
       icon: <BookOutlined />,
-      label: <Link to={ROUTER_URL.CUSTOMER.MY_COURSE}>Khóa học của tôi</Link>,
-    },
-    {
-      key: ROUTER_URL.CUSTOMER.APPOINTMENTS,
-      icon: <CalendarOutlined />,
-      label: <Link to={ROUTER_URL.CUSTOMER.APPOINTMENTS}>Lịch hẹn tư vấn</Link>,
-    },
-    {
-      key: ROUTER_URL.CLIENT.CART,
-      icon: <ShoppingCartOutlined />,
-      label: <Link to={ROUTER_URL.CLIENT.CART}>Giỏ hàng</Link>,
+      label: "Khóa học của tôi",
     },
     {
       key: ROUTER_URL.CUSTOMER.ORDER_HISTORY,
       icon: <FileTextOutlined />,
-      label: <Link to={ROUTER_URL.CUSTOMER.ORDER_HISTORY}>Lịch sử đơn hàng</Link>,
+      label: "Lịch sử đơn hàng",
     },
     {
       key: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
       icon: <FileTextOutlined />,
-      label: <Link to={ROUTER_URL.CUSTOMER.REVIEW_HISTORY}>Lịch sử đánh giá</Link>,
+      label: "Lịch sử đánh giá",
     },
     {
       key: ROUTER_URL.CUSTOMER.SETTINGS,
       icon: <SettingOutlined />,
-      label: <Link to={ROUTER_URL.CUSTOMER.SETTINGS}>Cài đặt</Link>,
+      label: "Cài đặt",
     },
   ];
 
@@ -105,70 +93,117 @@ const SidebarLayout: React.FC = () => {
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={250}
+      width={260}
       style={{
-        background: "#001529",
+        background: "linear-gradient(180deg, #e8f4fc 0%, #fdf9f3 100%)",
         position: "fixed",
         height: "100vh",
         left: 0,
         top: 0,
         bottom: 0,
+        boxShadow: "0 0 30px rgba(15, 40, 80, 0.08)",
       }}
+      className="flex flex-col"
     >
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center justify-between">
-          {!collapsed && (
-            <Link to={ROUTER_URL.COMMON.HOME}>
-              <div className="flex items-center space-x-3">
-                <div className="bg-primary rounded p-2 text-white font-bold">KH</div>
-                <div className="text-white">
-                  <div className="text-sm font-medium">Khách hàng</div>
-                  <div className="text-xs text-gray-300">Mỹ thuật thiếu nhi</div>
+      <div className="flex h-full min-h-0 flex-col">
+        {/* Header */}
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-center justify-between rounded-2xl bg-white/80 backdrop-blur-sm border border-white/60 shadow-sm px-3 py-2">
+            {!collapsed && (
+              <Link to={ROUTER_URL.COMMON.HOME} className="flex items-center space-x-3">
+                <div className="bg-gradient-to-br from-primary to-[#6610F2] rounded-xl px-3 py-2 text-white font-bold shadow-md text-sm">
+                  ART
                 </div>
-              </div>
-            </Link>
-          )}
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 32,
-              height: 32,
-              color: "white",
-            }}
-          />
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-slate-800 uppercase tracking-wide">
+                    Tài khoản khách hàng
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    Hành trình mỹ thuật của bé
+                  </span>
+                </div>
+              </Link>
+            )}
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              className="flex items-center justify-center rounded-xl hover:bg-white/80 text-slate-600"
+              style={{
+                fontSize: "18px",
+                width: 34,
+                height: 34,
+              }}
+            />
+          </div>
         </div>
-      </div>
 
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={[getSelectedKey()]}
-        items={menuItems}
-        style={{ border: "none", paddingTop: "16px" }}
-      />
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto px-3 pt-2 pb-4">
+          <nav className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = getSelectedKey() === item.key;
 
-      {!collapsed && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
-          <Dropdown menu={userMenu} trigger={["click"]} placement="topLeft">
-            <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded">
-              <Avatar
-                src={userInfo?.profilePicUrl}
-                icon={!userInfo?.profilePicUrl && <UserOutlined />}
-                size="small"
-              />
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">
-                  {userInfo?.firstName} {userInfo?.lastName}
-                </div>
-                <div className="text-xs text-gray-300 truncate">{userInfo?.email}</div>
-              </div>
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => navigate(item.key)}
+                  className={`group w-full flex items-center rounded-2xl px-3 py-2.5 text-sm font-medium transition-all duration-200
+                    ${isActive
+                      ? "bg-white shadow-md text-primary border border-primary/20"
+                      : "bg-white/40 text-slate-700 border border-transparent hover:bg-white/80 hover:text-primary"
+                    }`}
+                >
+                  <span
+                    className={`flex items-center justify-center rounded-xl mr-3 text-base transition-colors duration-200
+                      ${isActive ? "bg-primary/10 text-primary" : "bg-white/80 text-slate-500 group-hover:bg-primary/5 group-hover:text-primary"}
+                    `}
+                    style={{ width: 32, height: 32 }}
+                  >
+                    {item.icon}
+                  </span>
+                  {!collapsed && (
+                    <span className="flex-1 text-left truncate">{item.label}</span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Footer / Account */}
+        {!collapsed && (
+          <div className="px-4 pb-4 pt-2">
+            <div className="rounded-2xl bg-white/85 backdrop-blur-sm border border-white/70 shadow-sm">
+              <Dropdown menu={userMenu} trigger={["click"]} placement="topLeft">
+                <button className="w-full flex flex-col gap-2 px-3 py-3 cursor-pointer hover:bg-slate-50 rounded-2xl transition-colors duration-200 text-left">
+                  <div className="flex items-center">
+                    <Avatar
+                      src={userInfo?.profilePicUrl}
+                      icon={!userInfo?.profilePicUrl && <UserOutlined />}
+                      size="small"
+                      className="mr-3 bg-primary/10 text-primary"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-slate-800 truncate">
+                        {userInfo?.firstName} {userInfo?.lastName}
+                      </div>
+                      <div className="text-[11px] text-slate-500 truncate">
+                        {userInfo?.email}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <span className="inline-flex items-center rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-[11px] font-medium text-primary">
+                      Quản lý tài khoản
+                    </span>
+                  </div>
+                </button>
+              </Dropdown>
             </div>
-          </Dropdown>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </Sider>
   );
 };

@@ -1,4 +1,4 @@
-﻿import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SearchCom from "../../components/common/search.com";
 import { useAuth } from "../../contexts/Auth.context";
@@ -41,8 +41,6 @@ const HeaderLayout = () => {
   const navItems = [
     { name: "Trang Chủ", path: ROUTER_URL.COMMON.HOME },
     { name: "Khóa Học", path: ROUTER_URL.CLIENT.COURSE },
-    { name: "Khám Phá Năng Khiếu", path: ROUTER_URL.CLIENT.ASSESSMENT },
-    { name: "Gặp Giáo Viên", path: ROUTER_URL.CLIENT.APPOINTMENTS },
     { name: "Blog", path: ROUTER_URL.CLIENT.BLOG },
     { name: "Về Chúng Tôi", path: ROUTER_URL.COMMON.ABOUT },
   ];
@@ -87,7 +85,9 @@ const HeaderLayout = () => {
           {
             key: "manager-dashboard",
             icon: <DashboardOutlined className="text-purple-600" />,
-            label: <span className="text-gray-700">Bảng điều khiển quản lý</span>,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển quản lý</span>
+            ),
             onClick: () => navigate(ROUTER_URL.MANAGER.BASE),
           },
           {
@@ -110,7 +110,9 @@ const HeaderLayout = () => {
           {
             key: "staff-dashboard",
             icon: <DashboardOutlined className="text-green-600" />,
-            label: <span className="text-gray-700">Bảng điều khiển nhân viên</span>,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển nhân viên</span>
+            ),
             onClick: () => navigate(ROUTER_URL.STAFF.BASE),
           },
           {
@@ -133,7 +135,9 @@ const HeaderLayout = () => {
           {
             key: "consultant-dashboard",
             icon: <DashboardOutlined className="text-blue-600" />,
-            label: <span className="text-gray-700">Bảng điều khiển giảng viên</span>,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển giảng viên</span>
+            ),
             onClick: () => navigate(ROUTER_URL.CONSULTANT.BASE),
           },
           {
@@ -156,7 +160,9 @@ const HeaderLayout = () => {
           {
             key: "instructor-dashboard",
             icon: <DashboardOutlined className="text-amber-600" />,
-            label: <span className="text-gray-700">Bảng điều khiển giảng viên</span>,
+            label: (
+              <span className="text-gray-700">Bảng điều khiển giảng viên</span>
+            ),
             onClick: () => navigate(ROUTER_URL.INSTRUCTOR.BASE),
           },
           {
@@ -247,8 +253,12 @@ const HeaderLayout = () => {
             className="bg-primary"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{getUserFullName()}</p>
-            <p className={cn("text-xs font-medium", getRoleColor())}>{getRoleDisplayName()}</p>
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {getUserFullName()}
+            </p>
+            <p className={cn("text-xs font-medium", getRoleColor())}>
+              {getRoleDisplayName()}
+            </p>
             <p className="text-xs text-gray-500 truncate">{userInfo?.email}</p>
           </div>
         </div>
@@ -278,7 +288,9 @@ const HeaderLayout = () => {
       {role && (
         <>
           <div className="px-3 py-2">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tài khoản</p>
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Tài khoản
+            </p>
           </div>
           <Menu.Item
             key="settings"
@@ -372,7 +384,11 @@ const HeaderLayout = () => {
           </Badge>
 
           {token && userInfo ? (
-            <Dropdown overlay={userMenu} trigger={["click"]} placement="bottomRight">
+            <Dropdown
+              overlay={userMenu}
+              trigger={["click"]}
+              placement="bottomRight"
+            >
               <div className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded-md">
                 <Avatar
                   src={userInfo.profilePicUrl}

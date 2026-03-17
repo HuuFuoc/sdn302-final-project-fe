@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 interface CoverProps {
   title?: string;
@@ -15,7 +15,7 @@ const Cover: React.FC<CoverProps> = ({
   subtitle = "sắc màu cùng bé",
   buttonText = "Xem khóa học",
   buttonLink = "/khoa-hoc",
-  secondButtonText = "Gặp giảng viên",
+  secondButtonText = "Liên hệ tư vấn",
   secondButtonLink = "/lich-hen-tu-van",
 }) => {
   return (
@@ -62,25 +62,38 @@ const Cover: React.FC<CoverProps> = ({
 
       <section className="relative w-screen overflow-hidden flex items-center justify-center ml-[calc(-50vw+50%)] min-h-[90vh] bg-gradient-to-br from-[#e8f4fc] via-white to-[#efe6fc]">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-[15%] left-[10%] w-24 h-24 rounded-full bg-[#1A8FE3]/10 float-soft" style={{ animationDelay: '0s' }} />
-          <div className="absolute top-[25%] right-[12%] w-16 h-16 rounded-full bg-[#E6C229]/20 float-soft" style={{ animationDelay: '1s' }} />
-          <div className="absolute bottom-[20%] left-[20%] w-20 h-20 rounded-full bg-[#6610F2]/10 float-soft" style={{ animationDelay: '2s' }} />
-          <div className="absolute bottom-[30%] right-[15%] w-14 h-14 rounded-full bg-[#F17105]/15 float-soft" style={{ animationDelay: '0.5s' }} />
+          <div
+            className="absolute top-[15%] left-[10%] w-24 h-24 rounded-full bg-[#1A8FE3]/10 float-soft"
+            style={{ animationDelay: "0s" }}
+          />
+          <div
+            className="absolute top-[25%] right-[12%] w-16 h-16 rounded-full bg-[#E6C229]/20 float-soft"
+            style={{ animationDelay: "1s" }}
+          />
+          <div
+            className="absolute bottom-[20%] left-[20%] w-20 h-20 rounded-full bg-[#6610F2]/10 float-soft"
+            style={{ animationDelay: "2s" }}
+          />
+          <div
+            className="absolute bottom-[30%] right-[15%] w-14 h-14 rounded-full bg-[#F17105]/15 float-soft"
+            style={{ animationDelay: "0.5s" }}
+          />
           <div className="absolute top-1/2 left-1/2 w-32 h-32 rounded-full bg-[#1A8FE3]/5 -translate-x-1/2 -translate-y-1/2" />
         </div>
 
         <div className="max-w-[1000px] w-full flex items-center justify-center relative z-10 px-6 py-16">
           <div className="text-center max-w-4xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6">
-              {title}{' '}
+              {title}{" "}
               <span className="gradient-text-cover block md:inline">
                 {subtitle}
               </span>
             </h1>
 
             <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Nền tảng khóa học vẽ và mỹ thuật cho thiếu nhi — sáng tạo, vui nhộn và an toàn.
-              Chọn khóa học phù hợp hoặc gặp giảng viên để tìm hiểu lộ trình học cho bé.
+              Nền tảng khóa học vẽ và mỹ thuật cho thiếu nhi — sáng tạo, vui
+              nhộn và an toàn. Chọn khóa học phù hợp hoặc liên hệ tư vấn để tìm
+              hiểu lộ trình học cho bé.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-16">
