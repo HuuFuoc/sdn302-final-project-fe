@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Spin, Typography, Button, Divider, Collapse } from "antd";
+import { Spin, Typography, Button, Divider, Collapse, Alert } from "antd";
 import { LessonService } from "../../../services/lesson/lesson.service";
 import { SessionService } from "../../../services/session/session.service";
+import { CourseService } from "../../../services/course/course.service";
 import type { Lesson } from "../../../types/lesson/Lesson.res.type";
 import type { Session } from "../../../types/session/Session.res.type";
 import {
@@ -18,6 +19,42 @@ import { ROUTER_URL } from "../../../consts/router.path.const";
 const { Title } = Typography;
 const { Panel } = Collapse;
 
+type LessonAccessPayload = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  content?: string;
+  lessonType?: string;
+  videoUrl?: string;
+  imageUrl?: string;
+  fullTime?: number;
+  positionOrder?: number;
+  session_id?: string;
+  sessionId?: string;
+  course_id?: string;
+  courseId?: string;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
+  user_id?: string;
+  userId?: string;
+  preview?: boolean;
+  isPreview?: boolean;
+  isFree?: boolean;
+};
+
+type SessionLessonItem = {
+  _id?: string;
+  id?: string;
+  name?: string;
+  lessonType?: string;
+};
+
+type SessionWithLessons = Session & {
+  lessons: SessionLessonItem[];
+};
+
 const LessonDetail: React.FC = () => {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
@@ -25,9 +62,13 @@ const LessonDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
   const [sidebarLoading, setSidebarLoading] = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [backendError, setBackendError] = useState<string | null>(null);
 
   // Thêm state để lưu lessons
-  const [sessionsWithLessons, setSessionsWithLessons] = useState<any[]>([]);
+  const [sessionsWithLessons, setSessionsWithLessons] = useState<
+    SessionWithLessons[]
+  >([]);
 
   useEffect(() => {
     const fetchLesson = async () => {
@@ -37,31 +78,66 @@ const LessonDetail: React.FC = () => {
           const res = await LessonService.getLessonById({ lessonId });
           if (res.data?.success && res.data?.data) {
             // API trả về field dạng _id, course_id, session_id → map sang Lesson
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const raw: any = res.data.data;
+            const raw = res.data.data as LessonAccessPayload;
+            const courseId = raw.course_id || raw.courseId || "";
+            const isPreviewLesson = Boolean(
+              raw.preview ?? raw.isPreview ?? raw.isFree ?? false,
+            );
+
+            let hasAccess = isPreviewLesson;
+            if (!hasAccess && courseId) {
+              const myCoursesRes = await CourseService.getMyCourses();
+              const myCourses = Array.isArray(myCoursesRes.data?.data)
+                ? myCoursesRes.data.data
+                : [];
+
+              hasAccess = myCourses.some(
+                (course: { id?: string; _id?: string; courseId?: string }) => {
+                  const id = course.id || course._id || course.courseId || "";
+                  return id === courseId;
+                },
+              );
+            }
+
+            if (!hasAccess) {
+              setAccessDenied(true);
+              setLesson(null);
+              return;
+            }
+
             const mappedLesson: Lesson = {
-              id: raw._id || raw.id,
-              name: raw.name,
-              content: raw.content,
-              lessonType: raw.lessonType,
-              videoUrl: raw.videoUrl,
-              imageUrl: raw.imageUrl,
-              fullTime: raw.fullTime,
-              positionOrder: raw.positionOrder,
-              sessionId: raw.session_id || raw.sessionId,
-              courseId: raw.course_id || raw.courseId,
+              id: raw._id || raw.id || "",
+              name: raw.name || "",
+              content: raw.content || "",
+              lessonType: raw.lessonType || "",
+              videoUrl: raw.videoUrl || "",
+              imageUrl: raw.imageUrl || "",
+              fullTime: raw.fullTime || 0,
+              positionOrder: raw.positionOrder || 0,
+              sessionId: raw.session_id || raw.sessionId || "",
+              courseId: raw.course_id || raw.courseId || "",
               userAvatar: "",
               fullName: "",
-              createdAt: raw.created_at || raw.createdAt,
-              updatedAt: raw.updated_at || raw.updatedAt,
-              userId: raw.user_id || raw.userId,
+              createdAt: raw.created_at || raw.createdAt || "",
+              updatedAt: raw.updated_at || raw.updatedAt || "",
+              userId: raw.user_id || raw.userId || "",
             };
+            setAccessDenied(false);
+            setBackendError(null);
             setLesson(mappedLesson);
           } else {
             setLesson(null);
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
+        const error = err as { status?: number; response?: { status?: number }; message?: string };
+        const status = error?.status || error?.response?.status;
+        if (status === 401 || status === 403) {
+          setAccessDenied(true);
+        }
+        setBackendError(
+          error?.message || "Khong the xac thuc quyen truy cap bai hoc tu may chu.",
+        );
         setLesson(null);
       } finally {
         setLoading(false);
@@ -236,7 +312,7 @@ const LessonDetail: React.FC = () => {
             >
               {sessionItem.lessons && sessionItem.lessons.length > 0 ? (
                 <div className="space-y-1 pb-4">
-                  {sessionItem.lessons.map((lessonItem: any) => {
+                  {sessionItem.lessons.map((lessonItem: SessionLessonItem) => {
                     const targetId = lessonItem.id || lessonItem._id;
                     const isActive = targetId === lessonId;
 
@@ -293,6 +369,32 @@ const LessonDetail: React.FC = () => {
   }
 
   if (!lesson) {
+    if (accessDenied) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen px-4">
+          <div className="w-full max-w-xl">
+            <Alert
+              type="warning"
+              showIcon
+              message="Ban khong co quyen truy cap bai hoc nay"
+              description={
+                backendError ||
+                "Hay mua khoa hoc hoac dung bai hoc hoc thu hop le de tiep tuc."
+              }
+            />
+          </div>
+          <div className="mt-6 flex gap-3">
+            <Button onClick={() => navigate(ROUTER_URL.CLIENT.COURSE)}>
+              Xem khoa hoc
+            </Button>
+            <Button type="primary" onClick={() => navigate(-1)}>
+              Quay lai
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Title level={3}>Không tìm thấy bài học</Title>
