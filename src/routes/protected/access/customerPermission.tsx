@@ -8,6 +8,7 @@ import MyCoursePage from "../../../pages/customer/my-course";
 import OrderHistory from "../../../pages/customer/order";
 import ReviewHistory from "../../../pages/customer/review";
 import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
+import LessonDetailPage from "../../../pages/customer/lesson";
 // Lazy load customer pages
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const AppointmentPage = lazy(
@@ -47,6 +48,10 @@ export const CustomerRoutes: RouteObject[] = [
       {
         path: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
         element: <ReviewHistory />,
+      },
+      {
+        path: ROUTER_URL.CUSTOMER.LESSON_DETAIL,
+        element: <LessonDetailPage />,
       },
     ],
   },
