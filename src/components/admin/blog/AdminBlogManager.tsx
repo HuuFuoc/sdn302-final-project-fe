@@ -303,33 +303,7 @@ const AdminBlogManager = () => {
         inputWidth="w-96"
       />
 
-      <div className="mb-4 flex items-center gap-2">
-        <Input
-          value={userIdFilter}
-          onChange={(e) => setUserIdFilter(e.target.value)}
-          placeholder="Lọc theo user_id (GET /api/blog/user/{user_id})"
-          className="max-w-md"
-          allowClear
-        />
-        <Button
-          type="default"
-          onClick={() => {
-            setCurrent(1);
-            setAppliedUserId(userIdFilter.trim());
-          }}
-        >
-          Lọc user_id
-        </Button>
-        <Button
-          onClick={() => {
-            setUserIdFilter("");
-            setAppliedUserId("");
-            setCurrent(1);
-          }}
-        >
-          Xóa lọc
-        </Button>
-      </div>
+
 
       <Table
         columns={columns}

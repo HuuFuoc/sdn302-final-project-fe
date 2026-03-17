@@ -126,11 +126,7 @@ const AdminAnalyticsPage: React.FC = () => {
             description={error}
           />
         ) : (
-          <Alert
-            showIcon
-            type="info"
-            message={`Đối soát: ${toNumber(completedPayments)} thanh toán hoàn tất và ${toNumber(paidOrders)} đơn hàng đã thanh toán`}
-          />
+          <></>
         )}
 
         <Row gutter={[16, 16]}>

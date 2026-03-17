@@ -283,9 +283,6 @@ const AdminUserManager = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h2>
-          <p className="text-gray-600 mt-1">
-            Dữ liệu lấy từ API <strong>GET /user/all</strong> của Admin
-          </p>
         </div>
         <Button
           type="primary"

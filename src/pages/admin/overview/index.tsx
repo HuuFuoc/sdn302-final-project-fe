@@ -463,12 +463,6 @@ const Overview: React.FC = () => {
         </Text>
       </div>
 
-      <Alert
-        type={apiFailedCount > 0 ? "warning" : "info"}
-        showIcon
-        message={`Tổng tài nguyên đang theo dõi: ${totalResources.toLocaleString("vi-VN")} | API lỗi: ${apiFailedCount}/${apiAudit.length}`}
-      />
-
       <Row gutter={[16, 16]}>
         {cards.map((card) => (
           <Col xs={24} sm={12} lg={8} xl={6} key={card.label}>
@@ -524,25 +518,6 @@ const Overview: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={12}>
-          <Card title="Trạng thái khóa học" style={{ borderRadius: 14 }}>
-            {courseByStatus.length > 0 ? (
-              <Bar
-                data={courseByStatus}
-                xField="status"
-                yField="count"
-                colorField="status"
-                color={(datum: { status: string; color?: string }) =>
-                  datum.color || getCourseStatusColor(datum.status)
-                }
-                label={{ text: "count", position: "right" }}
-                height={300}
-              />
-            ) : (
-              <Text type="secondary">Không có dữ liệu.</Text>
-            )}
-          </Card>
-        </Col>
-        <Col xs={24} xl={12}>
           <Card title="Tăng trưởng nội dung 6 tháng gần nhất" style={{ borderRadius: 14 }}>
             {contentGrowth.length > 0 ? (
               <Line
@@ -582,46 +557,7 @@ const Overview: React.FC = () => {
         </Col>
       </Row>
 
-      <Card title="Bảng kiểm tra API admin" style={{ borderRadius: 14 }}>
-        <Table
-          rowKey="key"
-          size="small"
-          pagination={false}
-          dataSource={apiAudit}
-          columns={[
-            { title: "Module", dataIndex: "module", key: "module" },
-            { title: "Endpoint", dataIndex: "endpoint", key: "endpoint" },
-            { title: "Mục đích", dataIndex: "purpose", key: "purpose" },
-            {
-              title: "Trạng thái",
-              key: "status",
-              render: (_, record: ApiAuditRow) =>
-                record.status === "success" ? (
-                  <Tag color="green">OK</Tag>
-                ) : (
-                  <Tag color="red">ERROR</Tag>
-                ),
-            },
-            {
-              title: "Chi tiết lỗi",
-              dataIndex: "error",
-              key: "error",
-              render: (error?: string) => error || "-",
-            },
-          ]}
-        />
-      </Card>
 
-      <Card title="Điều hướng admin" style={{ borderRadius: 14 }}>
-        <Space size={[8, 10]} wrap>
-          {ADMIN_AUDITED_ROUTES.map((route) => (
-            <Button key={route.path} onClick={() => navigate(route.path)}>
-              {route.label}
-              <Tag style={{ marginLeft: 8, marginRight: 0 }}>{route.path}</Tag>
-            </Button>
-          ))}
-        </Space>
-      </Card>
     </Space>
   );
 };
