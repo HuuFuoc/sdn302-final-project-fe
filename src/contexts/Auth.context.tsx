@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
 import { UserRole } from "../app/enums";
 import { AuthService } from "../services/auth/auth.service";
+import { UserService } from "../services/user/user.service";
 import { useNavigate } from "react-router-dom";
 import { HTTP_STATUS } from "../app/enums";
 import { HttpException } from "../app/exceptions";
@@ -36,6 +37,35 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+/** Map API user (avatar / profile_pic_url / profilePicUrl) to UserResponse */
+const normalizeUserFromApi = (raw: any): UserResponse => {
+  const profilePicUrl =
+    raw?.profilePicUrl ?? raw?.profile_pic_url ?? raw?.avatar ?? "";
+  return {
+    id: raw?.id ?? raw?._id ?? "",
+    firstName: raw?.firstName ?? raw?.first_name ?? "",
+    lastName: raw?.lastName ?? raw?.last_name ?? "",
+    password: raw?.password ?? "",
+    phoneNumber: raw?.phoneNumber ?? raw?.phone_number ?? "",
+    gender: raw?.gender ?? "",
+    email: raw?.email ?? "",
+    dob: raw?.dob ?? "",
+    ageGroup: raw?.ageGroup ?? raw?.age_group ?? "",
+    token: raw?.token,
+    isVerified: raw?.isVerified ?? raw?.is_verified ?? false,
+    isDeleted: raw?.isDeleted ?? raw?.is_deleted ?? false,
+    verificationToken: raw?.verificationToken ?? raw?.verification_token ?? "",
+    verificationTokenExpires: raw?.verificationTokenExpires
+      ? new Date(raw.verificationTokenExpires)
+      : new Date(),
+    role: mapBackendRoleToUserRole(raw?.role) ?? UserRole.CUSTOMER,
+    profilePicUrl: profilePicUrl || "",
+    createdAt: raw?.createdAt ? new Date(raw.createdAt) : new Date(),
+    updatedAt: raw?.updatedAt ? new Date(raw.updatedAt) : new Date(),
+    fullName: raw?.fullName ?? raw?.full_name ?? "",
+  };
+};
 
 const mapBackendRoleToUserRole = (backendRole: any): UserRole | null => {
   // Backend role mapping supports both legacy and current enum/string values.
@@ -77,34 +107,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load initial state from localStorage
+  // Load initial state from localStorage and fetch user by id for avatar
   useEffect(() => {
-    const initAuth = () => {
+    const clearAuthData = () => {
+      setToken(null);
+      setRole(null);
+      setUserInfo(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("userInfo");
+    };
+
+    const initAuth = async () => {
       try {
-        // Get stored values
         const storedToken = localStorage.getItem("token");
         const storedUserInfo = localStorage.getItem("userInfo");
 
-        // Set token if it exists
         if (storedToken) {
           setToken(storedToken);
           try {
-            // Verify and set role from token
-            const decoded = jwtDecode(storedToken) as { role?: any };
+            const decoded = jwtDecode(storedToken) as {
+              role?: any;
+              user_id?: string;
+              sub?: string;
+            };
             const mappedRole = mapBackendRoleToUserRole(decoded.role);
             if (!mappedRole) {
               throw new Error("Invalid role in token");
             }
             setRole(mappedRole);
+
+            const userId = decoded.user_id ?? decoded.sub;
+            if (userId) {
+              try {
+                const res = await UserService.getUserById({ userId });
+                if (res?.data?.data) {
+                  setUserInfo(normalizeUserFromApi(res.data.data));
+                } else if (storedUserInfo) {
+                  setUserInfo(JSON.parse(storedUserInfo));
+                }
+              } catch {
+                if (storedUserInfo) {
+                  setUserInfo(JSON.parse(storedUserInfo));
+                }
+              }
+            } else if (storedUserInfo) {
+              setUserInfo(JSON.parse(storedUserInfo));
+            }
           } catch (error) {
-            // Token is invalid or expired
             console.error("Token validation error:", error);
             clearAuthData();
           }
-        }
-
-        // Set user info if it exists
-        if (storedUserInfo) {
+        } else if (storedUserInfo) {
           setUserInfo(JSON.parse(storedUserInfo));
         }
       } catch (error) {
@@ -113,15 +167,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } finally {
         setIsLoading(false);
       }
-    };
-
-    const clearAuthData = () => {
-      setToken(null);
-      setRole(null);
-      setUserInfo(null);
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userInfo");
     };
 
     initAuth();
@@ -185,17 +230,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           localStorage.setItem("refresh_token", result.refresh_token);
         }
 
-        const decoded = jwtDecode(token) as { role?: any; user_id?: string };
+        const decoded = jwtDecode(token) as {
+          role?: any;
+          user_id?: string;
+          sub?: string;
+        };
         const mappedRole = mapBackendRoleToUserRole(decoded.role);
         if (!mappedRole) {
           throw new HttpException("Invalid role", HTTP_STATUS.UNAUTHORIZED);
         }
 
         const userRole = mappedRole;
+        const userId = decoded.user_id ?? decoded.sub ?? "";
 
-        // Minimal user info constructed from token + login data
+        localStorage.setItem("token", token);
+        setToken(token);
+        setRole(userRole);
+
         const userData: UserResponse = {
-          id: decoded.user_id ?? "",
+          id: userId,
           firstName: "",
           lastName: "",
           password: "",
@@ -216,14 +269,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           fullName: "",
         };
 
-        // Store values
-        setToken(token);
-        setRole(userRole);
+        if (userId) {
+          try {
+            const res = await UserService.getUserById({ userId });
+            if (res?.data?.data) {
+              const normalized = normalizeUserFromApi(res.data.data);
+              normalized.token = token;
+              setUserInfo(normalized);
+              helpers.notificationMessage("Đăng nhập thành công!", "success");
+              return normalized;
+            }
+          } catch {
+            // fallback to minimal userData
+          }
+        }
+
         setUserInfo(userData);
-
-        // Success message
         helpers.notificationMessage("Đăng nhập thành công!", "success");
-
         return userData;
       } catch (error) {
         throw error;

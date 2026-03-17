@@ -136,7 +136,10 @@ const MyCourseList: React.FC = () => {
           className="bg-[#20558A] hover:bg-blue-700 text-white"
           onClick={() =>
             navigate(
-              ROUTER_URL.CLIENT.COURSE_DETAIL.replace(":courseId", record.id),
+              ROUTER_URL.CLIENT.MY_COURSE_DETAIL.replace(
+                ":courseId",
+                record.id,
+              ),
             )
           }
         >
