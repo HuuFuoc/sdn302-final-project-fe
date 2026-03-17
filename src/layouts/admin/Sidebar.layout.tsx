@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,6 @@ import { Tooltip, Badge, Avatar, Divider } from "antd";
 import { cn } from "../../utils/cn";
 import { useAuth } from "../../contexts/Auth.context";
 
-// Enhanced navigation structure for admin
 const navSections = [
   {
     title: "Tổng Quan",
@@ -53,18 +52,11 @@ const navSections = [
         description: "Quản lý tất cả tài khoản",
       },
       {
-        name: "Quản Lý Viên",
-        to: ROUTER_URL.ADMIN.MANAGERS,
-        icon: <UserOutlined />,
-        badge: "5",
-        description: "Quản lý đội ngũ quản lý",
-      },
-      {
-        name: "Nhân Viên & Tư Vấn",
+        name: "Giảng viên & Quản lý giảng viên",
         to: ROUTER_URL.ADMIN.STAFF_CONSULTANTS,
         icon: <CrownOutlined />,
         badge: "45",
-        description: "Quản lý đội ngũ chuyên gia",
+        description: "Quản lý giảng viên và yêu cầu giảng viên",
       },
     ],
   },
@@ -145,10 +137,8 @@ const SidebarLayout: React.FC = () => {
         animate={{ width: collapsed ? "4rem" : "20rem" }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
       >
-        {/* Background Pattern */}
         <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.1) 1px,transparent 1px)] [background-size:20px_20px] opacity-30"></div>
 
-        {/* Toggle button */}
         <button
           onClick={toggleSidebar}
           className="absolute -right-3 top-24 bg-white rounded-full p-2 shadow-lg border border-gray-200 text-[#20558A] hover:text-[#1e4d7a] hover:shadow-xl transition-all z-20"
@@ -156,7 +146,6 @@ const SidebarLayout: React.FC = () => {
           {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         </button>
 
-        {/* Header */}
         <div
           className={cn(
             "p-6 border-b border-[#20558A]/30 flex items-center relative z-10",
@@ -189,7 +178,6 @@ const SidebarLayout: React.FC = () => {
           </NavLink>
         </div>
 
-        {/* Admin Profile Card */}
         {!collapsed && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -218,7 +206,6 @@ const SidebarLayout: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Navigation */}
         <div className="flex-1 overflow-hidden flex flex-col">
           <nav className="flex-1 px-4 py-2 space-y-2 relative z-10 overflow-y-auto overflow-x-hidden custom-scrollbar">
             {navSections.map((section, sectionIndex) => (
@@ -329,7 +316,6 @@ const SidebarLayout: React.FC = () => {
           </nav>
         </div>
 
-        {/* Footer */}
         <div
           className={cn(
             "p-4 border-t border-[#20558A]/30 relative z-10 flex-shrink-0",

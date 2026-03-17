@@ -23,6 +23,12 @@ export const UserService = {
       payload: params,
     });
   },
+  getAllUsersByAdmin(params: GetUsers) {
+    return BaseService.get<ResponseSuccess<UserResponse[]>>({
+      url: API_PATH.USER.GET_ALL_USERS_ADMIN,
+      payload: params,
+    });
+  },
 
   updateUser(params: UpdateUserRequest) {
     return BaseService.put<ResponseSuccess<UserResponse>>({
