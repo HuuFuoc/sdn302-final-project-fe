@@ -1,6 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root {
+  --font-vietnamese: "Be Vietnam Pro", "Noto Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  font-family: var(--font-vietnamese);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ant-typography,
+.ant-card,
+.ant-statistic,
+.ant-table,
+.ant-btn,
+.ant-menu,
+.ant-alert-message,
+.ant-alert-description {
+  font-family: var(--font-vietnamese);
+}
 
 /* Design system: Nền tảng học vẽ & mỹ thuật thiếu nhi */
 :root {
@@ -253,3 +276,5 @@
   border-color: #fde68a;
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.12);
 }
+
+

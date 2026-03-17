@@ -153,6 +153,7 @@ export const API_PATH = {
   PAYMENT: {
     CREATE_PAYMENT: "/api/payment/createPaymentFromOrder",
     GET_PAYMENT_HISTORY: (userId: string) => `/api/payment/history/${userId}`,
+    GET_ADMIN_FINANCIAL_OVERVIEW: "/api/payment/admin/financial-overview",
     STRIPE_WEBHOOK: "/api/payment/stripe-webhook",
     UPDATE_PAYMENT_STATUS: (paymentId: string) =>
       `/api/payment/${paymentId}/status`,
