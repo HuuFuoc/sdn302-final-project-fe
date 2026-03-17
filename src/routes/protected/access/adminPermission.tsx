@@ -13,6 +13,7 @@ import CategoryManagement from "../../../pages/admin/category";
 // Lazy load admin pages
 const AdminLayout = lazy(() => import("../../../layouts/admin/Admin.layout"));
 const OverviewPage = lazy(() => import("../../../pages/admin/overview"));
+const AnalyticsPage = lazy(() => import("../../../pages/admin/analytics"));
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const ProgramManagementPage = lazy(
   () => import("../../../pages/manager/program")
@@ -34,7 +35,7 @@ export const AdminRoutes: RouteObject[] = [
       },
       {
         path: ROUTER_URL.ADMIN.ANALYTICS,
-        element: <OverviewPage />,
+        element: <AnalyticsPage />,
       },
       {
         path: ROUTER_URL.ADMIN.USERS,
