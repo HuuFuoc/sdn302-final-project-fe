@@ -6,7 +6,6 @@ import { AdminRoutes } from "./access/adminPermission";
 import { CustomerRoutes } from "./access/customerPermission";
 import { ConsultantRoutes } from "./access/consultantPermission";
 import { StaffRoutes } from "./access/staffPermission";
-import { ManagerRoutes } from "./access/managerPermission";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { useAuth } from "../../contexts/Auth.context";
 import GuardProtectedRoute from "./GuardProtectedRoute";
@@ -46,33 +45,6 @@ const useProtectedRoutes = (): RouteObject[] => {
               <GuardProtectedRoute
                 component={route.element as JSX.Element}
                 allowedRoles={[UserRole.ADMIN]}
-              />
-            </Suspense>
-          ),
-        })),
-      ];
-      break;
-
-    case UserRole.MANAGER:
-      protectedRoutes = [
-        ...ManagerRoutes.map((route) => ({
-          ...route,
-          element: (
-            <Suspense>
-              <GuardProtectedRoute
-                component={route.element as JSX.Element}
-                allowedRoles={[UserRole.MANAGER]}
-              />
-            </Suspense>
-          ),
-        })),
-        ...CustomerRoutes.map((route) => ({
-          ...route,
-          element: (
-            <Suspense>
-              <GuardProtectedRoute
-                component={route.element as JSX.Element}
-                allowedRoles={[UserRole.MANAGER]}
               />
             </Suspense>
           ),

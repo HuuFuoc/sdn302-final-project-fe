@@ -99,8 +99,10 @@ const CourseContent: React.FC<CourseContentProps> = ({
             {section.lectures && section.lectures.length > 0 ? (
               <div className="space-y-1 pb-4">
                 {section.lectures.map((lecture, lectureIndex) => {
-                  const disabled = !isPurchased;
-                  const canClick = isPurchased && !!onLessonClick && !!lecture.id;
+                  const isPreviewLesson = Boolean(lecture.preview);
+                  const canAccess = isPurchased || isPreviewLesson;
+                  const disabled = !canAccess;
+                  const canClick = canAccess && !!onLessonClick && !!lecture.id;
 
                   return (
                     <div
@@ -121,16 +123,16 @@ const CourseContent: React.FC<CourseContentProps> = ({
                         <Text className="text-gray-700 text-sm">
                           {lecture.title}
                         </Text>
-                        {lecture.preview && isPurchased && (
+                        {isPreviewLesson && (
                           <Button
                             type="link"
                             size="small"
                             className="text-purple-600 p-0 h-auto text-xs"
                           >
-                            Xem trước
+                            Học thử
                           </Button>
                         )}
-                        {!isPurchased && (
+                        {!canAccess && (
                           <span className="flex items-center text-xs text-gray-500 ml-2">
                             <LockOutlined className="mr-1" />
                             Mua khóa học để học bài này

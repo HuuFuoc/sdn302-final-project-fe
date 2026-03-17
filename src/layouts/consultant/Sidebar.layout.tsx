@@ -146,7 +146,7 @@ const SidebarLayout: React.FC = () => {
                     lineHeight: 1.3,
                   }}
                 >
-                  Tư vấn viên
+                  Giảng viên
                 </div>
                 <div
                   style={{

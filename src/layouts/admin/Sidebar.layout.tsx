@@ -11,17 +11,8 @@ import {
   MenuUnfoldOutlined,
   TeamOutlined,
   BookOutlined,
-  FileTextOutlined,
   EditOutlined,
-  CalendarOutlined,
   BarChartOutlined,
-  SecurityScanOutlined,
-  MessageOutlined,
-  AlertOutlined,
-  GlobalOutlined,
-  SafetyOutlined,
-  HeartOutlined,
-  BulbOutlined,
   CrownOutlined,
   LogoutOutlined,
   FolderOpenOutlined,
@@ -30,7 +21,7 @@ import { Tooltip, Badge, Avatar, Divider } from "antd";
 import { cn } from "../../utils/cn";
 import { useAuth } from "../../contexts/Auth.context";
 
-// Enhanced navigation structure for drug prevention admin
+// Enhanced navigation structure for admin
 const navSections = [
   {
     title: "Tổng Quan",
@@ -75,29 +66,22 @@ const navSections = [
         badge: "45",
         description: "Quản lý đội ngũ chuyên gia",
       },
-      {
-        name: "Phân Quyền Hệ Thống",
-        to: ROUTER_URL.ADMIN.PERMISSIONS,
-        icon: <SecurityScanOutlined />,
-        badge: null,
-        description: "Cấu hình quyền truy cập",
-      },
     ],
   },
   {
-    title: "Nội Dung & Chương Trình",
+    title: "Nội Dung",
     items: [
       {
         name: "Quản Lý Khóa Học",
         to: ROUTER_URL.ADMIN.MANAGER_COURSE,
         icon: <BookOutlined />,
         badge: "23",
-        description: "Khóa học vẽ & mỹ thuật",
+        description: "Danh sách khóa học",
       },
       {
         name: "Quản Lý Danh Mục",
-        to: ROUTER_URL.ADMIN.MANAGER_CATEGORY, // <-- Đường dẫn quản lý category
-        icon: <FolderOpenOutlined />, // <-- Icon phù hợp cho category
+        to: ROUTER_URL.ADMIN.MANAGER_CATEGORY,
+        icon: <FolderOpenOutlined />,
         badge: null,
         description: "Quản lý danh mục khóa học",
       },
@@ -106,73 +90,7 @@ const navSections = [
         to: ROUTER_URL.ADMIN.MANAGER_BLOG,
         icon: <EditOutlined />,
         badge: "156",
-        description: "Bài viết giáo dục",
-      },
-      {
-        name: "Chương Trình Cộng Đồng",
-        to: ROUTER_URL.ADMIN.COMMUNITY_PROGRAMS,
-        icon: <GlobalOutlined />,
-        badge: "12",
-        description: "Hoạt động cộng đồng",
-      },
-      {
-        name: "Tài Nguyên Hỗ Trợ",
-        to: ROUTER_URL.ADMIN.RESOURCES,
-        icon: <BulbOutlined />,
-        badge: null,
-        description: "Tài liệu và công cụ hỗ trợ",
-      },
-    ],
-  },
-  {
-    title: "Đánh Giá & Tư Vấn",
-    items: [
-      {
-        name: "Công Cụ Đánh Giá",
-        to: ROUTER_URL.ADMIN.ASSESSMENTS,
-        icon: <FileTextOutlined />,
-        badge: "8",
-        description: "Bộ câu hỏi đánh giá nguy cơ",
-      },
-      {
-        name: "Lịch Tư Vấn",
-        to: ROUTER_URL.ADMIN.CONSULTATIONS,
-        icon: <CalendarOutlined />,
-        badge: "34",
-        description: "Quản lý lịch hẹn tư vấn",
-      },
-      {
-        name: "Hỗ Trợ Khẩn Cấp",
-        to: ROUTER_URL.ADMIN.EMERGENCY_SUPPORT,
-        icon: <HeartOutlined />,
-        badge: "7",
-        description: "Hỗ trợ khủng hoảng",
-      },
-    ],
-  },
-  {
-    title: "Hệ Thống",
-    items: [
-      {
-        name: "Cảnh Báo & Thông Báo",
-        to: ROUTER_URL.ADMIN.ALERTS,
-        icon: <AlertOutlined />,
-        badge: "3",
-        description: "Quản lý cảnh báo hệ thống",
-      },
-      {
-        name: "Tin Nhắn & Liên Lạc",
-        to: ROUTER_URL.ADMIN.MESSAGES,
-        icon: <MessageOutlined />,
-        badge: "12",
-        description: "Hệ thống nhắn tin",
-      },
-      {
-        name: "Bảo Mật & Kiểm Soát",
-        to: ROUTER_URL.ADMIN.SECURITY,
-        icon: <SafetyOutlined />,
-        badge: null,
-        description: "Cấu hình bảo mật",
+        description: "Bài viết và tin tức",
       },
       {
         name: "Cài Đặt Hệ Thống",

@@ -29,6 +29,14 @@ export const AdminRoutes: RouteObject[] = [
         element: <OverviewPage />,
       },
       {
+        path: ROUTER_URL.ADMIN.OVERVIEW,
+        element: <OverviewPage />,
+      },
+      {
+        path: ROUTER_URL.ADMIN.ANALYTICS,
+        element: <OverviewPage />,
+      },
+      {
         path: ROUTER_URL.ADMIN.USERS,
         element: <UserManagement />,
       },

@@ -362,7 +362,12 @@ const CourseDetail: React.FC = () => {
           id: lesson.id,
           title: lesson.name,
           duration: lesson.fullTime ? `${lesson.fullTime} phút` : "",
-          preview: false,
+          preview: Boolean(
+            (lesson as any).preview ??
+              (lesson as any).isPreview ??
+              (lesson as any).isFree ??
+              false,
+          ),
           completed: false,
           imageUrl: lesson.imageUrl || undefined,
           videoUrl: lesson.videoUrl || undefined,
