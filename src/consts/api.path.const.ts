@@ -12,6 +12,7 @@ export const API_PATH = {
   },
   USER: {
     GET_USERS: "/user",
+    GET_ALL_USERS_ADMIN: "/user/all",
     GET_USER_PROFILE: "/user/get-me",
     UPDATE_USER_PROFILE: "/user/update-me",
     GET_USER_BY_ID: (id: string) => `/user/${id}`,
@@ -102,7 +103,7 @@ export const API_PATH = {
   },
   CATEGORY: {
     GET_ALL_CATEGORIES: "/api/category",
-    CREATE_CATEGORY: "/category/create",
+    CREATE_CATEGORY: "/api/category/create",
     UPDATE_CATEGORY: (categoryId: string) => `/category/${categoryId}`,
     DELETE_CATEGORY: (categoryId: string) => `/category/${categoryId}`,
     GET_CATEGORY_BY_ID: (categoryId: string) => `/category/${categoryId}`,
