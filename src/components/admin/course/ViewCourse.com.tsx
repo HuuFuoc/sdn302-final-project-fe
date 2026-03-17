@@ -65,6 +65,82 @@ const toAbsoluteMediaUrl = (url: string) => {
   return `${base}/${normalized}`;
 };
 
+const SessionLessonItem: React.FC<{
+  lesson: {
+    name?: string;
+    lessonType?: string;
+    content?: string;
+    imageUrl?: string;
+  };
+  index: number;
+}> = ({ lesson, index }) => {
+  const [expandedLesson, setExpandedLesson] = useState(false);
+
+  const words = getWordsFromHTML(lesson.content || "");
+  const isLong = words.length > WORD_LIMIT;
+  let shortHTML = lesson.content;
+
+  if (isLong && !expandedLesson) {
+    const shortText = words.slice(0, WORD_LIMIT).join(" ") + "...";
+    shortHTML = `<span>${shortText}</span>`;
+  }
+
+  return (
+    <List.Item
+      className="hover:bg-gray-50 transition-colors border-0 border-b border-dashed border-gray-100 last:border-b-0"
+      style={{ background: "none" }}
+    >
+      <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <b
+            className="text-gray-800"
+            dangerouslySetInnerHTML={{
+              __html: `${index + 1}. ${lesson.name}`,
+            }}
+          />
+          <span className="text-gray-500">({lesson.lessonType})</span>
+          <div className="text-gray-600 text-sm mt-1">
+            <span
+              dangerouslySetInnerHTML={{
+                __html:
+                  expandedLesson || !isLong
+                    ? lesson.content || ""
+                    : shortHTML || "",
+              }}
+            />
+            {isLong && (
+              <Button
+                type="link"
+                size="small"
+                onClick={() => setExpandedLesson((prev) => !prev)}
+                style={{
+                  paddingLeft: 8,
+                  fontWeight: 500,
+                }}
+              >
+                {expandedLesson ? "Thu gá»n" : "Xem thÃªm"}
+              </Button>
+            )}
+          </div>
+        </div>
+        {lesson.lessonType === "Image" && lesson.imageUrl && (
+          <Image
+            src={lesson.imageUrl}
+            alt="lesson-img"
+            width={80}
+            height={60}
+            className="rounded-md shadow-sm hover:shadow-md transition-shadow"
+            style={{
+              objectFit: "cover",
+              marginTop: 6,
+            }}
+          />
+        )}
+      </div>
+    </List.Item>
+  );
+};
+
 const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
   const [data, setData] = useState<CourseDetailResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -308,85 +384,9 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
                           // Bỏ thuộc tính bordered để giảm border
                           className="mt-3 ml-4 bg-white rounded-md"
                           dataSource={session.lessonList}
-                          renderItem={(lesson, idx) => {
-                            // Xử lý rút gọn content cho mỗi lesson
-                            const words = getWordsFromHTML(
-                              lesson.content || ""
-                            );
-                            const isLong = words.length > WORD_LIMIT;
-                            let shortHTML = lesson.content;
-                            const [expandedLesson, setExpandedLesson] =
-                              useState(false);
-
-                            if (isLong && !expandedLesson) {
-                              const shortText =
-                                words.slice(0, WORD_LIMIT).join(" ") + "...";
-                              shortHTML = `<span>${shortText}</span>`;
-                            }
-
-                            return (
-                              <List.Item
-                                className="hover:bg-gray-50 transition-colors border-0 border-b border-dashed border-gray-100 last:border-b-0"
-                                style={{ background: "none" }}
-                              >
-                                <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                                  <div>
-                                    <b
-                                      className="text-gray-800"
-                                      dangerouslySetInnerHTML={{
-                                        __html: `${idx + 1}. ${lesson.name}`,
-                                      }}
-                                    />
-                                    <span className="text-gray-500">
-                                      ({lesson.lessonType})
-                                    </span>
-                                    <div className="text-gray-600 text-sm mt-1">
-                                      <span
-                                        dangerouslySetInnerHTML={{
-                                          __html:
-                                            expandedLesson || !isLong
-                                              ? lesson.content
-                                              : shortHTML,
-                                        }}
-                                      />
-                                      {isLong && (
-                                        <Button
-                                          type="link"
-                                          size="small"
-                                          onClick={() =>
-                                            setExpandedLesson((prev) => !prev)
-                                          }
-                                          style={{
-                                            paddingLeft: 8,
-                                            fontWeight: 500,
-                                          }}
-                                        >
-                                          {expandedLesson
-                                            ? "Thu gọn"
-                                            : "Xem thêm"}
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </div>
-                                  {/* Hiển thị ảnh nếu là Image lesson */}
-                                  {lesson.lessonType === "Image" &&
-                                    lesson.imageUrl && (
-                                      <Image
-                                        src={lesson.imageUrl}
-                                        alt="lesson-img"
-                                        width={80}
-                                        height={60}
-                                        className="rounded-md shadow-sm hover:shadow-md transition-shadow"
-                                        style={{
-                                          objectFit: "cover",
-                                          marginTop: 6,
-                                        }}
-                                      />
-                                    )}
-                                </div>
-                              </List.Item>
-                            );
-                          }}
+                          renderItem={(lesson, idx) => (
+                            <SessionLessonItem lesson={lesson} index={idx} />
+                          )}
                         />
                       ) : (
                         <div className="text-gray-500 italic mt-2 ml-4">
@@ -408,3 +408,6 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
 };
 
 export default ViewCourse;
+
+
+

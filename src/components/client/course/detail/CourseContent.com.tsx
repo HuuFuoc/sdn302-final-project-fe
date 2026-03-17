@@ -114,7 +114,9 @@ const CourseContent: React.FC<CourseContentProps> = ({
                       }`}
                       onClick={() => {
                         if (!canClick) return;
-                        onLessonClick && lecture.id && onLessonClick(lecture.id);
+                        if (onLessonClick && lecture.id) {
+                          onLessonClick(lecture.id);
+                        }
                       }}
                     >
                       <div className="flex items-center space-x-3">
