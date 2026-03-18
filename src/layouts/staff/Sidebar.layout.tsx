@@ -1,16 +1,14 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Button, message } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   DashboardOutlined,
   BookOutlined,
-  TeamOutlined,
   SettingOutlined,
   LogoutOutlined,
   UserOutlined,
   EditOutlined,
-  BarChartOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   AuditOutlined,
@@ -69,24 +67,14 @@ const SidebarLayout: React.FC = () => {
       label: <Link to={ROUTER_URL.STAFF.CONTENT}>Quản lý nội dung</Link>,
     },
     {
-      key: ROUTER_URL.STAFF.USERS,
-      icon: <TeamOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.USERS}>Quản lý tài khoản</Link>,
-    },
-    {
       key: ROUTER_URL.STAFF.INSTRUCTORS,
-      icon: <TeamOutlined />,
+      icon: <AuditOutlined />,
       label: <Link to={ROUTER_URL.STAFF.INSTRUCTORS}>Quản lý giảng viên</Link>,
     },
     {
       key: ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS,
       icon: <AuditOutlined />,
       label: <Link to={ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS}>Duyệt yêu cầu giảng viên</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.REPORTS,
-      icon: <BarChartOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.REPORTS}>Báo cáo</Link>,
     },
     {
       key: ROUTER_URL.STAFF.SETTINGS,

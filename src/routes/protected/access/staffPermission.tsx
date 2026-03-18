@@ -9,7 +9,7 @@ import BlogManagement from "../../../pages/admin/blog";
 
 // Lazy load staff pages
 const StaffLayout = lazy(() => import("../../../layouts/staff/Staff.layout"));
-const OverviewPage = lazy(() => import("../../../pages/admin/overview"));
+const StaffOverviewPage = lazy(() => import("../../../pages/staff/overview"));
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 
 // Staff routes with layout protection
@@ -20,7 +20,7 @@ export const StaffRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <OverviewPage />,
+        element: <StaffOverviewPage />,
       },
       {
         path: ROUTER_URL.STAFF.COURSES,
@@ -44,7 +44,7 @@ export const StaffRoutes: RouteObject[] = [
       },
       {
         path: ROUTER_URL.STAFF.REPORTS,
-        element: <OverviewPage />,
+        element: <StaffOverviewPage />,
       },
       {
         path: ROUTER_URL.STAFF.SETTINGS,
