@@ -3,7 +3,7 @@ import { BlogService } from "../../../services/blog/blog.service";
 import { UserService } from "../../../services/user/user.service";
 import type { BlogRequest } from "../../../types/blog/Blog.req.type";
 import type { Blog } from "../../../types/blog/Blog.res.type";
-import { Table, Button, message, Image, Modal, Tooltip, Input } from "antd";
+import { Table, Button, message, Image, Modal, Tooltip } from "antd";
 import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import CreateBlogForm from "./CreateBlog.com";
 import DeleteBlog from "./DeleteBlog.com";
@@ -22,8 +22,6 @@ const AdminBlogManager = () => {
   const [pageSize, setPageSize] = useState(6);
   const [total, setTotal] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [userIdFilter, setUserIdFilter] = useState("");
-  const [appliedUserId, setAppliedUserId] = useState("");
 
   // Thêm state cho View
   const [showViewModal, setShowViewModal] = useState(false);
@@ -101,21 +99,12 @@ const AdminBlogManager = () => {
       filterByContent: searchKeyword,
     };
     try {
-      if (appliedUserId.trim()) {
-        const res = await BlogService.getBlogsByUserId({ user_id: appliedUserId.trim() });
-        const data = res.data as any;
-        const mappedBlogs = Array.isArray(data?.data) ? data.data : [];
-        const enrichedBlogs = await enrichBlogsWithUserInfo(mappedBlogs);
-        setBlogs(enrichedBlogs);
-        setTotal(data?.totalCount || mappedBlogs.length || 0);
-      } else {
-        const res = await BlogService.getAllBlogs(params);
-        const data = res.data as any;
-        const mappedBlogs = Array.isArray(data?.data) ? data.data : [];
-        const enrichedBlogs = await enrichBlogsWithUserInfo(mappedBlogs);
-        setBlogs(enrichedBlogs);
-        setTotal(data?.totalCount || 0);
-      }
+      const res = await BlogService.getAllBlogs(params);
+      const data = res.data as any;
+      const mappedBlogs = Array.isArray(data?.data) ? data.data : [];
+      const enrichedBlogs = await enrichBlogsWithUserInfo(mappedBlogs);
+      setBlogs(enrichedBlogs);
+      setTotal(data?.totalCount || 0);
     } catch (err) {
       setBlogs([]);
       message.error("Lỗi khi lấy danh sách blog!");
@@ -127,10 +116,6 @@ const AdminBlogManager = () => {
   useEffect(() => {
     fetchBlogs();
   }, [current, pageSize, searchKeyword]);
-
-  useEffect(() => {
-    fetchBlogs();
-  }, [appliedUserId]);
 
   const handleBlogCreated = () => {
     setShowModal(false);
