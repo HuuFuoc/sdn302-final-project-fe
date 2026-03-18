@@ -21,6 +21,8 @@ import {
 } from "@ant-design/icons";
 import { Bar, Column, Line, Pie } from "@ant-design/charts";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
+import { ROUTER_URL } from "../../../consts/router.path.const";
 import { BlogService } from "../../../services/blog/blog.service";
 import { CategoryService } from "../../../services/category/category.service";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
@@ -100,6 +102,7 @@ const getCourseCategoryId = (course: unknown) =>
 // ─── component ────────────────────────────────────────────────────────────────
 
 const StaffOverview: React.FC = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<Course[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -138,6 +141,7 @@ const StaffOverview: React.FC = () => {
         icon: <BookOutlined />,
         color: "#6366f1",
         bg: "#eef2ff",
+        to: ROUTER_URL.STAFF.COURSES,
       },
       {
         label: "Bài viết",
@@ -145,6 +149,7 @@ const StaffOverview: React.FC = () => {
         icon: <FileTextOutlined />,
         color: "#0891b2",
         bg: "#e0f7fa",
+        to: ROUTER_URL.STAFF.CONTENT,
       },
       {
         label: "Giảng viên",
@@ -152,6 +157,7 @@ const StaffOverview: React.FC = () => {
         icon: <ReadOutlined />,
         color: "#db2777",
         bg: "#fce7f3",
+        to: ROUTER_URL.STAFF.INSTRUCTORS,
       },
       {
         label: "Yêu cầu giảng viên",
@@ -159,6 +165,7 @@ const StaffOverview: React.FC = () => {
         icon: <AuditOutlined />,
         color: "#d97706",
         bg: "#fef3c7",
+        to: ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS,
       },
       {
         label: "Đã xuất bản",
@@ -168,6 +175,7 @@ const StaffOverview: React.FC = () => {
         icon: <CheckCircleOutlined />,
         color: "#10b981",
         bg: "#d1fae5",
+        to: ROUTER_URL.STAFF.COURSES,
       },
       {
         label: "Đang chờ duyệt",
@@ -177,6 +185,7 @@ const StaffOverview: React.FC = () => {
         icon: <ClockCircleOutlined />,
         color: "#f59e0b",
         bg: "#fffbeb",
+        to: ROUTER_URL.STAFF.COURSES,
       },
       {
         label: "Danh mục",
@@ -184,6 +193,7 @@ const StaffOverview: React.FC = () => {
         icon: <RocketOutlined />,
         color: "#7c3aed",
         bg: "#ede9fe",
+        to: ROUTER_URL.STAFF.COURSES,
       },
     ],
     [blogs.length, categories.length, consultants.length, courses, instructorRequests.length]
@@ -316,12 +326,14 @@ const StaffOverview: React.FC = () => {
         {stats.map((s) => (
           <Col xs={12} sm={8} lg={6} xl={4} key={s.label}>
             <Card
+              onClick={() => navigate(s.to)}
               style={{
                 borderRadius: 14,
                 border: "none",
                 boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
                 background: "#fff",
                 transition: "transform 0.2s, box-shadow 0.2s",
+                cursor: "pointer",
               }}
               styles={{ body: { padding: "20px 16px" } }}
               className="hover-card"
