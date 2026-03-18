@@ -64,12 +64,14 @@ const PaymentPage: React.FC = () => {
     }
   }, [orderId]);
 
+  const resolvedOrderId = order?.orderId || order?._id;
+
   const handleConfirmPayment = () => {
-    if (!order) return;
+    if (!order || !resolvedOrderId) return;
 
     createPaymentMutation.mutate(
       {
-        orderId: order.orderId,
+        orderId: resolvedOrderId,
         userId: order.userId,
         amount: order.totalAmount,
         paymentMethod: paymentMethod,
@@ -95,10 +97,10 @@ const PaymentPage: React.FC = () => {
   };
 
   const handleCancelPayment = () => {
-    if (!order) return;
+    if (!resolvedOrderId) return;
 
     const payload = {
-      orderId: order.orderId,
+      orderId: resolvedOrderId,
       newStatus: OrderStatus.FAIL,
     };
 

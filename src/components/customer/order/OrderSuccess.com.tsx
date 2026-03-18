@@ -117,7 +117,8 @@ const OrderSuccessList: React.FC = () => {
         if (cId && !courseDetails[cId]) {
           CourseService.getCourseById({ id: cId })
             .then((res) => {
-              const cData = res.data?.data?.course || res.data?.data;
+              const coursePayload = res.data?.data as any;
+              const cData = coursePayload?.course || coursePayload;
               if (cData) {
                 setCourseDetails((prev) => ({
                   ...prev,
