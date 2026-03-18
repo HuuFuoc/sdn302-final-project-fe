@@ -4,7 +4,7 @@ import { EyeOutlined } from "@ant-design/icons";
 import { OrderService } from "../../../services/order/order.service";
 import { CourseService } from "../../../services/course/course.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
-import CustomSearch from "../../common/CustomSearch.com";
+import { OrderStatus } from "../../../app/enums/orderStatus.enum";
 import noImage from "../../../assets/images/no-image.svg";
 
 const PAGE_SIZE = 8;
@@ -190,14 +190,6 @@ const OrderSuccessList: React.FC = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 16 }}>
-        <CustomSearch
-          placeholder="Tìm kiếm theo tên khóa học hoặc ngày đặt"
-          onSearch={setSearch}
-          loading={loading}
-          inputWidth="w-64"
-        />
-      </div>
       <Table
         dataSource={orders}
         columns={columns}
