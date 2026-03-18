@@ -1,15 +1,11 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import {
-  Alert,
-  Button,
   Card,
   Col,
   Row,
   Space,
   Spin,
   Statistic,
-  Table,
-  Tag,
   Typography,
 } from "antd";
 import {
@@ -20,9 +16,6 @@ import {
 } from "@ant-design/icons";
 import { Bar, Column, Line, Pie } from "@ant-design/charts";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
-import { API_PATH } from "../../../consts/api.path.const";
-import { ROUTER_URL } from "../../../consts/router.path.const";
 import { BlogService } from "../../../services/blog/blog.service";
 import { CategoryService } from "../../../services/category/category.service";
 import { ConsultantService } from "../../../services/consultant/consultant.service";
@@ -40,7 +33,6 @@ import type { UserResponse } from "../../../types/user/User.res.type";
 
 const { Title, Text } = Typography;
 
-type ApiHealth = "success" | "failed";
 type ApiKey =
   | "users"
   | "courses"
@@ -50,85 +42,6 @@ type ApiKey =
   | "sessions"
   | "lessons"
   | "instructorRequests";
-
-interface ApiAuditRow {
-  key: ApiKey;
-  module: string;
-  endpoint: string;
-  purpose: string;
-  status: ApiHealth;
-  error?: string;
-}
-
-const API_AUDIT_TEMPLATE: Omit<ApiAuditRow, "status" | "error">[] = [
-  {
-    key: "users",
-    module: "User",
-    endpoint: API_PATH.USER.GET_ALL_USERS_ADMIN,
-    purpose: "Lấy danh sách người dùng theo vai trò",
-  },
-  {
-    key: "courses",
-    module: "Course",
-    endpoint: API_PATH.COURSE.GET_ALL_COURSES,
-    purpose: "Lấy danh sách khóa học và trạng thái",
-  },
-  {
-    key: "blogs",
-    module: "Blog",
-    endpoint: API_PATH.BLOG.GET_ALL_BLOGS,
-    purpose: "Lấy danh sách bài viết",
-  },
-  {
-    key: "categories",
-    module: "Category",
-    endpoint: API_PATH.CATEGORY.GET_ALL_CATEGORIES,
-    purpose: "Lấy danh mục khóa học",
-  },
-  {
-    key: "consultants",
-    module: "Instructor",
-    endpoint: API_PATH.INSTRUCTOR.GET_ALL_INSTRUCTORS,
-    purpose: "Lấy danh sách giảng viên/consultant",
-  },
-  {
-    key: "sessions",
-    module: "Session",
-    endpoint: API_PATH.SESSION.GET_ALL_SESSIONS,
-    purpose: "Lấy tổng số phiên học",
-  },
-  {
-    key: "lessons",
-    module: "Lesson",
-    endpoint: API_PATH.LESSON.GET_ALL_LESSONS,
-    purpose: "Lấy tổng số bài học",
-  },
-  {
-    key: "instructorRequests",
-    module: "Instructor Request",
-    endpoint: API_PATH.INSTRUCTOR.GET_INSTRUCTOR_REQUESTS,
-    purpose: "Theo dõi yêu cầu trở thành giảng viên",
-  },
-];
-
-const ADMIN_AUDITED_ROUTES = [
-  { label: "Dashboard", path: ROUTER_URL.ADMIN.BASE },
-  { label: "Thống kê", path: ROUTER_URL.ADMIN.ANALYTICS },
-  { label: "Quản lý user", path: ROUTER_URL.ADMIN.MANAGER_USER },
-  { label: "Quản lý manager", path: ROUTER_URL.ADMIN.MANAGERS },
-  { label: "Nhân viên & giảng viên", path: ROUTER_URL.ADMIN.STAFF_CONSULTANTS },
-  { label: "Quản lý khóa học", path: ROUTER_URL.ADMIN.MANAGER_COURSE },
-  { label: "Quản lý danh mục", path: ROUTER_URL.ADMIN.MANAGER_CATEGORY },
-  { label: "Quản lý blog", path: ROUTER_URL.ADMIN.MANAGER_BLOG },
-  { label: "Cài đặt", path: ROUTER_URL.ADMIN.SETTINGS },
-];
-
-const emptyAuditRows = (): ApiAuditRow[] =>
-  API_AUDIT_TEMPLATE.map((item) => ({
-    ...item,
-    status: "failed",
-    error: "Chưa gọi",
-  }));
 
 const pickArray = <T,>(response: any): T[] => {
   const root = response?.data;
@@ -182,12 +95,6 @@ const ROLE_CHART_COLORS: Record<string, string> = {
   Unknown: "#94a3b8",
 };
 
-const COURSE_STATUS_COLORS: Record<string, string> = {
-  draft: "#f59e0b",
-  published: "#10b981",
-  archived: "#64748b",
-};
-
 const hashString = (value: string) => {
   let hash = 0;
   for (let index = 0; index < value.length; index += 1) {
@@ -203,11 +110,6 @@ const generateColorByKey = (key: string) => {
   const saturation = 65 + (hash % 15);
   const lightness = 45 + (hash % 10);
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-};
-
-const getCourseStatusColor = (status: string) => {
-  const normalized = status.trim().toLowerCase();
-  return COURSE_STATUS_COLORS[normalized] || generateColorByKey(`status-${normalized}`);
 };
 
 const getCategoryColor = (category: string) =>
@@ -229,7 +131,6 @@ const getCourseCategoryId = (course: unknown): string => {
 };
 
 const Overview: React.FC = () => {
-  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -240,7 +141,6 @@ const Overview: React.FC = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [instructorRequests, setInstructorRequests] = useState<Record<string, unknown>[]>([]);
-  const [apiAudit, setApiAudit] = useState<ApiAuditRow[]>(emptyAuditRows());
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -281,43 +181,27 @@ const Overview: React.FC = () => {
         },
       ];
 
-      const auditMap = new Map<ApiKey, ApiAuditRow>(
-        API_AUDIT_TEMPLATE.map((item) => [
-          item.key,
-          { ...item, status: "failed", error: "Không gọi được" },
-        ]),
-      );
-
       const settled = await Promise.allSettled(requestItems.map((item) => item.request));
 
       settled.forEach((result, index) => {
         const key = requestItems[index].key;
-        const current = auditMap.get(key);
-        if (!current) return;
+        if (result.status !== "fulfilled") return;
 
-        if (result.status === "fulfilled") {
-          auditMap.set(key, { ...current, status: "success", error: undefined });
-          const response = result.value;
+        const response = result.value;
 
-          if (key === "users") setUsers(pickArray<UserResponse>(response));
-          if (key === "courses") setCourses(pickArray<Course>(response));
-          if (key === "blogs") setBlogs(pickArray<Blog>(response));
-          if (key === "categories") setCategories(pickArray<Category>(response));
+        if (key === "users") setUsers(pickArray<UserResponse>(response));
+        if (key === "courses") setCourses(pickArray<Course>(response));
+        if (key === "blogs") setBlogs(pickArray<Blog>(response));
+        if (key === "categories") setCategories(pickArray<Category>(response));
           if (key === "consultants") setConsultants(pickArray<Consultant>(response));
           if (key === "sessions") setSessions(pickArray<Session>(response));
           if (key === "lessons") setLessons(pickArray<Lesson>(response));
           if (key === "instructorRequests") {
             setInstructorRequests(pickArray<Record<string, unknown>>(response));
           }
-          return;
-        }
 
-        const message =
-          result.reason instanceof Error ? result.reason.message : "API request failed";
-        auditMap.set(key, { ...current, status: "failed", error: message });
       });
 
-      setApiAudit(Array.from(auditMap.values()));
       setLoading(false);
     };
 
@@ -371,19 +255,6 @@ const Overview: React.FC = () => {
     });
     return Array.from(countMap.entries()).map(([role, count]) => ({ role, count }));
   }, [users]);
-
-  const courseByStatus = useMemo(() => {
-    const countMap = new Map<string, number>();
-    courses.forEach((course) => {
-      const status = (course.status || "unknown").toString();
-      countMap.set(status, (countMap.get(status) || 0) + 1);
-    });
-    return Array.from(countMap.entries()).map(([status, count]) => ({
-      status,
-      count,
-      color: getCourseStatusColor(status),
-    }));
-  }, [courses]);
 
   const topCategories = useMemo(() => {
     const categoryNameMap = new Map(
@@ -440,10 +311,6 @@ const Overview: React.FC = () => {
     return result;
   }, [blogs, courses]);
 
-  const apiFailedCount = apiAudit.filter((item) => item.status === "failed").length;
-  const totalResources =
-    users.length + courses.length + consultants.length + blogs.length + sessions.length + lessons.length;
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[360px]">
@@ -462,12 +329,6 @@ const Overview: React.FC = () => {
           Dashboard này tổng hợp dữ liệu từ các API admin đang sử dụng trong hệ thống.
         </Text>
       </div>
-
-      <Alert
-        type={apiFailedCount > 0 ? "warning" : "info"}
-        showIcon
-        message={`Tổng tài nguyên đang theo dõi: ${totalResources.toLocaleString("vi-VN")} | API lỗi: ${apiFailedCount}/${apiAudit.length}`}
-      />
 
       <Row gutter={[16, 16]}>
         {cards.map((card) => (
@@ -524,25 +385,6 @@ const Overview: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={12}>
-          <Card title="Trạng thái khóa học" style={{ borderRadius: 14 }}>
-            {courseByStatus.length > 0 ? (
-              <Bar
-                data={courseByStatus}
-                xField="status"
-                yField="count"
-                colorField="status"
-                color={(datum: { status: string; color?: string }) =>
-                  datum.color || getCourseStatusColor(datum.status)
-                }
-                label={{ text: "count", position: "right" }}
-                height={300}
-              />
-            ) : (
-              <Text type="secondary">Không có dữ liệu.</Text>
-            )}
-          </Card>
-        </Col>
-        <Col xs={24} xl={12}>
           <Card title="Tăng trưởng nội dung 6 tháng gần nhất" style={{ borderRadius: 14 }}>
             {contentGrowth.length > 0 ? (
               <Line
@@ -582,46 +424,7 @@ const Overview: React.FC = () => {
         </Col>
       </Row>
 
-      <Card title="Bảng kiểm tra API admin" style={{ borderRadius: 14 }}>
-        <Table
-          rowKey="key"
-          size="small"
-          pagination={false}
-          dataSource={apiAudit}
-          columns={[
-            { title: "Module", dataIndex: "module", key: "module" },
-            { title: "Endpoint", dataIndex: "endpoint", key: "endpoint" },
-            { title: "Mục đích", dataIndex: "purpose", key: "purpose" },
-            {
-              title: "Trạng thái",
-              key: "status",
-              render: (_, record: ApiAuditRow) =>
-                record.status === "success" ? (
-                  <Tag color="green">OK</Tag>
-                ) : (
-                  <Tag color="red">ERROR</Tag>
-                ),
-            },
-            {
-              title: "Chi tiết lỗi",
-              dataIndex: "error",
-              key: "error",
-              render: (error?: string) => error || "-",
-            },
-          ]}
-        />
-      </Card>
 
-      <Card title="Điều hướng admin" style={{ borderRadius: 14 }}>
-        <Space size={[8, 10]} wrap>
-          {ADMIN_AUDITED_ROUTES.map((route) => (
-            <Button key={route.path} onClick={() => navigate(route.path)}>
-              {route.label}
-              <Tag style={{ marginLeft: 8, marginRight: 0 }}>{route.path}</Tag>
-            </Button>
-          ))}
-        </Space>
-      </Card>
     </Space>
   );
 };
