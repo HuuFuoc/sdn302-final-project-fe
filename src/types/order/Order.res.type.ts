@@ -1,6 +1,7 @@
 export interface OrderResponse {
   orderId?: string;
   _id?: string;
+  cart_id?: string;
   userId: string;
   userName?: string;
   totalAmount: number;
@@ -9,6 +10,8 @@ export interface OrderResponse {
   paymentId?: string;
   orderStatus?: string;
   status?: string;
+  created_at?: string;
+  updated_at?: string;
   orderDetails?: OrderDetail[];
   order?: any;
   details?: any[];

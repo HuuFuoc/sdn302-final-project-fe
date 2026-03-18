@@ -1,5 +1,4 @@
 import { lazy } from "react";
-import { Navigate } from "react-router-dom";
 import { ROUTER_URL } from "../../../consts/router.path.const";
 import type { RouteObject } from "react-router-dom";
 
@@ -13,6 +12,9 @@ const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const AppointmentPage = lazy(
   () => import("../../../pages/customer/appointment")
 );
+const CustomerDashboardPage = lazy(
+  () => import("../../../pages/customer/dashboard")
+);
 
 // Customer routes that require authentication
 export const CustomerRoutes: RouteObject[] = [
@@ -22,7 +24,7 @@ export const CustomerRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Navigate to={ROUTER_URL.CUSTOMER.MY_COURSE} replace />,
+        element: <CustomerDashboardPage />,
       },
       {
         path: ROUTER_URL.CUSTOMER.SETTINGS,
