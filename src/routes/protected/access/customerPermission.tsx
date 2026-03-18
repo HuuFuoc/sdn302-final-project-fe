@@ -6,7 +6,6 @@ import type { RouteObject } from "react-router-dom";
 import CustomerLayout from "../../../layouts/customer/Customer.layout";
 import MyCoursePage from "../../../pages/customer/my-course";
 import OrderHistory from "../../../pages/customer/order";
-import ReviewHistory from "../../../pages/customer/review";
 import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
 import LessonDetailPage from "../../../pages/customer/lesson";
 // Lazy load customer pages
@@ -44,10 +43,6 @@ export const CustomerRoutes: RouteObject[] = [
       {
         path: ROUTER_URL.CUSTOMER.ORDER_HISTORY,
         element: <OrderHistory />,
-      },
-      {
-        path: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
-        element: <ReviewHistory />,
       },
       {
         path: ROUTER_URL.CUSTOMER.LESSON_DETAIL,

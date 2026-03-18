@@ -36,8 +36,8 @@ export const OrderService = {
       payload: undefined,
     });
   },
-  getOrderByUserId: (params: MyOrderRequest) => {
-    return BaseService.get<ResponseSuccess<OrderResponse[]>>({
+  getMyOrders: (params?: MyOrderRequest) => {
+    return BaseService.get<ResponseSuccess<OrderResponse[]> | OrderResponse[]>({
       url: API_PATH.ORDER.GET_ORDER_BY_USER_ID,
       payload: params,
     });

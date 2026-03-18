@@ -5,10 +5,11 @@ import { OrderService } from "../../../services/order/order.service";
 import { CourseService } from "../../../services/course/course.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
 import CustomSearch from "../../common/CustomSearch.com";
+import noImage from "../../../assets/images/no-image.svg";
 
 const PAGE_SIZE = 8;
 
-const OrderFailList: React.FC = () => {
+const OrderSuccessList: React.FC = () => {
   const [orders, setOrders] = useState<OrderResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
@@ -54,18 +55,18 @@ const OrderFailList: React.FC = () => {
           }
         }
 
-        console.log("Fetched Fail Orders before filter:", allOrders);
-        const failOrders = allOrders.filter(
+        console.log("Fetched Orders before filter:", allOrders);
+        const successOrders = allOrders.filter(
           (order: any) => {
              const s = (order.orderStatus || order.status || "").toLowerCase();
-             return s === "failed" || s === "fail" || s === "canceled" || s === "cancelled";
+             return s === "paid" || s === "success" || s === "completed" || s === "done";
           }
         );
 
         // Filter by search (theo tên khóa học hoặc ngày đặt)
-        let filtered = failOrders;
+        let filtered = successOrders;
         if (search) {
-          filtered = failOrders.filter(
+          filtered = successOrders.filter(
             (order: OrderResponse) =>
               order.orderDetails?.some((d) =>
                 d.courseName?.toLowerCase().includes(search.toLowerCase())
@@ -133,13 +134,7 @@ const OrderFailList: React.FC = () => {
 
   const columns = [
     // KHÔNG hiển thị orderId
-    {
-      title: "Ngày đặt",
-      dataIndex: "orderDate",
-      key: "orderDate",
-      render: (date: string) =>
-        date ? new Date(date).toLocaleDateString("vi-VN") : "",
-    },
+
     {
       title: "Mã đơn hàng",
       key: "orderId",
@@ -153,7 +148,7 @@ const OrderFailList: React.FC = () => {
       title: "Trạng thái",
       dataIndex: "orderStatus",
       key: "orderStatus",
-      render: () => <Tag color="red">Đã hủy</Tag>,
+      render: () => <Tag color="green">Đã mua</Tag>,
     },
     {
       title: "Tổng tiền",
@@ -162,6 +157,16 @@ const OrderFailList: React.FC = () => {
       render: (amount: number) => (
         <div className="flex justify-end">
           {amount?.toLocaleString("vi-VN") + " đ"}
+        </div>
+      ),
+    },
+    {
+      title: "Ngày mua",
+      dataIndex: "orderDate",
+      key: "orderDate",
+      render: (date: string) => (
+        <div className="flex justify-end">
+          {date ? new Date(date).toLocaleDateString("vi-VN") : ""}
         </div>
       ),
     },
@@ -230,7 +235,7 @@ const OrderFailList: React.FC = () => {
             Đóng
           </Button>,
         ]}
-        width={420}
+        width={520}
         style={{ top: 40 }}
         bodyStyle={{
           padding: 32,
@@ -268,23 +273,71 @@ const OrderFailList: React.FC = () => {
                     : (orderInfo.created_at ? new Date(orderInfo.created_at).toLocaleDateString("vi-VN") : "")}
                 </div>
                 <div style={{ marginBottom: 10 }}>
-                  <b>Người mua:</b> {orderInfo.userName || "Bạn"}
-                </div>
-                <div style={{ marginBottom: 10 }}>
                   <b>Khóa học đã mua:</b>
-                  <ul style={{ margin: 0, paddingLeft: 18, marginTop: 10 }}>
+                  <ul style={{ margin: 0, paddingLeft: 0, marginTop: 10 }}>
                     {selectedOrder.logs?.map((log: any, index: number) => {
                       const cId = log.course_id;
                       const course = courseDetails[cId];
                       const detailMatch = selectedOrder.details?.[index];
                       const priceAmt = detailMatch ? detailMatch.amount : (course?.price || 0);
-
+                      
                       return (
-                        <li key={cId + index} style={{ marginBottom: 8 }}>
-                          <b>{course?.name || "Đang tải ..."}</b>{" "}
-                          <span style={{ color: "#888", fontSize: 13 }}>
-                            ({priceAmt?.toLocaleString("vi-VN")} đ)
-                          </span>
+                        <li
+                          key={cId + index}
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: 14,
+                            marginBottom: 18,
+                            background: "#f7f9fa",
+                            borderRadius: 8,
+                            padding: 12,
+                            border: "1px solid #eee",
+                            listStyle: "none",
+                          }}
+                        >
+                          <img
+                            src={course?.imageUrls?.[0] || course?.imageUrl || noImage}
+                            alt={course?.name || "Khóa học"}
+                            onError={(e) => {
+                              const image = e.currentTarget as HTMLImageElement;
+                              image.onerror = null;
+                              image.src = noImage;
+                            }}
+                            style={{
+                              width: 56,
+                              height: 56,
+                              objectFit: "cover",
+                              borderRadius: 8,
+                              border: "1px solid #eee",
+                              background: "#fafafa",
+                              flexShrink: 0,
+                            }}
+                          />
+                          <div style={{ flex: 1 }}>
+                            <div
+                              style={{
+                                fontWeight: 700,
+                                fontSize: 17,
+                                color: "#20558A",
+                              }}
+                            >
+                              {course?.name || "Đang tải thông tin..."}
+                            </div>
+    
+                            <div
+                              style={{
+                                fontSize: 14,
+                                color: "#555",
+                                margin: "4px 0",
+                              }}
+                            >
+                              <b>Giá mua:</b>{" "}
+                              <span style={{ color: "#888", fontSize: 13 }}>
+                                {priceAmt?.toLocaleString("vi-VN")} đ
+                              </span>
+                            </div>
+                          </div>
                         </li>
                       );
                     })}
@@ -295,8 +348,24 @@ const OrderFailList: React.FC = () => {
                   {orderInfo.totalAmount?.toLocaleString("vi-VN")} đ
                 </div>
                 <div>
-                  <b>Trạng thái:</b> <Tag color="red">Đã hủy</Tag>
+                  <b>Thanh toán:</b>{" "}
+                  <Tag
+                    color={
+                      (orderInfo.paymentStatus || orderInfo.status) === "paid" || 
+                      orderInfo.paymentStatus === "Success" ? "green" : "red"
+                    }
+                  >
+                    {(orderInfo.paymentStatus || orderInfo.status) === "paid" || 
+                     orderInfo.paymentStatus === "Success"
+                      ? "Thành công"
+                      : orderInfo.paymentStatus || orderInfo.status}
+                  </Tag>
                 </div>
+                {orderInfo.orderStatus === "Paid" || orderInfo.status === "paid" ? null : (
+                  <div style={{ marginTop: 10 }}>
+                    <b>Trạng thái:</b> <Tag color="red">Đã hủy</Tag>
+                  </div>
+                )}
               </div>
             );
           })()
@@ -308,4 +377,4 @@ const OrderFailList: React.FC = () => {
   );
 };
 
-export default OrderFailList;
+export default OrderSuccessList;

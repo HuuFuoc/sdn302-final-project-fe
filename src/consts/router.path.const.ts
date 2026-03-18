@@ -93,7 +93,6 @@ export const ROUTER_URL = {
     MY_COURSE: "/customer/khoa-hoc-cua-toi",
     MY_COURSE_DETAIL: "/customer/khoa-hoc-cua-toi/:courseId",
     ORDER_HISTORY: "/customer/lich-su-don-hang",
-    REVIEW_HISTORY: "/customer/lich-su-danh-gia",
     LESSON_DETAIL: "/customer/bai-hoc/:lessonId",
   },
   COMMON: {

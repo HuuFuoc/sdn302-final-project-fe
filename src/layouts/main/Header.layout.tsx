@@ -42,7 +42,6 @@ const HeaderLayout = () => {
     { name: "Trang Chủ", path: ROUTER_URL.COMMON.HOME },
     { name: "Khóa Học", path: ROUTER_URL.CLIENT.COURSE },
     { name: "Blog", path: ROUTER_URL.CLIENT.BLOG },
-    { name: "Gặp Giảng Viên", path: ROUTER_URL.CLIENT.APPOINTMENTS },
     { name: "Về Chúng Tôi", path: ROUTER_URL.COMMON.ABOUT },
   ];
 

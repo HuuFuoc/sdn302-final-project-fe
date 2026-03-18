@@ -1,5 +1,5 @@
 import { Tabs } from "antd";
-import OrderSuccessList from "../../../components/customer/order/OrderSucces.com";
+import OrderSuccessList from "../../../components/customer/order/OrderSuccess.com";
 import OrderFailList from "../../../components/customer/order/OrderFail.com";
 
 export default function OrderHistory() {
