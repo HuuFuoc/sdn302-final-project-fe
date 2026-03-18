@@ -11,6 +11,7 @@ import {
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/Auth.context";
 import { ROUTER_URL } from "../../consts/router.path.const";
@@ -69,6 +70,11 @@ const SidebarLayout: React.FC = () => {
       key: ROUTER_URL.CUSTOMER.REVIEW_HISTORY,
       icon: <FileTextOutlined />,
       label: "Lịch sử đánh giá",
+    },
+    {
+      key: ROUTER_URL.CLIENT.APPOINTMENTS,
+      icon: <TeamOutlined />,
+      label: "Gặp đội ngũ giảng viên",
     },
     {
       key: ROUTER_URL.CUSTOMER.SETTINGS,
