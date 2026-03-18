@@ -6,7 +6,6 @@ import {
   Col,
   Empty,
   List,
-  Progress,
   Row,
   Skeleton,
   Space,
@@ -18,7 +17,6 @@ import {
   BookOutlined,
   FileTextOutlined,
   PlayCircleOutlined,
-  ProfileOutlined,
   RiseOutlined,
   ShoppingCartOutlined,
   UserOutlined,
@@ -60,15 +58,10 @@ const CustomerDashboardPage: React.FC = () => {
     const fetchDashboard = async () => {
       setLoading(true);
       try {
-        const userId = userInfo?.id;
         const [ordersRes, courseRes, suggestionRes] = await Promise.allSettled([
           OrderService.getMyOrders({ pageNumber: 1, pageSize: 200 }),
           CourseService.getMyCourses(),
-          CourseService.getAllCourses({
-            pageNumber: 1,
-            pageSize: 20,
-            userId: userId || undefined,
-          }),
+          CourseService.getMyRecommendedCourses({ limit: 4, includeReasons: true }),
         ]);
 
         if (ordersRes.status === "fulfilled") {
@@ -90,6 +83,8 @@ const CustomerDashboardPage: React.FC = () => {
             })
             .slice(0, 4);
           setSuggestions(candidate);
+        } else {
+          setSuggestions([]);
         }
       } finally {
         setLoading(false);
@@ -120,6 +115,10 @@ const CustomerDashboardPage: React.FC = () => {
   );
 
   const recentLearningCourses = useMemo(() => myCourses.slice(0, 5), [myCourses]);
+  const getCourseImage = (course: Course) => {
+    const firstImage = Array.isArray(course.imageUrls) ? course.imageUrls.find((url) => Boolean(url)) : undefined;
+    return firstImage || undefined;
+  };
   const userName =
     userInfo?.fullName ||
     `${userInfo?.firstName || ""} ${userInfo?.lastName || ""}`.trim() ||
@@ -160,34 +159,23 @@ const CustomerDashboardPage: React.FC = () => {
             <Button icon={<FileTextOutlined />} onClick={() => navigate(ROUTER_URL.CUSTOMER.ORDER_HISTORY)}>
               Xem đơn hàng
             </Button>
-            <Button onClick={() => navigate(ROUTER_URL.CUSTOMER.APPOINTMENTS)}>
-              Đặt lịch tư vấn
-            </Button>
           </Space>
         </div>
       </Card>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} xl={6}>
-          <Card>
+        <Col xs={24} sm={12} lg={8}>
+          <Card className="h-full">
             <Statistic title="Khóa học đã mua" value={myCourses.length} prefix={<BookOutlined />} />
           </Card>
         </Col>
-        <Col xs={24} sm={12} xl={6}>
-          <Card>
+        <Col xs={24} sm={12} lg={8}>
+          <Card className="h-full">
             <Statistic title="Khóa học đang học" value={myCourses.length} prefix={<PlayCircleOutlined />} />
           </Card>
         </Col>
-        <Col xs={24} sm={12} xl={6}>
-          <Card>
-            <Statistic title="Khóa học đã hoàn thành" value={0} prefix={<ProfileOutlined />} />
-            <Text type="secondary" className="text-xs">
-              Chưa có dữ liệu tiến độ từ backend
-            </Text>
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} xl={6}>
-          <Card>
+        <Col xs={24} sm={12} lg={8}>
+          <Card className="h-full">
             <Statistic
               title="Tổng chi tiêu"
               value={totalSpent}
@@ -200,14 +188,7 @@ const CustomerDashboardPage: React.FC = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={14}>
-          <Card
-            title="Tiến độ học tập"
-            extra={
-              <Button type="link" onClick={() => navigate(ROUTER_URL.CUSTOMER.MY_COURSE)}>
-                Xem tất cả
-              </Button>
-            }
-          >
+          <Card className="h-full" title="Các khóa học hiện tại">
             {loading ? (
               <Skeleton active paragraph={{ rows: 4 }} />
             ) : recentLearningCourses.length === 0 ? (
@@ -219,34 +200,11 @@ const CustomerDashboardPage: React.FC = () => {
             ) : (
               <List
                 dataSource={recentLearningCourses}
-                renderItem={(course, index) => {
-                  const percent = Math.max(8, Math.min(80, 80 - index * 12));
-                  return (
-                    <List.Item
-                      actions={[
-                        <Button
-                          key="learn"
-                          type="link"
-                          onClick={() =>
-                            navigate(ROUTER_URL.CUSTOMER.MY_COURSE_DETAIL.replace(":courseId", course.id))
-                          }
-                        >
-                          Học tiếp
-                        </Button>,
-                      ]}
-                    >
-                      <List.Item.Meta
-                        avatar={<Avatar shape="square" size={52} src={course.imageUrls?.[0]} icon={<BookOutlined />} />}
-                        title={<Text strong>{course.name}</Text>}
-                        description={
-                          <div className="mt-1">
-                            <Progress percent={percent} size="small" strokeColor="#0ea5e9" />
-                          </div>
-                        }
-                      />
-                    </List.Item>
-                  );
-                }}
+                renderItem={(course) => (
+                  <List.Item>
+                    <Text strong>{course.name}</Text>
+                  </List.Item>
+                )}
               />
             )}
           </Card>
@@ -254,6 +212,7 @@ const CustomerDashboardPage: React.FC = () => {
 
         <Col xs={24} xl={10}>
           <Card
+            className="h-full"
             title="Đơn hàng gần đây (đã thanh toán)"
             extra={
               <Button type="link" onClick={() => navigate(ROUTER_URL.CUSTOMER.ORDER_HISTORY)}>
@@ -312,14 +271,11 @@ const CustomerDashboardPage: React.FC = () => {
                   </Button>,
                 ]}
               >
-                <List.Item.Meta
-                  avatar={<Avatar shape="square" size={48} src={course.imageUrls?.[0]} icon={<ShoppingCartOutlined />} />}
+              <List.Item.Meta
+                  avatar={<Avatar shape="square" size={48} src={getCourseImage(course)} icon={<ShoppingCartOutlined />} />}
                   title={<Text strong>{course.name}</Text>}
                   description={
-                    <Space>
-                      <Tag color="geekblue">{course.riskLevel || "N/A"}</Tag>
-                      <Text type="secondary">{formatCurrencyVND(course.price || 0)}</Text>
-                    </Space>
+                    <Text type="secondary">{formatCurrencyVND(course.price || 0)}</Text>
                   }
                 />
               </List.Item>

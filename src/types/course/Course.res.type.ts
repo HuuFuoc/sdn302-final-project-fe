@@ -18,6 +18,8 @@ export interface Course {
   createdAt: string;
   riskLevel: RiskLevel;
   isPurchased?: boolean;
+  recommendationScore?: number;
+  recommendationReason?: string;
 }
 
 export interface CoursePageInfo {

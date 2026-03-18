@@ -3,6 +3,7 @@ import type { ResponseSuccess } from "../../app/interface";
 import { API_PATH } from "../../consts/api.path.const";
 import type {
   CourseRequest,
+  CourseRecommendationRequest,
   CreateCourseRequest,
   UpdateCourseRequest,
   DeleteCourseRequest,
@@ -52,6 +53,12 @@ export const CourseService = {
   getMyCourses() {
     return BaseService.get<ResponseSuccess<Course[]>>({
       url: API_PATH.COURSE.GET_MY_COURSES,
+    });
+  },
+  getMyRecommendedCourses(params?: CourseRecommendationRequest) {
+    return BaseService.get<ResponseSuccess<Course[]>>({
+      url: API_PATH.COURSE.GET_RECOMMENDED_COURSES_ME,
+      payload: params,
     });
   },
 };

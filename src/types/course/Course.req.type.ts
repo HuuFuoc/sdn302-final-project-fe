@@ -9,6 +9,11 @@ export interface CourseRequest {
   keyword?: string;
   userId?: string;
 }
+
+export interface CourseRecommendationRequest {
+  limit?: number;
+  includeReasons?: boolean;
+}
 export interface CreateCourseRequest {
   name: string;
   slug: string;
