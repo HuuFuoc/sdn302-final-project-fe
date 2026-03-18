@@ -15,7 +15,7 @@ const Cover: React.FC<CoverProps> = ({
   subtitle = "sắc màu cùng bé",
   buttonText = "Xem khóa học",
   buttonLink = "/khoa-hoc",
-  secondButtonText = "Liên hệ tư vấn",
+  secondButtonText = "Gặp giảng viên",
   secondButtonLink = "/lich-hen-tu-van",
 }) => {
   return (
