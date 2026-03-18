@@ -4,7 +4,6 @@ import { EyeOutlined } from "@ant-design/icons";
 import { OrderService } from "../../../services/order/order.service";
 import { CourseService } from "../../../services/course/course.service";
 import type { OrderResponse } from "../../../types/order/Order.res.type";
-import CustomSearch from "../../common/CustomSearch.com";
 import noImage from "../../../assets/images/no-image.svg";
 
 const PAGE_SIZE = 8;
@@ -22,8 +21,6 @@ const OrderSuccessList: React.FC = () => {
     null
   );
 
-  // Search state
-  const [search, setSearch] = useState("");
 
   // Course details state
   const [courseDetails, setCourseDetails] = useState<Record<string, any>>({});
@@ -63,22 +60,9 @@ const OrderSuccessList: React.FC = () => {
           }
         );
 
-        // Filter by search (theo tên khóa học hoặc ngày đặt)
-        let filtered = successOrders;
-        if (search) {
-          filtered = successOrders.filter(
-            (order: OrderResponse) =>
-              order.orderDetails?.some((d) =>
-                d.courseName?.toLowerCase().includes(search.toLowerCase())
-              ) ||
-              (order.orderDate &&
-                new Date(order.orderDate)
-                  .toLocaleDateString("vi-VN")
-                  .includes(search))
-          );
-        }
-        setOrders(filtered);
-        setTotal(filtered.length);
+        
+        setOrders(successOrders);
+        setTotal(successOrders.length);
       } catch (error) {
         console.error("Fetch orders error:", error);
         message.error("Không thể tải lịch sử đơn hàng!");
@@ -88,7 +72,7 @@ const OrderSuccessList: React.FC = () => {
     };
     fetchOrders();
     // eslint-disable-next-line
-  }, [current, search]);
+  }, [current]);
 
   // Xem chi tiết đơn hàng
   const handleView = async (orderId: string) => {
@@ -190,14 +174,6 @@ const OrderSuccessList: React.FC = () => {
 
   return (
     <>
-      <div style={{ marginBottom: 16 }}>
-        <CustomSearch
-          placeholder="Tìm kiếm theo tên khóa học hoặc ngày đặt"
-          onSearch={setSearch}
-          loading={loading}
-          inputWidth="w-64"
-        />
-      </div>
       <Table
         dataSource={orders}
         columns={columns}
