@@ -27,7 +27,11 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ order }) => {
           <CalendarOutlined className="mr-1" />
           Ngày đặt:
         </span>
-        <span>{new Date(order.orderDate).toLocaleString("vi-VN")}</span>
+        <span>
+          {order.orderDate
+            ? new Date(order.orderDate).toLocaleString("vi-VN")
+            : ""}
+        </span>
       </div>
       <div className="flex justify-between text-gray-700">
         <span>Trạng thái đơn hàng:</span>
