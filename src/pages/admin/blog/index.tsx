@@ -1,10 +1,10 @@
 import AdminBlogManager from "../../../components/admin/blog/AdminBlogManager";
 
-const BlogMManagement = () => {
+const BlogManagementPage = () => {
   return (
     <>
       <AdminBlogManager />
     </>
   );
 };
-export default BlogMManagement;
+export default BlogManagementPage;

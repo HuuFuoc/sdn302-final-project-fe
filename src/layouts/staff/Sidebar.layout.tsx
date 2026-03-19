@@ -58,7 +58,7 @@ const SidebarLayout: React.FC = () => {
     {
       key: ROUTER_URL.STAFF.CONTENT,
       icon: <EditOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.CONTENT}>Quản lý nội dung</Link>,
+      label: <Link to={ROUTER_URL.STAFF.CONTENT}>Quản lý bài đăng</Link>,
     },
     {
       key: ROUTER_URL.STAFF.INSTRUCTORS,

@@ -40,7 +40,7 @@ const AdminLayout: React.FC = () => {
       overview: "Tổng Quan",
       users: "Quản Lý Người Dùng",
       "manager-user": "Quản Lý Tài Khoản",
-      "manager-blog": "Quản Lý Blog",
+      "manager-blog": "Quản Lý Bài Đăng",
       "manager-course": "Quản Lý Khóa Học",
       "manager-category": "Quản Lý Danh Mục",
       settings: "Cài Đặt",

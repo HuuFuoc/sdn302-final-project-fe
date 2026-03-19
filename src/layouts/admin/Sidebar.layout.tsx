@@ -78,11 +78,11 @@ const navSections = [
         description: "Quản lý danh mục khóa học",
       },
       {
-        name: "Quản Lý Blog",
+        name: "Quản Lý Bài Đăng",
         to: ROUTER_URL.ADMIN.MANAGER_BLOG,
         icon: <EditOutlined />,
         badge: "156",
-        description: "Bài viết và tin tức",
+        description: "Quản lý bài đăng hệ thống",
       },
       {
         name: "Cài Đặt Hệ Thống",

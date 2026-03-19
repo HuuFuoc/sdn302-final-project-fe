@@ -6,7 +6,7 @@ import type { DeleteBlogRequest } from "../../../types/blog/Blog.req.type";
 interface DeleteBlogProps {
   blogId: string;
   onDeleted?: () => void;
-  buttonProps?: React.ComponentProps<typeof Button>; // Thêm dòng này
+  buttonProps?: React.ComponentProps<typeof Button>;
 }
 
 const DeleteBlog: React.FC<DeleteBlogProps> = ({
@@ -18,19 +18,19 @@ const DeleteBlog: React.FC<DeleteBlogProps> = ({
     try {
       const params: DeleteBlogRequest = { id: blogId };
       await BlogService.deleteBlog(params);
-      message.success("Đã xóa blog!");
-      if (onDeleted) onDeleted();
+      message.success("Đã xóa bài đăng");
+      onDeleted?.();
     } catch {
-      message.error("Xóa blog thất bại!");
+      message.error("Xóa bài đăng thất bại");
     }
   };
 
   return (
     <Popconfirm
-      title="Bạn chắc chắn muốn xóa blog này?"
-      onConfirm={handleDelete}
+      title="Bạn có chắc muốn xóa bài đăng này?"
       okText="Xóa"
       cancelText="Hủy"
+      onConfirm={handleDelete}
     >
       <Button {...buttonProps} />
     </Popconfirm>

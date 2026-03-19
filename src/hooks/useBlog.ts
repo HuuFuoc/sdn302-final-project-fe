@@ -4,42 +4,40 @@ import type {
   CreateBlogRequest,
   UpdateBlogRequest,
 } from "../types/blog/Blog.req.type";
-import { useNavigate } from "react-router-dom";
-import { ROUTER_URL } from "../consts/router.path.const";
 import { helpers } from "../utils";
 
 /**
- * Hook for blog createBlog
+ * Hook for creating a blog post
  */
 export const useCreateBlog = () => {
-  const navigate = useNavigate();
-
   return useMutation({
     mutationFn: (data: CreateBlogRequest) => BlogService.createBlog(data),
     onSuccess: () => {
-      helpers.notificationMessage("Tạo Blog thành công", "success");
-      navigate(ROUTER_URL.ADMIN.MANAGER_BLOG);
+      helpers.notificationMessage("Tạo bài đăng thành công", "success");
     },
-    onError: (error) => {
-      helpers.notificationMessage(error.message, "error");
+    onError: (error: any) => {
+      helpers.notificationMessage(
+        error?.response?.data?.message || error?.message || "Tạo bài đăng thất bại",
+        "error",
+      );
     },
   });
 };
 
 /**
- * Hook for blog updateBlog
+ * Hook for updating a blog post
  */
 export const useUpdateBlog = () => {
-  const navigate = useNavigate();
-
   return useMutation({
     mutationFn: (data: UpdateBlogRequest) => BlogService.updateBlog(data),
     onSuccess: () => {
-      helpers.notificationMessage("Cập nhập Blog thành công", "success");
-      navigate(ROUTER_URL.ADMIN.MANAGER_BLOG);
+      helpers.notificationMessage("Cập nhật bài đăng thành công", "success");
     },
-    onError: (error) => {
-      helpers.notificationMessage(error.message, "error");
+    onError: (error: any) => {
+      helpers.notificationMessage(
+        error?.response?.data?.message || error?.message || "Cập nhật bài đăng thất bại",
+        "error",
+      );
     },
   });
 };

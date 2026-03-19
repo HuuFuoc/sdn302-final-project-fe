@@ -1,32 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Image,
+  Input,
+  Modal,
+  Row,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+  message,
+} from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import type { ColumnsType } from "antd/es/table";
 import { BlogService } from "../../../services/blog/blog.service";
 import { UserService } from "../../../services/user/user.service";
 import type { BlogRequest } from "../../../types/blog/Blog.req.type";
 import type { Blog } from "../../../types/blog/Blog.res.type";
-import { Table, Button, message, Image, Modal, Tooltip } from "antd";
-import { EditOutlined, DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import CreateBlogForm from "./CreateBlog.com";
 import DeleteBlog from "./DeleteBlog.com";
 import UpdateBlogForm from "./UpdateBlog.com";
 import CustomPagination from "../../common/Pagiation.com";
-import CustomSearch from "../../common/CustomSearch.com";
 import { helpers } from "../../../utils";
+
+const { Title, Text } = Typography;
 
 const AdminBlogManager = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
-  const [current, setCurrent] = useState(1);
-  const [pageSize, setPageSize] = useState(6);
-  const [total, setTotal] = useState(0);
-  const [searchKeyword, setSearchKeyword] = useState("");
-
-  // Thêm state cho View
   const [showViewModal, setShowViewModal] = useState(false);
   const [viewingBlog, setViewingBlog] = useState<Blog | null>(null);
   const [viewLoading, setViewLoading] = useState(false);
+
+  const [current, setCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(6);
+  const [total, setTotal] = useState(0);
+
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [authorIdInput, setAuthorIdInput] = useState("");
+  const [authorIdApplied, setAuthorIdApplied] = useState("");
 
   const enrichBlogsWithUserInfo = async (items: Blog[]) => {
     const userIds = Array.from(
@@ -52,8 +80,7 @@ const AdminBlogManager = () => {
     };
 
     const extractUserFullName = (rawUser: any) => {
-      const directName =
-        rawUser?.fullName || rawUser?.full_name || rawUser?.name || "";
+      const directName = rawUser?.fullName || rawUser?.full_name || rawUser?.name || "";
       if (directName && String(directName).trim()) return String(directName).trim();
 
       const firstName = rawUser?.firstName || rawUser?.first_name || "";
@@ -93,21 +120,49 @@ const AdminBlogManager = () => {
 
   const fetchBlogs = async () => {
     setLoading(true);
-    const params: BlogRequest = {
-      pageNumber: current,
-      pageSize: pageSize,
-      filterByContent: searchKeyword,
-    };
     try {
+      let source: Blog[] = [];
+
+      // Case 1: filter by author id => use GET /api/blog/user/{userId}
+      if (authorIdApplied.trim()) {
+        const res = await BlogService.getBlogsByUserId({ userId: authorIdApplied.trim() });
+        const data = res.data as any;
+        source = Array.isArray(data?.data) ? data.data : [];
+
+        if (searchKeyword.trim()) {
+          const keyword = searchKeyword.trim().toLowerCase();
+          source = source.filter((item) =>
+            `${item.title} ${item.content}`.toLowerCase().includes(keyword),
+          );
+        }
+
+        const enriched = await enrichBlogsWithUserInfo(source);
+        const start = (current - 1) * pageSize;
+        const end = start + pageSize;
+        setBlogs(enriched.slice(start, end));
+        setTotal(enriched.length);
+        return;
+      }
+
+      // Case 2: default list => use GET /api/blog with paging and keyword
+      const params: BlogRequest = {
+        pageNumber: current,
+        pageSize,
+        filterByContent: searchKeyword.trim() || undefined,
+      };
+
       const res = await BlogService.getAllBlogs(params);
       const data = res.data as any;
-      const mappedBlogs = Array.isArray(data?.data) ? data.data : [];
-      const enrichedBlogs = await enrichBlogsWithUserInfo(mappedBlogs);
-      setBlogs(enrichedBlogs);
+      const rows = Array.isArray(data?.data) ? data.data : [];
+      const enriched = await enrichBlogsWithUserInfo(rows);
+
+      setBlogs(enriched);
       setTotal(data?.totalCount || 0);
-    } catch (err) {
+    } catch (error) {
+      console.error("Error fetching blog list:", error);
       setBlogs([]);
-      message.error("Lỗi khi lấy danh sách blog!");
+      setTotal(0);
+      message.error("Không thể tải danh sách bài đăng");
     } finally {
       setLoading(false);
     }
@@ -115,100 +170,112 @@ const AdminBlogManager = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [current, pageSize, searchKeyword]);
+  }, [current, pageSize, searchKeyword, authorIdApplied]);
 
-  const handleBlogCreated = () => {
-    setShowModal(false);
-    fetchBlogs();
-  };
-
-  const handleBlogUpdated = () => {
-    setShowUpdateModal(false);
-    fetchBlogs();
-  };
-
-  const handlePageChange = (page: number, size: number) => {
-    setCurrent(page);
-    setPageSize(size);
-  };
-
-  // Hàm view blog
   const handleViewBlog = async (id: string) => {
     setShowViewModal(true);
     setViewLoading(true);
     try {
+      // GET /api/blog/{id}
       const res = await BlogService.getBlogById({ id });
       const rawBlog = (res.data?.data || null) as Blog | null;
       if (!rawBlog) {
         setViewingBlog(null);
         return;
       }
-
       const enriched = await enrichBlogsWithUserInfo([rawBlog]);
       setViewingBlog(enriched[0] || rawBlog);
     } catch {
       setViewingBlog(null);
-      message.error("Không thể tải chi tiết blog!");
+      message.error("Không thể tải chi tiết bài đăng");
     } finally {
       setViewLoading(false);
     }
   };
 
-  const columns = [
+  const onCreated = () => {
+    setShowCreateModal(false);
+    fetchBlogs();
+  };
+
+  const onUpdated = () => {
+    setShowUpdateModal(false);
+    setSelectedBlog(null);
+    fetchBlogs();
+  };
+
+  const resetFilters = () => {
+    setCurrent(1);
+    setSearchKeyword("");
+    setAuthorIdInput("");
+    setAuthorIdApplied("");
+  };
+
+  const stats = useMemo(() => {
+    const deleted = blogs.filter((item) => item.isDeleted).length;
+    const active = blogs.length - deleted;
+    return {
+      currentPageCount: blogs.length,
+      active,
+      deleted,
+    };
+  }, [blogs]);
+
+  const columns: ColumnsType<Blog> = [
     {
       title: "Ảnh",
       dataIndex: "blogImgUrl",
       key: "blogImgUrl",
+      width: 100,
       render: (url: string) =>
         url ? (
           <Image
             src={url}
             alt="blog"
-            width={80}
-            height={60}
-            style={{ objectFit: "cover" }}
+            width={72}
+            height={52}
+            style={{ objectFit: "cover", borderRadius: 8 }}
           />
         ) : (
-          <span>Không có ảnh</span>
+          <Text type="secondary">Không có</Text>
         ),
     },
     {
       title: "Tiêu đề",
       dataIndex: "title",
       key: "title",
-      render: (text: string) => <span style={{ fontWeight: 600 }}>{text}</span>,
-      width: 180,
+      render: (text: string) => <Text strong>{text || "(Không tiêu đề)"}</Text>,
     },
     {
       title: "Nội dung",
       dataIndex: "content",
       key: "content",
-      render: (text: string) => (
-        <div style={{ maxWidth: 300, whiteSpace: "pre-line" }}>{text}</div>
+      render: (content: string) => (
+        <Text className="line-clamp-2" style={{ maxWidth: 360 }}>
+          {content || "Không có nội dung"}
+        </Text>
       ),
     },
     {
       title: "Người đăng",
-      dataIndex: "user_id",
-      key: "user_id",
-      render: (_: string, record: Blog) => {
-        const displayName = (record.fullName || "").trim();
-        const fallbackId = record.user_id || record.userId || "";
+      key: "author",
+      width: 220,
+      render: (_: unknown, record: Blog) => {
+        const fallbackId = record.user_id || record.userId || "Không rõ";
+        const displayName = record.fullName?.trim() || fallbackId;
 
         return (
-          <div className="flex items-center gap-2">
-            <img
-              src={record.userAvatar || "/no-avatar.png"}
-              alt={displayName || fallbackId || "Không rõ"}
-              className="w-8 h-8 rounded-full object-cover border"
-            />
-            <div className="flex flex-col">
-              <span>{displayName || fallbackId || "Không rõ"}</span>
-              {!displayName && fallbackId ? (
-                <span className="text-xs text-gray-500">{fallbackId}</span>
+          <Space>
+            <Avatar src={record.userAvatar} icon={<UserOutlined />} />
+            <div>
+              <div>{displayName}</div>
+              {displayName !== fallbackId ? (
+                <Text type="secondary" className="text-xs">
+                  {fallbackId}
+                </Text>
               ) : null}
             </div>
-          </div>
+          </Space>
         );
       },
     },
@@ -216,183 +283,218 @@ const AdminBlogManager = () => {
       title: "Ngày tạo",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (date: string) => helpers.formatDate(new Date(date)),
+      width: 170,
+      render: (date: string) => {
+        if (!date) return <Text type="secondary">-</Text>;
+        return <Text>{helpers.formatDate(new Date(date))}</Text>;
+      },
+    },
+    {
+      title: "Trạng thái",
+      key: "status",
+      width: 120,
+      render: (_: unknown, record: Blog) =>
+        record.isDeleted ? <Tag color="red">Đã xóa</Tag> : <Tag color="green">Hiển thị</Tag>,
     },
     {
       title: "Hành động",
       key: "action",
-      render: (_: any, record: Blog) => (
-        <div className="flex gap-2">
+      width: 160,
+      render: (_: unknown, record: Blog) => (
+        <Space>
+          <Tooltip title="Xem chi tiết">
+            <Button
+              icon={<EyeOutlined />}
+              shape="circle"
+              size="small"
+              onClick={() => handleViewBlog(record.id)}
+            />
+          </Tooltip>
+
           {!record.isDeleted && (
             <>
-              <Tooltip title="Xem chi tiết">
-                <Button
-                  icon={<EyeOutlined />}
-                  shape="circle"
-                  type="default"
-                  size="small"
-                  onClick={() => handleViewBlog(record.id)}
-                />
-              </Tooltip>
               <Tooltip title="Cập nhật">
                 <Button
                   icon={<EditOutlined />}
                   shape="circle"
-                  type="default"
                   size="small"
                   onClick={() => {
                     setSelectedBlog(record);
                     setShowUpdateModal(true);
                   }}
-                  style={{ borderColor: "#1677ff", color: "#1677ff" }}
                 />
               </Tooltip>
-              <Tooltip title="Xóa">
-                <DeleteBlog
-                  blogId={record.id}
-                  onDeleted={fetchBlogs}
-                  buttonProps={{
-                    icon: <DeleteOutlined />,
-                    shape: "circle",
-                    danger: true,
-                    size: "small",
-                    style: { borderColor: "#ff4d4f", color: "#ff4d4f" },
-                  }}
-                />
-              </Tooltip>
+              <DeleteBlog
+                blogId={record.id}
+                onDeleted={fetchBlogs}
+                buttonProps={{
+                  icon: <DeleteOutlined />,
+                  shape: "circle",
+                  size: "small",
+                  danger: true,
+                }}
+              />
             </>
           )}
-        </div>
+        </Space>
       ),
     },
   ];
 
   return (
-    <div className="p-6 bg-white rounded shadow relative">
-      <Button
-        type="primary"
-        className="absolute top-6 right-6 bg-[#20558A]"
-        onClick={() => setShowModal(true)}
-      >
-        Tạo blog mới
-      </Button>
+    <div className="space-y-4">
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <Title level={4} className="!mb-1">Quản lý bài đăng</Title>
+          </div>
+          <Button type="primary" icon={<PlusOutlined />} className="bg-[#20558A]" onClick={() => setShowCreateModal(true)}>
+            Tạo bài đăng
+          </Button>
+        </div>
+      </Card>
 
-      {/* Thanh tìm kiếm */}
-      <CustomSearch
-        onSearch={(keyword) => {
-          setCurrent(1);
-          setSearchKeyword(keyword);
-        }}
-        className="mb-4"
-        placeholder="Tìm kiếm theo tiêu đề blog"
-        inputWidth="w-96"
-      />
+      <Row gutter={[12, 12]}>
+        <Col xs={24} md={8}>
+          <Card size="small">
+            <Text type="secondary">Bài đăng trang hiện tại</Text>
+            <Title level={3} className="!mb-0">{stats.currentPageCount}</Title>
+          </Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card size="small">
+            <Text type="secondary">Đang hiển thị</Text>
+            <Title level={3} className="!mb-0 text-green-600">{stats.active}</Title>
+          </Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card size="small">
+            <Text type="secondary">Đã xóa</Text>
+            <Title level={3} className="!mb-0 text-red-500">{stats.deleted}</Title>
+          </Card>
+        </Col>
+      </Row>
 
+      <Card>
+        <Space wrap className="w-full">
+          <Input
+            allowClear
+            prefix={<SearchOutlined />}
+            placeholder="Tìm theo tiêu đề hoặc nội dung"
+            value={searchKeyword}
+            onChange={(e) => {
+              setCurrent(1);
+              setSearchKeyword(e.target.value);
+            }}
+            style={{ width: 320 }}
+          />
 
+          <Input
+            allowClear
+            placeholder="Lọc theo ID người đăng (tuỳ chọn)"
+            value={authorIdInput}
+            onChange={(e) => setAuthorIdInput(e.target.value)}
+            style={{ width: 280 }}
+          />
 
-      <Table
-        columns={columns}
-        dataSource={blogs}
-        rowKey="id"
-        loading={loading}
-        pagination={false}
-        bordered
-      />
+          <Button
+            type="default"
+            onClick={() => {
+              setCurrent(1);
+              setAuthorIdApplied(authorIdInput.trim());
+            }}
+          >
+            Áp dụng lọc người đăng
+          </Button>
 
-      <CustomPagination
-        current={current}
-        pageSize={pageSize}
-        total={total}
-        onChange={handlePageChange}
-      />
+          <Button icon={<ReloadOutlined />} onClick={resetFilters}>
+            Xóa lọc
+          </Button>
+        </Space>
+      </Card>
+
+      <Card>
+        <Table
+          rowKey="id"
+          columns={columns}
+          dataSource={blogs}
+          loading={loading}
+          pagination={false}
+          scroll={{ x: 1100 }}
+          locale={{ emptyText: "Chưa có bài đăng." }}
+        />
+        <div className="mt-4">
+          <CustomPagination
+            current={current}
+            pageSize={pageSize}
+            total={total}
+            onChange={(page: number, size: number) => {
+              setCurrent(page);
+              setPageSize(size);
+            }}
+          />
+        </div>
+      </Card>
 
       <Modal
-        open={showModal}
-        onCancel={() => setShowModal(false)}
+        open={showCreateModal}
+        title={null}
         footer={null}
-        width={600}
+        width={760}
+        onCancel={() => setShowCreateModal(false)}
+        destroyOnClose
       >
-        <CreateBlogForm onSuccess={handleBlogCreated} />
+        <CreateBlogForm onSuccess={onCreated} />
       </Modal>
 
       <Modal
         open={showUpdateModal}
-        onCancel={() => setShowUpdateModal(false)}
+        title={null}
         footer={null}
-        width={600}
+        width={760}
+        onCancel={() => {
+          setShowUpdateModal(false);
+          setSelectedBlog(null);
+        }}
+        destroyOnClose
       >
-        {selectedBlog && (
-          <UpdateBlogForm blog={selectedBlog} onSuccess={handleBlogUpdated} />
-        )}
+        {selectedBlog ? <UpdateBlogForm blog={selectedBlog} onSuccess={onUpdated} /> : null}
       </Modal>
 
-      {/* Modal xem chi tiết */}
       <Modal
         open={showViewModal}
-        onCancel={() => setShowViewModal(false)}
+        title="Chi tiết bài đăng"
         footer={null}
-        title="Chi tiết blog"
-        width={600}
+        width={760}
+        onCancel={() => setShowViewModal(false)}
       >
         {viewLoading ? (
-          <div>Đang tải...</div>
+          <Text>Đang tải...</Text>
         ) : viewingBlog ? (
-          <div className="space-y-4">
-            <div>
-              <strong>Tiêu đề:</strong>
-              <div style={{ fontWeight: 600, fontSize: 18 }}>
-                {viewingBlog.title}
-              </div>
-            </div>
-            <div>
-              <strong>Nội dung:</strong>
-              <div style={{ whiteSpace: "pre-line" }}>
-                {viewingBlog.content}
-              </div>
-            </div>
-            <div>
-              <strong>Ảnh:</strong>
-              <div>
-                {viewingBlog.blogImgUrl ? (
-                  <Image
-                    src={viewingBlog.blogImgUrl}
-                    alt="blog"
-                    width={120}
-                    height={90}
-                    style={{ objectFit: "cover" }}
-                  />
-                ) : (
-                  <span>Không có ảnh</span>
-                )}
-              </div>
-            </div>
-            <div>
-              <strong>Người đăng:</strong>
-              <div className="flex items-center gap-2">
-                {(() => {
-                  const displayName = (viewingBlog.fullName || "").trim();
-                  const fallbackId = viewingBlog.user_id || viewingBlog.userId || "";
-
-                  return (
-                    <>
-                      <img
-                        src={viewingBlog.userAvatar || "/no-avatar.png"}
-                        alt={displayName || fallbackId || "Không rõ"}
-                        className="w-8 h-8 rounded-full object-cover border"
-                      />
-                      <span>{displayName || fallbackId || "Không rõ"}</span>
-                    </>
-                  );
-                })()}
-              </div>
-            </div>
-            <div>
-              <strong>Ngày tạo:</strong>
-              <div>{helpers.formatDate(new Date(viewingBlog.createdAt))}</div>
-            </div>
-          </div>
+          <Descriptions bordered column={1} size="small">
+            <Descriptions.Item label="Tiêu đề">{viewingBlog.title}</Descriptions.Item>
+            <Descriptions.Item label="Nội dung">
+              <div className="whitespace-pre-wrap">{viewingBlog.content}</div>
+            </Descriptions.Item>
+            <Descriptions.Item label="Ảnh">
+              {viewingBlog.blogImgUrl ? (
+                <Image src={viewingBlog.blogImgUrl} width={180} />
+              ) : (
+                <Text type="secondary">Không có ảnh</Text>
+              )}
+            </Descriptions.Item>
+            <Descriptions.Item label="Người đăng">
+              <Space>
+                <Avatar src={viewingBlog.userAvatar} icon={<UserOutlined />} />
+                <Text>{viewingBlog.fullName || viewingBlog.user_id || viewingBlog.userId}</Text>
+              </Space>
+            </Descriptions.Item>
+            <Descriptions.Item label="Ngày tạo">
+              {viewingBlog.createdAt ? helpers.formatDate(new Date(viewingBlog.createdAt)) : "-"}
+            </Descriptions.Item>
+          </Descriptions>
         ) : (
-          <div>Không tìm thấy blog.</div>
+          <Text type="secondary">Không tìm thấy bài đăng.</Text>
         )}
       </Modal>
     </div>
