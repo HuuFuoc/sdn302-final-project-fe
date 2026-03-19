@@ -4,7 +4,6 @@ import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   DashboardOutlined,
-  BookOutlined,
   SettingOutlined,
   LogoutOutlined,
   UserOutlined,
@@ -55,11 +54,6 @@ const SidebarLayout: React.FC = () => {
       key: ROUTER_URL.STAFF.BASE,
       icon: <DashboardOutlined />,
       label: <Link to={ROUTER_URL.STAFF.BASE}>Tổng quan</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.COURSES,
-      icon: <BookOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.COURSES}>Quản lý khóa học</Link>,
     },
     {
       key: ROUTER_URL.STAFF.CONTENT,

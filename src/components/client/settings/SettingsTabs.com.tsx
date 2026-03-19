@@ -47,7 +47,9 @@ const SettingsTabs: React.FC<SettingsTabsProps> = ({ loading, setLoading }) => {
       children: <BecomeInstructorTab loading={loading} setLoading={setLoading} />,
     },
   ].filter((item) =>
-    item.key === "become-instructor" ? role !== UserRole.STAFF : true
+    item.key === "become-instructor"
+      ? role !== UserRole.STAFF && role !== UserRole.ADMIN
+      : true
   );
 
   return (
