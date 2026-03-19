@@ -41,7 +41,7 @@ const HeaderLayout = () => {
   const navItems = [
     { name: "Trang Chủ", path: ROUTER_URL.COMMON.HOME },
     { name: "Khóa Học", path: ROUTER_URL.CLIENT.COURSE },
-    { name: "Blog", path: ROUTER_URL.CLIENT.BLOG },
+    { name: "Bài đăng", path: ROUTER_URL.CLIENT.BLOG },
     { name: "Về Chúng Tôi", path: ROUTER_URL.COMMON.ABOUT },
   ];
 

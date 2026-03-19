@@ -21,7 +21,7 @@ const BlogList = () => {
       setTotal(data?.totalCount || 0);
     } catch (err) {
       setBlogs([]);
-      console.error("Lỗi khi lấy blog:", err);
+      console.error("Lỗi khi lấy bài đăng:", err);
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ const BlogList = () => {
         ) : blogs.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-6xl text-gray-300 mb-4">📝</div>
-            <p className="text-xl text-gray-500">Không có blog nào.</p>
+            <p className="text-xl text-gray-500">Không có bài đăng nào.</p>
           </div>
         ) : (
           <>
