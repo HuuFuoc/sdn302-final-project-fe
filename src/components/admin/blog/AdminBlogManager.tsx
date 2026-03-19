@@ -53,8 +53,19 @@ const AdminBlogManager = () => {
   const [total, setTotal] = useState(0);
 
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
   const [authorIdInput, setAuthorIdInput] = useState("");
   const [authorIdApplied, setAuthorIdApplied] = useState("");
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchKeyword(searchKeyword);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [searchKeyword]);
 
   const enrichBlogsWithUserInfo = async (items: Blog[]) => {
     const userIds = Array.from(
@@ -129,8 +140,8 @@ const AdminBlogManager = () => {
         const data = res.data as any;
         source = Array.isArray(data?.data) ? data.data : [];
 
-        if (searchKeyword.trim()) {
-          const keyword = searchKeyword.trim().toLowerCase();
+        if (debouncedSearchKeyword.trim()) {
+          const keyword = debouncedSearchKeyword.trim().toLowerCase();
           source = source.filter((item) =>
             `${item.title} ${item.content}`.toLowerCase().includes(keyword),
           );
@@ -148,7 +159,7 @@ const AdminBlogManager = () => {
       const params: BlogRequest = {
         pageNumber: current,
         pageSize,
-        filterByContent: searchKeyword.trim() || undefined,
+        filterByContent: debouncedSearchKeyword.trim() || undefined,
       };
 
       const res = await BlogService.getAllBlogs(params);
@@ -170,7 +181,7 @@ const AdminBlogManager = () => {
 
   useEffect(() => {
     fetchBlogs();
-  }, [current, pageSize, searchKeyword, authorIdApplied]);
+  }, [current, pageSize, debouncedSearchKeyword, authorIdApplied]);
 
   const handleViewBlog = async (id: string) => {
     setShowViewModal(true);
@@ -207,6 +218,7 @@ const AdminBlogManager = () => {
   const resetFilters = () => {
     setCurrent(1);
     setSearchKeyword("");
+    setDebouncedSearchKeyword("");
     setAuthorIdInput("");
     setAuthorIdApplied("");
   };
