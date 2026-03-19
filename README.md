@@ -1,38 +1,6 @@
-# Nền tảng Phòng chống Tệ nạn Ma túy
-
-Ứng dụng web toàn diện cho tổ chức tình nguyện **phòng chống tệ nạn ma túy** trong cộng đồng. Nền tảng cung cấp tài nguyên giáo dục, khảo sát đánh giá rủi ro, đào tạo trực tuyến và dịch vụ tư vấn trực tiếp trong một hệ thống thống nhất.
-
----
-
-## 📖 Mục lục
-
-- [Tầm nhìn](#-tầm-nhìn)
-- [Tính năng](#-tính-năng)
-- [Công nghệ](#-công-nghệ)
-- [Cấu trúc dự án](#-cấu-trúc-dự-án)
-- [Cài đặt & Chạy](#-cài-đặt--chạy)
-- [Biến môi trường](#-biến-môi-trường)
-- [Build & Deploy](#-build--deploy)
-- [Đóng góp](#-đóng-góp)
-- [Liên hệ](#-liên-hệ)
-
----
-
-## 🎯 Tầm nhìn
-
-> _"Trao quyền cho cộng đồng với kiến thức, công cụ đánh giá và hướng dẫn chuyên gia để **ngăn chặn lạm dụng ma túy trước khi nó bắt đầu**."_
-
-Nền tảng phục vụ nhiều nhóm người dùng: học sinh, phụ huynh, giáo viên, tình nguyện viên y tế — với nội dung thiết kế riêng, đánh giá rủi ro tương tác (ASSIST, CRAFFT...), đặt lịch tư vấn và theo dõi tiến độ.
-
----
-
-## 🧩 Tính năng
-
 ### Trang công khai
 
-- Trang chủ, blog, khóa học, chương trình cộng đồng
-- Đánh giá rủi ro (khảo sát)
-- Đặt lịch tư vấn
+- Trang chủ, Bài đăng, khóa học
 - Giỏ hàng & thanh toán
 
 ### Theo vai trò
@@ -40,9 +8,7 @@ Nền tảng phục vụ nhiều nhóm người dùng: học sinh, phụ huynh, 
 | Vai trò        | Tính năng chính                                                                           |
 | -------------- | ----------------------------------------------------------------------------------------- |
 | **Admin**      | Quản lý toàn hệ thống: người dùng, blog, khóa học, phiên học, bài học, danh mục, thống kê |
-| **Manager**    | Phân tích, quản lý nhân viên/giảng viên, chương trình, khảo sát, báo cáo                  |
 | **Staff**      | Tổng quan, quản lý bài đăng, quản lý giảng viên, duyệt yêu cầu giảng viên                 |
-| **Consultant** | Tổng quan, khóa học, khách hàng, lịch hẹn tư vấn, cài đặt                                 |
 | **Customer**   | Khóa học của tôi, lịch sử đơn hàng, lịch hẹn, cài đặt                                     |
 | **Instructor** | Khóa học, học viên, doanh thu, đánh giá                                                   |
 
@@ -87,16 +53,13 @@ src/
 │   ├── admin/        # Giao diện Admin
 │   ├── client/       # Trang công khai (khóa học, blog, tư vấn...)
 │   ├── common/       # Components dùng chung
-│   ├── consultant/   # Giao diện Consultant
 │   ├── customer/     # Giao diện Customer
 │   ├── home/         # Trang chủ
-│   └── manager/      # Giao diện Manager
 ├── contexts/         # React contexts (Auth, ...)
 ├── consts/           # Constants (API, router, ...)
 ├── hooks/            # Custom hooks
 ├── layouts/          # Layout theo vai trò
 │   ├── admin/
-│   ├── consultant/
 │   ├── customer/
 │   ├── main/         # Layout công khai
 │   ├── manager/
