@@ -7,7 +7,7 @@ const { Text } = Typography;
 
 interface CourseHeroProps {
   course: Course;
-  averageRating: number; // thêm prop này
+  averageRating: number;
   authorName?: string;
   authorLoading?: boolean;
 }
@@ -24,18 +24,23 @@ const CourseHero: React.FC<CourseHeroProps> = ({
       teacher: "Giáo viên",
       parent: "Phụ huynh",
     };
-    return map[audience] || audience;
+
+    if (!audience || audience.toLowerCase() === "all") return "";
+    return map[audience] || "";
   };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "Không xác định";
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return "Không xác định";
     return date.toLocaleDateString("vi-VN", {
       year: "numeric",
       month: "long",
       day: "numeric",
     });
   };
+
+  const targetAudienceLabel = getTargetAudienceLabel(course.targetAudience);
 
   return (
     <div style={{ background: "#f7fafd", padding: "32px 0" }}>
@@ -50,7 +55,6 @@ const CourseHero: React.FC<CourseHeroProps> = ({
         }}
       >
         <Row gutter={32} align="middle">
-          {/* Ảnh đại diện khóa học chiếm 6 phần (60%) */}
           <Col xs={24} md={14} style={{ textAlign: "center" }}>
             <img
               src={
@@ -69,9 +73,8 @@ const CourseHero: React.FC<CourseHeroProps> = ({
               }}
             />
           </Col>
-          {/* Thông tin khóa học chiếm 4 phần (40%) */}
+
           <Col xs={24} md={10}>
-            {/* Breadcrumb */}
             <div style={{ marginBottom: 12 }}>
               <Text
                 style={{
@@ -82,12 +85,16 @@ const CourseHero: React.FC<CourseHeroProps> = ({
               >
                 Khóa học vẽ
               </Text>
-              <Text style={{ color: "#bdbdbd", margin: "0 8px" }}>›</Text>
-              <Text style={{ color: "#64748b", fontWeight: 500 }}>
-                {getTargetAudienceLabel(course.targetAudience)}
-              </Text>
+              {targetAudienceLabel ? (
+                <>
+                  <Text style={{ color: "#bdbdbd", margin: "0 8px" }}>›</Text>
+                  <Text style={{ color: "#64748b", fontWeight: 500 }}>
+                    {targetAudienceLabel}
+                  </Text>
+                </>
+              ) : null}
             </div>
-            {/* Title */}
+
             <h1
               style={{
                 color: "#1A8FE3",
@@ -100,7 +107,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({
             >
               {course.name}
             </h1>
-            {/* Description */}
+
             <div
               style={{
                 color: "#374151",
@@ -116,7 +123,7 @@ const CourseHero: React.FC<CourseHeroProps> = ({
             >
               <span dangerouslySetInnerHTML={{ __html: course.content }} />
             </div>
-            {/* Stats */}
+
             <div
               style={{
                 display: "flex",
@@ -142,11 +149,9 @@ const CourseHero: React.FC<CourseHeroProps> = ({
                   {averageRating.toFixed(1)}
                 </span>
               </div>
-              <span style={{ color: "#64748b", fontSize: 18 }}>
-                230 học viên
-              </span>
+              <span style={{ color: "#64748b", fontSize: 18 }}>230 học viên</span>
             </div>
-            {/* Author + Meta */}
+
             <div
               style={{
                 display: "flex",
@@ -158,11 +163,9 @@ const CourseHero: React.FC<CourseHeroProps> = ({
               }}
             >
               <span>
-                Tạo bởi{" "}
+                Tạo bởi {" "}
                 <span style={{ fontWeight: 600, color: "#111827" }}>
-                  {authorLoading
-                    ? "Đang tải..."
-                    : authorName || "Unknown author"}
+                  {authorLoading ? "Đang tải..." : authorName || "Unknown author"}
                 </span>
               </span>
               <div
@@ -173,15 +176,11 @@ const CourseHero: React.FC<CourseHeroProps> = ({
                 }}
               >
                 <span>
-                  <CalendarOutlined
-                    style={{ marginRight: 4, color: "#1A8FE3" }}
-                  />
+                  <CalendarOutlined style={{ marginRight: 4, color: "#1A8FE3" }} />
                   {formatDate(course.createdAt)}
                 </span>
                 <span>
-                  <ClockCircleOutlined
-                    style={{ marginRight: 4, color: "#1A8FE3" }}
-                  />
+                  <ClockCircleOutlined style={{ marginRight: 4, color: "#1A8FE3" }} />
                   Tiếng Việt
                 </span>
               </div>

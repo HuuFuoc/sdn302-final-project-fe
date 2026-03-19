@@ -19,41 +19,51 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({
   course,
   isPurchased = false,
 }) => {
-  // Calculate final price after discount
   const finalPrice = course.price * (1 - course.discount / 100);
 
-  // Map target audience to Vietnamese
   const getTargetAudienceLabel = (audience: string) => {
     const map: Record<string, string> = {
       student: "Học sinh",
       teacher: "Giáo viên",
       parent: "Phụ huynh",
     };
-    return map[audience] || audience;
+
+    if (!audience || audience.toLowerCase() === "all") return "";
+    return map[audience] || "";
   };
 
-  // Format creation date
   const formatDate = (dateString: string) => {
+    if (!dateString) return "";
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return "";
     return date.toLocaleDateString("vi-VN");
   };
 
+  const targetAudienceLabel = getTargetAudienceLabel(course.targetAudience);
+  const createdAtLabel = formatDate(course.createdAt);
+
   return (
     <div className="p-6 h-64 flex flex-col justify-between bg-white">
-      {/* Header */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <Tag
-            color="#1A8FE3"
-            className="text-xs font-medium px-3 py-1 rounded-full"
-          >
-            <UserOutlined className="mr-1" />
-            {getTargetAudienceLabel(course.targetAudience)}
-          </Tag>
-          <div className="flex items-center text-gray-500 text-xs">
-            <ClockCircleOutlined className="mr-1" />
-            {formatDate(course.createdAt)}
-          </div>
+          {targetAudienceLabel ? (
+            <Tag
+              color="#1A8FE3"
+              className="text-xs font-medium px-3 py-1 rounded-full"
+            >
+              <UserOutlined className="mr-1" />
+              {targetAudienceLabel}
+            </Tag>
+          ) : (
+            <span />
+          )}
+
+          {createdAtLabel ? (
+            <div className="flex items-center text-gray-500 text-xs">
+              <ClockCircleOutlined className="mr-1" />
+              {createdAtLabel}
+            </div>
+          ) : null}
         </div>
 
         <h3 className="text-lg font-bold mb-3 text-gray-800 line-clamp-2 min-h-[3.5rem] leading-tight group-hover:text-[#1A8FE3] transition-colors duration-300">
@@ -65,7 +75,6 @@ const CourseCardContent: React.FC<CourseCardContentProps> = ({
         </Paragraph>
       </div>
 
-      {/* Footer with pricing */}
       <div className="mt-auto">
         <div className="flex items-center justify-between">
           <div className="flex flex-col">

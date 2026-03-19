@@ -4,8 +4,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ClockCircleOutlined,
-  HeartOutlined,
-  ShareAltOutlined,
   CheckCircleTwoTone,
 } from "@ant-design/icons";
 import type { Course } from "../../../../types/course/Course.res.type";
@@ -170,21 +168,6 @@ const CourseCardHover: React.FC<CourseCardHoverProps> = ({
                 isInCart={!!rawCourse.isInCart}
               />
             )}
-
-            <div className="flex space-x-2">
-              <Button
-                icon={<HeartOutlined />}
-                className="flex-1 border-gray-300 hover:border-red-400 hover:text-red-500"
-              >
-                Yêu thích
-              </Button>
-              <Button
-                icon={<ShareAltOutlined />}
-                className="flex-1 border-gray-300 hover:border-blue-400 hover:text-blue-500"
-              >
-                Chia sẻ
-              </Button>
-            </div>
           </div>
         </div>
       </Card>

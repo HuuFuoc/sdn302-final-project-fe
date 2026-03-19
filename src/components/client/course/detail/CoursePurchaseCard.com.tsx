@@ -1,11 +1,7 @@
-import React, { useState } from "react";
-import { Card, Typography, Tag, Button, Divider, message } from "antd";
+import React from "react";
+import { Card, Typography, Tag, Divider } from "antd";
 import { motion } from "framer-motion";
 import {
-  HeartOutlined,
-  ShareAltOutlined,
-  GiftOutlined,
-  CheckCircleOutlined,
   PlayCircleOutlined,
   MobileOutlined,
   TrophyOutlined,
@@ -27,9 +23,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   course,
   highlights,
 }) => {
-  const [isLiked, setIsLiked] = useState(false);
-
-  // Đảm bảo luôn có courseId hợp lệ cho API giỏ hàng
   const raw = course as any;
   const courseId =
     raw.id ||
@@ -37,24 +30,9 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
     raw.courseId ||
     (raw.course && (raw.course._id || raw.course.id));
 
-  // Calculate final price and discount percentage
   const finalPrice = course.price * (1 - course.discount / 100);
   const discountPercentage = course.discount;
   const savingAmount = course.price * (course.discount / 100);
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    message.success(isLiked ? "Đã bỏ yêu thích" : "Đã thêm vào yêu thích");
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    message.success("Đã sao chép link khóa học!");
-  };
-
-  const handleGift = () => {
-    message.info("Tính năng tặng khóa học sẽ sớm ra mắt!");
-  };
 
   return (
     <div className="sticky top-6 z-[9998]">
@@ -71,7 +49,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
           }}
           bodyStyle={{ padding: 0 }}
         >
-          {/* Course Image */}
           <div className="relative">
             <img
               src={course.imageUrls?.[0] || noImage}
@@ -95,9 +72,7 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
             )}
           </div>
 
-          {/* Content */}
           <div className="p-6">
-            {/* Price Section */}
             <div className="text-center mb-6">
               <div className="flex items-center justify-center space-x-3">
                 <Text className="text-3xl font-bold text-gray-900">
@@ -124,7 +99,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
               )}
             </div>
 
-            {/* Action Buttons */}
             <div className="space-y-3 mb-6">
               <AddToCartButton
                 courseId={courseId}
@@ -132,15 +106,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
               />
             </div>
 
-            {/* Money Back Guarantee */}
-            <div className="text-center mb-6 p-4 bg-green-50 rounded-xl border border-green-200">
-              <CheckCircleOutlined className="text-green-600 text-lg mr-2" />
-              <Text className="text-green-700 font-medium">
-                Đảm bảo hoàn tiền trong 30 ngày
-              </Text>
-            </div>
-
-            {/* Course Highlights */}
             <div className="mb-6">
               <Title level={5} className="mb-3 text-gray-800">
                 Khóa học này bao gồm:
@@ -171,35 +136,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
             </div>
 
             <Divider className="my-4" />
-
-            {/* Secondary Actions */}
-            <div className="flex space-x-2">
-              <Button
-                icon={<HeartOutlined />}
-                className={`flex-1 border-gray-300 ${
-                  isLiked
-                    ? "text-red-500 border-red-400"
-                    : "hover:border-red-400 hover:text-red-500"
-                }`}
-                onClick={handleLike}
-              >
-                Yêu thích
-              </Button>
-              <Button
-                icon={<ShareAltOutlined />}
-                className="flex-1 border-gray-300 hover:border-blue-400 hover:text-blue-500"
-                onClick={handleShare}
-              >
-                Chia sẻ
-              </Button>
-              <Button
-                icon={<GiftOutlined />}
-                className="flex-1 border-gray-300 hover:border-orange-400 hover:text-orange-500"
-                onClick={handleGift}
-              >
-                Tặng
-              </Button>
-            </div>
           </div>
         </Card>
       </motion.div>

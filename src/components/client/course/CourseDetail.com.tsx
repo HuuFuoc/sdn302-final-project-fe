@@ -347,7 +347,6 @@ const CourseDetail: React.FC = () => {
   const courseHighlights = [
     "Truy cập trên thiết bị di động và TV",
     "Quyền truy cập đầy đủ suốt đời",
-    "Giấy chứng nhận hoàn thành",
   ];
 
   // Content từ sessionList
