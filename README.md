@@ -1,160 +1,202 @@
 # Nền tảng Phòng chống Tệ nạn Ma túy
 
-Một ứng dụng web toàn diện được phát triển cho tổ chức tình nguyện nhằm **phòng chống tệ nạn ma túy** trong cộng đồng. Nền tảng cung cấp tài nguyên giáo dục, khảo sát đánh giá rủi ro, đào tạo trực tuyến và dịch vụ tư vấn trực tiếp - tất cả trong một hệ thống thống nhất.
+Ứng dụng web toàn diện cho tổ chức tình nguyện **phòng chống tệ nạn ma túy** trong cộng đồng. Nền tảng cung cấp tài nguyên giáo dục, khảo sát đánh giá rủi ro, đào tạo trực tuyến và dịch vụ tư vấn trực tiếp trong một hệ thống thống nhất.
 
 ---
 
 ## 📖 Mục lục
-1. [Tầm nhìn Dự án](#tầm-nhìn-dự-án)
-2. [Tính năng Chính](#tính-năng-chính)
-3. [Công nghệ Sử dụng](#công-nghệ-sử-dụng)
-4. [Kiến trúc Tổng quan](#kiến-trúc-tổng-quan)
-5. [Phát triển Cục bộ](#phát-triển-cục-bộ)
-6. [Biến Môi trường](#biến-môi-trường)
-7. [Triển khai](#triển-khai)
-8. [Đóng góp](#đóng-góp)
-9. [Giấy phép](#giấy-phép)
-10. [Liên hệ](#liên-hệ)
+
+- [Tầm nhìn](#-tầm-nhìn)
+- [Tính năng](#-tính-năng)
+- [Công nghệ](#-công-nghệ)
+- [Cấu trúc dự án](#-cấu-trúc-dự-án)
+- [Cài đặt & Chạy](#-cài-đặt--chạy)
+- [Biến môi trường](#-biến-môi-trường)
+- [Build & Deploy](#-build--deploy)
+- [Đóng góp](#-đóng-góp)
+- [Liên hệ](#-liên-hệ)
 
 ---
 
-## 🚀 Tầm nhìn Dự án
+## 🎯 Tầm nhìn
 
-> "Trao quyền cho cộng đồng với kiến thức, công cụ đánh giá và hướng dẫn chuyên gia để **ngăn chặn lạm dụng ma túy trước khi nó bắt đầu**."
+> *"Trao quyền cho cộng đồng với kiến thức, công cụ đánh giá và hướng dẫn chuyên gia để **ngăn chặn lạm dụng ma túy trước khi nó bắt đầu**."*
 
-Nền tảng hỗ trợ các nhóm người dùng khác nhau - học sinh, phụ huynh, giáo viên, tình nguyện viên y tế - với nội dung được thiết kế riêng, đánh giá rủi ro tương tác (ASSIST, CRAFFT, ...), đặt lịch hẹn với tư vấn viên và bảng điều khiển tiến độ.
-
----
-
-## 🧩 Tính năng Chính
-
-| Mô-đun | Mô tả |
-| ------ | ----- |
-| Trang chủ / Blog | Trang đích công khai giới thiệu tổ chức và chia sẻ các bài viết thực hành tốt nhất & câu chuyện thành công. |
-| Khóa học | Tìm kiếm, đăng ký và hoàn thành các khóa đào tạo trực tuyến (ví dụ: nâng cao nhận thức, kỹ năng từ chối). Nội dung được lọc theo độ tuổi. |
-| Đánh giá Rủi ro | Khảo sát tương tác (ASSIST, CRAFFT, v.v.) để xác định mức độ rủi ro sử dụng ma túy. Đưa ra khuyến nghị cá nhân hóa khi hoàn thành. |
-| Đặt lịch Tư vấn | Lịch thời gian thực & đặt lịch với tư vấn viên được chứng nhận. Nhắc nhở qua email & bảng điều khiển cho tư vấn viên. |
-| Chương trình Cộng đồng | Quản lý các sự kiện truyền thông / giáo dục với **khảo sát trước/sau** để đo lường tác động. |
-| Người dùng & Hồ sơ | Xác thực dựa trên JWT, vai trò (Quản trị, Tư vấn viên, Người dùng), quản lý hồ sơ, theo dõi lịch sử. |
-| Bảng điều khiển Quản trị | KPI, phân tích khóa học, thông tin chương trình, thống kê cuộc hẹn, báo cáo có thể xuất. |
+Nền tảng phục vụ nhiều nhóm người dùng: học sinh, phụ huynh, giáo viên, tình nguyện viên y tế — với nội dung thiết kế riêng, đánh giá rủi ro tương tác (ASSIST, CRAFFT...), đặt lịch tư vấn và theo dõi tiến độ.
 
 ---
 
-## 🛠️ Công nghệ Sử dụng
+## 🧩 Tính năng
 
-### Giao diện người dùng
+### Trang công khai
+- Trang chủ, blog, khóa học, chương trình cộng đồng
+- Đánh giá rủi ro (khảo sát)
+- Đặt lịch tư vấn
+- Giỏ hàng & thanh toán
 
-* **React 19 + Vite** – máy chủ phát triển & gói nhanh như chớp.
-* **TypeScript** – gõ tĩnh để giảm lỗi runtime.
-* **PNPM** – trình quản lý gói hiệu suất cao với hỗ trợ workspace.
-* **Ant Design 5** – thành phần UI hiện đại.
-* **JWT** – xác thực không trạng thái & định tuyến dựa trên vai trò.
-* **Axios + React-Query** – tìm nạp & lưu trữ dữ liệu.
-* **Vercel** – triển khai xem trước & lưu trữ edge.
-* **AWS S3** – lưu trữ đối tượng bền vững cho hình ảnh, video & tài liệu.
+### Theo vai trò
 
-### Máy chủ
-
-* **.NET 8 (C#)** – REST API hiệu suất cao.
-* **Entity Framework Core** – lớp truy cập dữ liệu.
-* **JWT Authentication** – token truy cập an toàn & luồng làm mới.
-* **SendMail / SMTP** – email giao dịch (xác minh, nhắc nhở).
-* **PayOS** – cổng thanh toán cho đào tạo có phí (nếu có).
-* **Azure App Service / Render** – lưu trữ API tự động mở rộng.
-* **Render** – lưu trữ API tự động mở rộng.
-* **SQL Server** – cơ sở dữ liệu quan hệ.
-
-### DevOps / Công cụ
-
-* **GitHub Actions** – pipeline CI (lint, test, build, deploy).
+| Vai trò | Tính năng chính |
+|---------|-----------------|
+| **Admin** | Quản lý toàn hệ thống: người dùng, blog, khóa học, phiên học, bài học, danh mục, thống kê |
+| **Manager** | Phân tích, quản lý nhân viên/giảng viên, chương trình, khảo sát, báo cáo |
+| **Staff** | Tổng quan, quản lý bài đăng, quản lý giảng viên, duyệt yêu cầu giảng viên |
+| **Consultant** | Tổng quan, khóa học, khách hàng, lịch hẹn tư vấn, cài đặt |
+| **Customer** | Khóa học của tôi, lịch sử đơn hàng, lịch hẹn, cài đặt |
+| **Instructor** | Khóa học, học viên, doanh thu, đánh giá |
 
 ---
 
-## 🏗 Kiến trúc Tổng quan
+## 🛠️ Công nghệ
 
-```mermaid
-flowchart LR
-    subgraph Frontend [React Vite SPA]
-        A[Trình duyệt]
-    end
+### Frontend
+| Công nghệ | Phiên bản | Mô tả |
+|-----------|-----------|-------|
+| React | 19.x | UI framework |
+| Vite | 6.x | Build tool & dev server |
+| TypeScript | 5.9 | Type safety |
+| Ant Design | 5.x | UI components |
+| React Router | 7.x | Định tuyến |
+| TanStack Query | 5.x | Data fetching & cache |
+| Zustand / Redux | - | State management |
+| Tailwind CSS | 3.x | Styling |
+| TinyMCE | 7.x | Rich text editor |
+| AWS S3 | - | Lưu trữ file |
 
-    subgraph Backend [.NET 8 API]
-        B1[Đăng nhập / JWT]
-        B2[Khóa học / Chương trình]
-        B3[Khảo sát & Đánh giá]
-        B4[Đặt lịch Tư vấn]
-        B5[Tích hợp Thanh toán]
-    end
+### Backend (tham chiếu)
+- **.NET 8 (C#)** — REST API
+- **Entity Framework Core** — ORM
+- **JWT** — Xác thực
+- **SQL Server** — Database
+- **PayOS** — Thanh toán (nếu có)
 
-    A -- REST/JSON --> Backend
-    B1 -- JWT --> A
-    Backend --> |Tệp tĩnh| S3[(AWS S3)]
-    B5 --> PayOS[(PayOS)]
-    B4 --> Email[SMTP]
-    Backend --> DB[(CSDL quan hệ)]
+---
+
+## 📁 Cấu trúc dự án
+
+```
+src/
+├── app/              # Cấu hình app, store, enums
+├── components/       # Components theo module
+│   ├── admin/        # Giao diện Admin
+│   ├── client/       # Trang công khai (khóa học, blog, tư vấn...)
+│   ├── common/       # Components dùng chung
+│   ├── consultant/   # Giao diện Consultant
+│   ├── customer/     # Giao diện Customer
+│   ├── home/         # Trang chủ
+│   └── manager/      # Giao diện Manager
+├── contexts/         # React contexts (Auth, ...)
+├── consts/           # Constants (API, router, ...)
+├── hooks/            # Custom hooks
+├── layouts/          # Layout theo vai trò
+│   ├── admin/
+│   ├── consultant/
+│   ├── customer/
+│   ├── main/         # Layout công khai
+│   ├── manager/
+│   └── staff/
+├── pages/            # Trang theo route
+├── providers/        # QueryProvider, ...
+├── routes/           # Cấu hình route & bảo vệ
+├── services/         # API services
+├── types/            # TypeScript types
+└── utils/            # Các tiện ích
 ```
 
 ---
 
-## ⚙️ Phát triển Cục bộ
+## ⚙️ Cài đặt & Chạy
 
 ### Yêu cầu
+- **Node.js** >= 18
+- **pnpm** (khuyến nghị) hoặc npm/yarn
 
-* **Node >= 18** và PNPM
-* **.NET 8 SDK**
-
-### 1. Clone & cài đặt
+### Bước 1: Clone & cài đặt
 
 ```bash
-# HTTPS
-git clone https://github.com/server-craftsman/swp391-web-app-drug-use-prevention-support-system
-cd swp391-web-app-drug-use-prevention-support-system
-
-# Cài đặt frontend
+git clone https://github.com/server-craftsman/swp391-web-app-drug-use-prevention-support-system.git
+cd web-app-drug-use-prevention-support-system
 pnpm install
 ```
 
-### 2. Chạy Frontend
+### Bước 2: Chạy development
 
 ```bash
-pnpm run dev
-# Ứng dụng tại http://localhost:3000
+pnpm dev
+```
+
+Ứng dụng chạy tại **http://localhost:3000** (mở trình duyệt tự động).
+
+### Các lệnh khác
+
+```bash
+pnpm build    # Build production
+pnpm preview  # Xem bản build
+pnpm lint     # Kiểm tra ESLint
 ```
 
 ---
 
-## 🚀 Triển khai
+## 🔐 Biến môi trường
 
-| Môi trường | Công nghệ | Nhánh |
-| ---------- | --------- | ----- |
-| **Vercel** | Static/Serverless (Frontend) | `main` |
-| **Azure App Service** | .NET API | `main` |
-| **Render** | .NET API | `main` |
+Tạo file `.env` hoặc `.env.local` tại thư mục gốc (nếu cần):
 
-CI/CD được tự động hóa bởi **GitHub Actions**. Mỗi lần push vào `main` sẽ tự động build & deploy.
+```env
+VITE_API_BASE_URL=/api
+# Thêm các biến khác theo yêu cầu dự án
+```
+
+API mặc định được proxy qua `/api` tới backend (xem `vite.config.ts`).
+
+---
+
+## 🚀 Build & Deploy
+
+### Build production
+
+```bash
+pnpm build
+```
+
+Output nằm trong thư mục `dist/`.
+
+### Preview bản build
+
+```bash
+pnpm preview
+```
+
+### Deploy
+
+| Môi trường | Công nghệ | Ghi chú |
+|------------|-----------|---------|
+| Frontend | Vercel / Netlify / Static Host | Deploy thư mục `dist` |
+| Backend | Azure App Service / Render | .NET 8 API |
+
+CI/CD có thể thiết lập qua **GitHub Actions** (lint, build, deploy tự động khi push `main`).
 
 ---
 
 ## 🤝 Đóng góp
 
-1. Fork repository và tạo branch `feat/<tên>`.
-2. Commit theo chuẩn **Conventional Commits**.
-3. Mở Pull Request, điền mẫu PR và liên kết issue liên quan.
-4. Đảm bảo pipeline CI xanh trước khi request review.
-
-Xem thêm trong `CONTRIBUTING.md` để biết chi tiết.
+1. Fork repository và tạo branch `feat/<tên>` hoặc `fix/<tên>`
+2. Commit theo chuẩn **Conventional Commits** (ví dụ: `feat: thêm tính năng X`)
+3. Mở Pull Request kèm mô tả rõ ràng
+4. Đảm bảo `pnpm lint` và `pnpm build` chạy thành công
 
 ---
 
 ## 📜 Giấy phép
 
-Dự án phát hành theo giấy phép **MIT**. Xem file `LICENSE` để biết thêm chi tiết.
+Dự án phát hành theo giấy phép **MIT**. Xem file `LICENSE` để biết chi tiết.
 
 ---
 
 ## 📬 Liên hệ
 
-* **Nguyễn Đan Huy** – huyit2003@gmail.com
-* Vui lòng tạo **GitHub Issue** cho lỗi hoặc yêu cầu tính năng.
+- **Nguyễn Đan Huy** — huyit2003@gmail.com
+- Vui lòng tạo **GitHub Issue** cho lỗi hoặc đề xuất tính năng.
 
-> “Chung tay xây dựng tương lai không ma túy.” 🌱
+---
+
+> *"Chung tay xây dựng tương lai không ma túy."* 🌱
