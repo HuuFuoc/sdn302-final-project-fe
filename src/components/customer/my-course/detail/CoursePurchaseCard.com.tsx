@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, Typography, Tag, Button, Divider, message } from "antd";
 import { motion } from "framer-motion";
 import {
-  HeartOutlined,
   ShareAltOutlined,
   GiftOutlined,
   CheckCircleOutlined,
@@ -27,8 +26,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
   course,
   highlights,
 }) => {
-  const [isLiked, setIsLiked] = useState(false);
-
   const courseId =
     (course as any).id || (course as any)._id || (course as any).courseId;
 
@@ -41,11 +38,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 
   const handleBuyNow = () => {
     message.success("Chuyển hướng đến trang thanh toán...");
-  };
-
-  const handleLike = () => {
-    setIsLiked(!isLiked);
-    message.success(isLiked ? "Đã bỏ yêu thích" : "Đã thêm vào yêu thích");
   };
 
   const handleShare = () => {
@@ -174,17 +166,6 @@ const CoursePurchaseCard: React.FC<CoursePurchaseCardProps> = ({
 
             {/* Secondary Actions */}
             <div className="flex space-x-2">
-              <Button
-                icon={<HeartOutlined />}
-                className={`flex-1 border-gray-300 ${
-                  isLiked
-                    ? "text-red-500 border-red-400"
-                    : "hover:border-red-400 hover:text-red-500"
-                }`}
-                onClick={handleLike}
-              >
-                Yêu thích
-              </Button>
               <Button
                 icon={<ShareAltOutlined />}
                 className="flex-1 border-gray-300 hover:border-blue-400 hover:text-blue-500"

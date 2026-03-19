@@ -16,7 +16,6 @@ import {
   FileTextOutlined,
   EditOutlined,
   LineChartOutlined,
-  HeartOutlined,
 } from "@ant-design/icons";
 import { UserRole } from "../../app/enums";
 import { ROUTER_URL } from "../../consts/router.path.const";
@@ -323,14 +322,6 @@ const HeaderLayout = () => {
             <span className="text-gray-700">Cài đặt</span>
           </Menu.Item>
 
-          <Menu.Item
-            key="favorites"
-            icon={<HeartOutlined className="text-gray-600" />}
-            className={cn("hover:bg-gray-50 transition-colors mx-2 rounded")}
-            onClick={() => navigate("/favorites")}
-          >
-            <span className="text-gray-700">Yêu thích</span>
-          </Menu.Item>
           <Menu.Item
             key="cart"
             icon={<ShoppingCartOutlined className="text-gray-600" />}

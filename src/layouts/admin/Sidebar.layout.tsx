@@ -1,5 +1,5 @@
 ﻿import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { ROUTER_URL } from "../../consts/router.path.const";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
@@ -98,7 +98,6 @@ const navSections = [
 const SidebarLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { userInfo, logout } = useAuth();
-  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
@@ -106,7 +105,6 @@ const SidebarLayout: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
   };
 
   return (
