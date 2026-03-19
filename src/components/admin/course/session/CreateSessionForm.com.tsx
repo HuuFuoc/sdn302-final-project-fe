@@ -16,16 +16,13 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
 
   const { userInfo } = useAuth();
 
-  const resolveCourseId = (course: Course | (Course & { _id?: string; course_id?: string })) => {
+  const resolveCourseId = (
+    course: Course | (Course & { _id?: string; course_id?: string }),
+  ) => {
     // Ưu tiên field id theo type, fallback _id / course_id nếu backend trả khác
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyCourse = course as any;
-    return (
-      course.id ||
-      anyCourse._id ||
-      anyCourse.course_id ||
-      ""
-    );
+    return course.id || anyCourse._id || anyCourse.course_id || "";
   };
 
   const userId = useMemo(() => {
@@ -133,10 +130,6 @@ const CreateSessionForm = ({ courses, onSuccess }: CreateSessionFormProps) => {
         rules={[{ required: true, message: "Vui lòng nhập thứ tự" }]}
       >
         <Input type="number" min={0} placeholder="Nhập thứ tự" />
-      </Form.Item>
-
-      <Form.Item label="User ID (tự động)" tooltip="Lấy từ tài khoản đang đăng nhập">
-        <Input value={userId} disabled />
       </Form.Item>
 
       <Form.Item>

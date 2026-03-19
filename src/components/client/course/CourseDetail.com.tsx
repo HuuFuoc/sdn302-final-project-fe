@@ -401,7 +401,7 @@ const CourseDetail: React.FC = () => {
                 onLessonClick={(lessonId) => {
                   // Điều hướng sang trang học lesson theo lessonId
                   navigate(
-                    ROUTER_URL.CUSTOMER.LESSON_DETAIL.replace(
+                    ROUTER_URL.CLIENT.LESSON_DETAIL.replace(
                       ":lessonId",
                       lessonId,
                     ),

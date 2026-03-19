@@ -323,10 +323,7 @@ const LessonDetail: React.FC = () => {
                         onClick={() => {
                           if (!targetId || targetId === lessonId) return;
                           navigate(
-                            ROUTER_URL.CUSTOMER.LESSON_DETAIL.replace(
-                              ":lessonId",
-                              targetId,
-                            ),
+                            `/bai-hoc/${targetId}`,
                           );
                         }}
                         style={{

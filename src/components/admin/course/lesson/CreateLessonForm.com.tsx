@@ -208,7 +208,7 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
       name: values.name,
       content: values.content || "",
       positionOrder: Number(values.positionOrder) || 0,
-      fullTime: Number(values.fullTime) || 0,
+      fullTime: 0,
       courseId: selectedCourseId,
       sessionId: selectedSessionId,
       lessonType,
@@ -346,25 +346,6 @@ const CreateLessonForm = ({ courses, onSuccess }: CreateLessonFormProps) => {
         ]}
       >
         <Input type="number" min={0} />
-      </Form.Item>
-
-      <Form.Item
-        label="Thời lượng (phút)"
-        name="fullTime"
-        rules={[
-          {
-            type: "number",
-            min: 0,
-            transform: (value) => (value ? Number(value) : 0),
-            message: "Thời lượng phải là số >= 0",
-          },
-        ]}
-      >
-        <Input type="number" min={0} />
-      </Form.Item>
-
-      <Form.Item label="User ID (tự động)">
-        <Input value={userId} disabled />
       </Form.Item>
 
       <Form.Item>

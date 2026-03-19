@@ -107,6 +107,7 @@ export const ROUTER_URL = {
     COURSE: "/khoa-hoc",
     COURSE_DETAIL: "/khoa-hoc/:courseId",
     MY_COURSE_DETAIL: "/my-course/:courseId",
+    LESSON_DETAIL: "/bai-hoc/:lessonId",
     BLOG: "/blog",
     BLOG_DETAIL: "/blog/:blogId",
     COUNSEL: "/tu-van",

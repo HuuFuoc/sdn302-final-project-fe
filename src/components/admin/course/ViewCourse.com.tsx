@@ -47,6 +47,80 @@ const riskLevelLabel: Record<string, string> = {
 
 const WORD_LIMIT = 60;
 
+/** API có thể trả về { course, sessions } hoặc CourseDetailResponse phẳng - chuẩn hóa về CourseDetailResponse */
+function normalizeCourseDetail(raw: unknown): CourseDetailResponse | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  const hasNested = "course" in obj && "sessions" in obj;
+  const rawCourse = (hasNested ? obj.course : obj) as Record<string, unknown> | undefined;
+  const rawSessions = (hasNested ? obj.sessions : obj.sessionList) as unknown[] | undefined;
+  if (!rawCourse) return null;
+
+  const course = rawCourse as Record<string, unknown>;
+  const sessions = Array.isArray(rawSessions) ? rawSessions : [];
+  const imageUrlVal = course.imageUrl ?? course.image_url;
+  const imageUrlsVal = course.imageUrls ?? course.image_urls;
+
+  const imageUrls = Array.isArray(imageUrlsVal) && imageUrlsVal.length > 0
+    ? (imageUrlsVal as string[])
+    : typeof imageUrlVal === "string" && imageUrlVal
+      ? [String(imageUrlVal)]
+      : [];
+
+  const sessionList = sessions.map((s: unknown) => {
+    const ses = s as Record<string, unknown>;
+    const lessons = Array.isArray(ses.lessonList) ? ses.lessonList : (Array.isArray(ses.lessons) ? ses.lessons : []);
+    return {
+      id: String(ses.id ?? ses._id ?? ""),
+      courseId: String(ses.courseId ?? ses.course_id ?? ""),
+      name: String(ses.name ?? ""),
+      userId: String(ses.userId ?? ses.user_id ?? ""),
+      slug: String(ses.slug ?? ""),
+      content: String(ses.content ?? ""),
+      lessonList: lessons.map((l: unknown) => {
+        const les = l as Record<string, unknown>;
+        return {
+          id: String(les.id ?? les._id ?? ""),
+          name: String(les.name ?? ""),
+          content: String(les.content ?? ""),
+          lessonType: String(les.lessonType ?? les.lesson_type ?? ""),
+          videoUrl: String(les.videoUrl ?? les.video_url ?? ""),
+          imageUrl: String(les.imageUrl ?? les.image_url ?? ""),
+          fullTime: Number(les.fullTime ?? les.full_time ?? 0),
+          positionOrder: Number(les.positionOrder ?? les.position_order ?? 0),
+          sessionId: String(les.sessionId ?? les.session_id ?? ""),
+          courseId: String(les.courseId ?? les.course_id ?? ""),
+          userAvatar: "",
+          fullName: "",
+          createdAt: String(les.createdAt ?? les.created_at ?? ""),
+          updatedAt: String(les.updatedAt ?? les.updated_at ?? ""),
+          userId: String(les.userId ?? les.user_id ?? ""),
+        };
+      }),
+    };
+  });
+
+  return {
+    id: String(course.id ?? course._id ?? ""),
+    name: String(course.name ?? ""),
+    userId: String(course.userId ?? course.user_id ?? ""),
+    categoryId: String(course.categoryId ?? course.category_id ?? ""),
+    content: String(course.content ?? ""),
+    status: (course.status as CourseDetailResponse["status"]) ?? CourseStatus.PUBLISHED,
+    targetAudience: (course.targetAudience ?? course.target_audience) as CourseDetailResponse["targetAudience"] ?? CourseTargetAudience.GENERAL_PUBLIC,
+    imageUrls,
+    videoUrls: Array.isArray(course.videoUrls) ? course.videoUrls : (Array.isArray(course.video_urls) ? course.video_urls : []),
+    price: Number(course.price ?? 0),
+    discount: Number(course.discount ?? 0),
+    slug: String(course.slug ?? ""),
+    createdAt: String(course.createdAt ?? course.created_at ?? ""),
+    isInCart: Boolean(course.isInCart ?? course.is_in_cart),
+    isPurchased: Boolean(course.isPurchased ?? course.is_purchased),
+    sessionList,
+    riskLevel: (course.riskLevel ?? course.risk_level) as CourseDetailResponse["riskLevel"] ?? RiskLevel.NONE,
+  };
+}
+
 function getWordsFromHTML(html: string) {
   const text = html.replace(/<[^>]+>/g, " ");
   return text.split(/\s+/).filter(Boolean);
@@ -118,7 +192,7 @@ const SessionLessonItem: React.FC<{
                   fontWeight: 500,
                 }}
               >
-                {expandedLesson ? "Thu gá»n" : "Xem thÃªm"}
+                {expandedLesson ? "Thu gọn" : "Xem thêm"}
               </Button>
             )}
           </div>
@@ -158,7 +232,14 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
     try {
       const res = await CourseService.getCourseById({ id: courseId });
       if (res.data.success && res.data) {
-        setData(res.data.data as CourseDetailResponse);
+        const raw = res.data.data as unknown;
+        const normalized = normalizeCourseDetail(raw);
+        if (normalized) {
+          setData(normalized);
+        } else {
+          message.error("Định dạng dữ liệu khóa học không hợp lệ.");
+          setData(null);
+        }
       } else {
         message.error("Không tìm thấy thông tin khóa học.");
         setData(null);
@@ -217,7 +298,7 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
                 {riskLevelLabel[data.riskLevel] || data.riskLevel}
               </Tag>
               <Text type="secondary" className="text-sm text-gray-500">
-                Ngày tạo: {new Date(data.createdAt).toLocaleDateString("vi-VN")}
+                Ngày tạo: {data.createdAt ? new Date(data.createdAt).toLocaleDateString("vi-VN") : "-"}
               </Text>
             </div>
           </div>
@@ -229,7 +310,7 @@ const ViewCourse: React.FC<ViewCourseProps> = ({ courseId, open, onClose }) => {
                 Giá:
               </Text>{" "}
               <span className="text-lg font-medium text-green-600">
-                {data.price.toLocaleString("vi-VN")}₫
+                {(data.price ?? 0).toLocaleString("vi-VN")}₫
               </span>
             </div>
             <div>

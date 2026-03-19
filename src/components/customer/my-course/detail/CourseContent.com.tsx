@@ -99,7 +99,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ content }) => {
                     onClick={() =>
                       lecture.id &&
                       navigate(
-                        ROUTER_URL.CUSTOMER.LESSON_DETAIL.replace(
+                        ROUTER_URL.CLIENT.LESSON_DETAIL.replace(
                           ":lessonId",
                           lecture.id
                         )

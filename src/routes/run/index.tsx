@@ -85,7 +85,7 @@ const RunRoutes = () => {
               />
             );
           }
-        })
+        }),
       )}
 
       {/* Protected Routes - Based on user role and authentication */}
@@ -95,11 +95,7 @@ const RunRoutes = () => {
         if (route.children) {
           // Routes with children (like AdminLayout)
           return (
-            <Route
-              key={routeKey}
-              path={route.path}
-              element={route.element}
-            >
+            <Route key={routeKey} path={route.path} element={route.element}>
               {route.children.map((childRoute, childIndex) => (
                 <Route
                   key={`${routeKey}-child-${childIndex}`}
@@ -127,11 +123,13 @@ const RunRoutes = () => {
       <Route
         path="*"
         element={
-          role ?
+          role ? (
             <Routes>
               <Route path="*" element={<div>Page Not Found</div>} />
-            </Routes> :
+            </Routes>
+          ) : (
             <GuardPublicRoute component={<div>Page Not Found</div>} />
+          )
         }
       />
     </Routes>

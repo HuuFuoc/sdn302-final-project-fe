@@ -106,24 +106,16 @@ const ViewSession: React.FC<ViewSessionProps> = ({
         <div className="space-y-8">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div>
-                  <Title level={2} className="!mb-1 text-gray-800">{session.name}</Title>
-                  <div className="flex items-center gap-3">
-                    <Tag color="green" className="text-sm px-3 py-1 rounded-full">
-                      <PlayCircleOutlined />
-                      BUỔI HỌC
-                    </Tag>
-                    <Text className="text-gray-500">#{session.positionOrder}</Text>
-                  </div>
+            <div className="flex items-center gap-4">
+              <div>
+                <Title level={2} className="!mb-1 text-gray-800">{session.name}</Title>
+                <div className="flex items-center gap-3">
+                  <Tag color="green" className="text-sm px-3 py-1 rounded-full">
+                    <PlayCircleOutlined />
+                    BUỔI HỌC
+                  </Tag>
+                  <Text className="text-gray-500">#{session.positionOrder}</Text>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">
-                  {(session as any)?.lessons?.length || 0}
-                </div>
-                <div className="text-sm text-gray-500">bài học</div>
               </div>
             </div>
           </div>
@@ -210,7 +202,7 @@ const ViewSession: React.FC<ViewSessionProps> = ({
               title={
                 <div className="flex items-center gap-2">
                   <BookOutlined className="text-purple-500" />
-                  <span className="font-semibold text-gray-700">Danh sách bài học ({(session as any).lessons.length})</span>
+                  <span className="font-semibold text-gray-700">Danh sách bài học</span>
                 </div>
               }
               className="border-0 shadow-sm"

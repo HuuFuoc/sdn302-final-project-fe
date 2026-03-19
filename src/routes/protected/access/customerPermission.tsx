@@ -6,14 +6,13 @@ import CustomerLayout from "../../../layouts/customer/Customer.layout";
 import MyCoursePage from "../../../pages/customer/my-course";
 import OrderHistory from "../../../pages/customer/order";
 import AppointmentDetail from "../../../components/customer/appointment/Detail.com";
-import LessonDetailPage from "../../../pages/customer/lesson";
 // Lazy load customer pages
 const SettingsPage = lazy(() => import("../../../pages/client/settings"));
 const AppointmentPage = lazy(
-  () => import("../../../pages/customer/appointment")
+  () => import("../../../pages/customer/appointment"),
 );
 const CustomerDashboardPage = lazy(
-  () => import("../../../pages/customer/dashboard")
+  () => import("../../../pages/customer/dashboard"),
 );
 
 // Customer routes that require authentication
@@ -46,10 +45,7 @@ export const CustomerRoutes: RouteObject[] = [
         path: ROUTER_URL.CUSTOMER.ORDER_HISTORY,
         element: <OrderHistory />,
       },
-      {
-        path: ROUTER_URL.CUSTOMER.LESSON_DETAIL,
-        element: <LessonDetailPage />,
-      },
+      // Lesson detail dùng route public /bai-hoc/:lessonId - không cần route riêng /customer/bai-hoc
     ],
   },
 ];

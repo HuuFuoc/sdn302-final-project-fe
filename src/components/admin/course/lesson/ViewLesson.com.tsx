@@ -4,7 +4,6 @@ import {
   Typography,
   Image,
   Tag,
-  Avatar,
   message,
   Card,
   Row,
@@ -17,8 +16,6 @@ import {
   PlayCircleOutlined,
   PictureOutlined,
   FileTextOutlined,
-  UserOutlined,
-  CalendarOutlined,
   ClockCircleOutlined,
   TrophyOutlined,
   EyeOutlined,
@@ -27,9 +24,33 @@ import { LessonService } from "../../../../services/lesson/lesson.service";
 import type { Lesson } from "../../../../types/lesson/Lesson.res.type";
 import type { Course } from "../../../../types/course/Course.res.type";
 import type { Session } from "../../../../types/session/Session.res.type";
-import { formatDate } from "../../../../utils/helper";
 
 const { Title, Text } = Typography;
+
+/** Chuẩn hóa API response - backend có thể trả về { lesson } hoặc snake_case (_id, lesson_type, course_id, ...) */
+function normalizeLesson(raw: unknown): Lesson | null {
+  if (!raw || typeof raw !== "object") return null;
+  const obj = raw as Record<string, unknown>;
+  const o = (obj.lesson && typeof obj.lesson === "object" ? obj.lesson : obj) as Record<string, unknown>;
+  if (!o || typeof o !== "object") return null;
+  return {
+    id: String(o.id ?? o._id ?? ""),
+    name: String(o.name ?? ""),
+    content: String(o.content ?? ""),
+    lessonType: String(o.lessonType ?? o.lesson_type ?? ""),
+    videoUrl: String(o.videoUrl ?? o.video_url ?? ""),
+    imageUrl: String(o.imageUrl ?? o.image_url ?? ""),
+    fullTime: Number(o.fullTime ?? o.full_time ?? 0),
+    positionOrder: Number(o.positionOrder ?? o.position_order ?? 0),
+    sessionId: String(o.sessionId ?? o.session_id ?? ""),
+    courseId: String(o.courseId ?? o.course_id ?? ""),
+    userAvatar: String(o.userAvatar ?? o.user_avatar ?? ""),
+    fullName: String(o.fullName ?? o.full_name ?? ""),
+    createdAt: String(o.createdAt ?? o.created_at ?? ""),
+    updatedAt: String(o.updatedAt ?? o.updated_at ?? ""),
+    userId: String(o.userId ?? o.user_id ?? ""),
+  };
+}
 
 interface ViewLessonProps {
   lessonId: string | null;
@@ -59,9 +80,12 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
     setLoading(true);
     try {
       const res = await LessonService.getLessonById({ lessonId: id });
-      setLesson(res.data?.data || null);
+      const raw = res.data?.data as unknown;
+      const normalized = raw ? normalizeLesson(raw) : null;
+      setLesson(normalized);
     } catch {
       message.error("Không thể tải thông tin bài học.");
+      setLesson(null);
     } finally {
       setLoading(false);
     }
@@ -69,13 +93,17 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
 
   const getCourseName = () => {
     if (!lesson || !lesson.courseId) return "Không xác định";
-    const found = courses.find((c) => c.id === lesson.courseId);
+    const found = courses.find(
+      (c) => c.id === lesson.courseId || (c as { _id?: string })._id === lesson.courseId
+    );
     return found?.name || "Không xác định";
   };
 
   const getSessionName = () => {
     if (!lesson || !lesson.sessionId) return "Không xác định";
-    const found = sessions.find((s) => s.id === lesson.sessionId);
+    const found = sessions.find(
+      (s) => s.id === lesson.sessionId || (s as { _id?: string })._id === lesson.sessionId
+    );
     return found?.name || "Không xác định";
   };
 
@@ -103,7 +131,8 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
 
   const renderLessonContent = () => {
     if (!lesson) return null;
-    switch (lesson.lessonType.toLowerCase()) {
+    const type = (lesson.lessonType || "").toLowerCase();
+    switch (type) {
       case "video":
         if (!lesson.videoUrl && !lesson.imageUrl) {
           return (
@@ -223,22 +252,16 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
         <div className="space-y-8">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div>
-                  <Title level={2} className="!mb-1 text-gray-800">{lesson.name}</Title>
-                  <div className="flex items-center gap-3">
-                    <Tag color={getLessonTypeColor(lesson.lessonType)} className="text-sm px-3 py-1 rounded-full">
-                      {getLessonTypeIcon(lesson.lessonType)}
-                      {lesson.lessonType.toUpperCase()}
-                    </Tag>
-                    <Text className="text-gray-500">#{lesson.positionOrder}</Text>
-                  </div>
+            <div className="flex items-center gap-4">
+              <div>
+                <Title level={2} className="!mb-1 text-gray-800">{lesson.name}</Title>
+                <div className="flex items-center gap-3">
+                  <Tag color={getLessonTypeColor(lesson.lessonType)} className="text-sm px-3 py-1 rounded-full">
+                    {getLessonTypeIcon(lesson.lessonType)}
+                    {(lesson.lessonType || "").toUpperCase()}
+                  </Tag>
+                  <Text className="text-gray-500">#{lesson.positionOrder}</Text>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">{lesson.fullTime || 0}</div>
-                <div className="text-sm text-gray-500">phút</div>
               </div>
             </div>
           </div>
@@ -288,30 +311,6 @@ const ViewLesson: React.FC<ViewLessonProps> = ({
             className="border-0 shadow-sm"
           >
             {renderLessonContent()}
-          </Card>
-
-          {/* Author Information */}
-          <Card className="border-0 shadow-sm bg-gradient-to-r from-gray-50 to-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Avatar
-                  size={64}
-                  src={lesson.userAvatar}
-                  icon={<UserOutlined />}
-                  className="border-4 border-white shadow-lg"
-                />
-                <div>
-                  <Text className="block font-semibold text-gray-500 text-sm">Người tạo</Text>
-                  <Text className="text-lg font-semibold text-gray-800">{lesson.fullName}</Text>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center gap-2 text-gray-500">
-                  <CalendarOutlined />
-                  <Text className="text-sm">{formatDate(new Date(lesson.createdAt))}</Text>
-                </div>
-              </div>
-            </div>
           </Card>
         </div>
       ) : (

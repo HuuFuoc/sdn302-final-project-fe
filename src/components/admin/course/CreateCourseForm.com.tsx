@@ -54,10 +54,9 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
   const [categories, setCategories] = useState<CategoryLike[]>([]);
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [categoryError, setCategoryError] = useState<string | null>(null);
-  const [imageUrl, setImageUrl] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUploading, setImageUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -100,7 +99,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
     }
   }, [userInfo]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
@@ -119,7 +118,9 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
     }
 
     if (!objectIdRegex.test(categoryId)) {
-      message.error("Không lấy được category_id hợp lệ. Vui lòng kiểm tra danh mục trên hệ thống.");
+      message.error(
+        "Không lấy được category_id hợp lệ. Vui lòng kiểm tra danh mục trên hệ thống.",
+      );
       return;
     }
 
@@ -134,6 +135,18 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       return;
     }
 
+    let imageUrl = "";
+    if (imageFile) {
+      try {
+        setIsSubmitting(true);
+        const uploaded = await uploadFileToS3(imageFile);
+        imageUrl = uploaded.url;
+      } catch {
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
     const payload: CreateCourseRequest = {
       name: name.trim(),
       slug: generatedSlug,
@@ -142,8 +155,8 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       content,
       price: price || 0,
       discount: discount || 0,
-      imageUrl: imageUrl.trim(),
-      imageUrls: imageUrl.trim() ? [imageUrl.trim()] : [],
+      imageUrl,
+      imageUrls: imageUrl ? [imageUrl] : [],
     };
 
     createCourse(payload, {
@@ -153,13 +166,14 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
         setContent("");
         setPrice(0);
         setDiscount(0);
-        setImageUrl("");
         setImageFile(null);
         setImagePreview("");
+        setIsSubmitting(false);
         if (onSuccess) onSuccess();
       },
       onError: () => {
         message.error("Tạo khóa học thất bại. Vui lòng kiểm tra lại dữ liệu.");
+        setIsSubmitting(false);
       },
     });
   };
@@ -174,7 +188,9 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       </h2>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">Tên khóa học</label>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Tên khóa học
+        </label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -185,13 +201,17 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">Nội dung khóa học</label>
+        <label className="block mb-2 font-semibold text-gray-700">
+          Nội dung khóa học
+        </label>
         <Editor height={300} value={content} onChange={setContent} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block mb-2 font-semibold text-gray-700">Danh mục</label>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Danh mục
+          </label>
           <Select
             value={categoryId || undefined}
             onChange={(value) => setCategoryId(value)}
@@ -199,8 +219,8 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
               categoryLoading
                 ? "Đang tải danh mục..."
                 : categoryError
-                ? "Không thể tải danh mục"
-                : "Chọn danh mục"
+                  ? "Không thể tải danh mục"
+                  : "Chọn danh mục"
             }
             className="w-full"
             loading={categoryLoading}
@@ -222,7 +242,9 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           )}
         </div>
         <div>
-          <label className="block mb-2 font-semibold text-gray-700">Giá (VNĐ)</label>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Giá (VNĐ)
+          </label>
           <input
             type="number"
             min={0}
@@ -233,7 +255,9 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
           />
         </div>
         <div>
-          <label className="block mb-2 font-semibold text-gray-700">Giảm giá</label>
+          <label className="block mb-2 font-semibold text-gray-700">
+            Giảm giá
+          </label>
           <input
             type="number"
             min={0}
@@ -245,7 +269,7 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label className="block mb-2 font-semibold text-gray-700">Ảnh đại diện</label>
+        <label className="block mb-2 font-semibold text-gray-700">Ảnh</label>
         <input
           type="file"
           accept="image/*"
@@ -267,41 +291,14 @@ const CreateCourseForm: React.FC<CreateCourseFormProps> = ({ onSuccess }) => {
             className="mt-3 w-40 h-28 object-cover rounded-lg border"
           />
         )}
-        <button
-          type="button"
-          className="mt-3 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold disabled:opacity-60"
-          disabled={!imageFile || imageUploading}
-          onClick={async () => {
-            if (!imageFile) return;
-            try {
-              setImageUploading(true);
-              const uploaded = await uploadFileToS3(imageFile);
-              setImageUrl(uploaded.url);
-              message.success("Tải ảnh lên thành công!");
-            } catch {
-              // error đã được upload util handle
-            } finally {
-              setImageUploading(false);
-            }
-          }}
-        >
-          {imageUploading ? "Đang tải ảnh..." : "Upload ảnh lên hệ thống"}
-        </button>
-        {imageUrl && (
-          <p className="mt-1 text-xs text-gray-500 break-all">
-            URL ảnh đã lưu: <span className="font-mono">{imageUrl}</span>
-          </p>
-        )}
       </div>
-
-      {/* imageUrls vẫn gửi lên backend dưới dạng mảng, được lấy từ imageUrl ở trên */}
 
       <button
         type="submit"
-        disabled={isPending}
+        disabled={isPending || isSubmitting}
         className="w-full bg-primary text-white font-bold py-3 rounded-lg shadow-md transition disabled:opacity-60"
       >
-        {isPending ? "Đang tạo..." : "Tạo khóa học"}
+        {isPending || isSubmitting ? "Đang tạo..." : "Tạo khóa học"}
       </button>
     </form>
   );
