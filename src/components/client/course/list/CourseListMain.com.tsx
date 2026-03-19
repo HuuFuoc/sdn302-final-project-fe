@@ -9,6 +9,15 @@ import { CourseStatus } from "../../../../app/enums/courseStatus.enum";
 
 const itemsPerPage = 12;
 
+const normalizeSearchText = (value?: string) =>
+  (value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase()
+    .trim();
+
 const CourseList = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [myCourseIds, setMyCourseIds] = useState<Set<string>>(new Set());
@@ -16,10 +25,19 @@ const CourseList = () => {
   const [current, setCurrent] = useState(1);
   const [pageSize, setPageSize] = useState(itemsPerPage);
   const [total, setTotal] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [priceSort, setPriceSort] = useState<string>("");
   const [targetAudience, setTargetAudience] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
+
+  useEffect(() => {
+    const debounceTimer = window.setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(debounceTimer);
+    };
+  }, [searchTerm]);
 
   const fetchMyCourses = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -87,61 +105,40 @@ const CourseList = () => {
           };
         });
 
-        // Lọc chỉ lấy course có status là "published"
         let filteredCourses = normalizedCourses.filter(
           (course) => course.status === CourseStatus.PUBLISHED,
         );
 
-        // FRONTEND FILTERING
-        // 1. Filter by search term
-        if (searchTerm && searchTerm.trim() !== "") {
-          const searchLower = searchTerm.toLowerCase().trim();
+        if (debouncedSearchTerm.trim() !== "") {
+          const normalizedSearch = normalizeSearchText(debouncedSearchTerm);
           filteredCourses = filteredCourses.filter(
-            (course) =>
-              course.name?.toLowerCase().includes(searchLower) ||
-              (course as { description?: string }).description
-                ?.toLowerCase()
-                .includes(searchLower),
+            (course) => {
+              const normalizedName = normalizeSearchText(course.name);
+              const normalizedDescription = normalizeSearchText(
+                (course as { description?: string }).description,
+              );
+
+              return (
+                normalizedName.includes(normalizedSearch) ||
+                normalizedDescription.includes(normalizedSearch)
+              );
+            },
           );
         }
 
-        // 2. Filter by category
-        if (selectedCategory && selectedCategory !== "") {
-          filteredCourses = filteredCourses.filter(
-            (course) => course.categoryId === selectedCategory,
-          );
-        }
-
-        // 3. Filter by target audience
-        if (targetAudience && targetAudience !== "") {
+        if (targetAudience !== "") {
           filteredCourses = filteredCourses.filter(
             (course) => course.targetAudience === targetAudience,
           );
         }
 
-        // 4. Sort by price
-        if (priceSort && priceSort !== "") {
-          filteredCourses.sort((a, b) => {
-            const priceA = a.price || 0;
-            const priceB = b.price || 0;
-
-            if (priceSort === "ASC") {
-              return priceA - priceB; // Tăng dần
-            } else if (priceSort === "DESC") {
-              return priceB - priceA; // Giảm dần
-            }
-            return 0;
-          });
-        }
-
-        // PAGINATION Ở FRONTEND
         const totalFiltered = filteredCourses.length;
         const startIndex = (page - 1) * size;
         const endIndex = startIndex + size;
         const paginatedCourses = filteredCourses.slice(startIndex, endIndex);
 
         setCourses(paginatedCourses);
-        setTotal(totalFiltered); // Set total theo số lượng đã filter
+        setTotal(totalFiltered);
       } catch (err) {
         setCourses([]);
         setTotal(0);
@@ -150,7 +147,7 @@ const CourseList = () => {
         setLoading(false);
       }
     },
-    [priceSort, searchTerm, selectedCategory, targetAudience],
+    [debouncedSearchTerm, targetAudience],
   );
 
   useEffect(() => {
@@ -161,28 +158,25 @@ const CourseList = () => {
     fetchCourses(current, pageSize);
   }, [current, pageSize, fetchCourses]);
 
+  useEffect(() => {
+    setCurrent(1);
+  }, [debouncedSearchTerm, targetAudience]);
+
   const handlePageChange = (page: number, size: number) => {
     setCurrent(page);
     setPageSize(size);
   };
 
-  const handleApplyFilters = (filters: {
-    category: string;
+  const handleFiltersChange = (filters: {
     targetAudience: string;
-    priceSort: string;
     searchTerm: string;
   }) => {
-    setSelectedCategory(filters.category);
     setTargetAudience(filters.targetAudience);
-    setPriceSort(filters.priceSort);
     setSearchTerm(filters.searchTerm);
-    setCurrent(1); // Reset to first page when filters change
   };
 
   const handleClearFilters = () => {
-    setSelectedCategory(""); // SỬA: "" thay vì "all"
-    setTargetAudience(""); // SỬA: "" thay vì "all"
-    setPriceSort(""); // SỬA: "" thay vì "default"
+    setTargetAudience("");
     setSearchTerm("");
     setCurrent(1);
   };
@@ -198,24 +192,19 @@ const CourseList = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
     >
-      {/* Hero Section */}
       <CourseListHero
         searchTerm={searchTerm}
         onSearchChange={handleSearchChange}
       />
 
       <div className="max-w-7xl mx-auto px-8">
-        {/* Filters */}
         <CourseListFilters
-          selectedCategory={selectedCategory}
           targetAudience={targetAudience}
-          priceSort={priceSort}
           searchTerm={searchTerm}
-          onApplyFilters={handleApplyFilters}
+          onFiltersChange={handleFiltersChange}
           onClearFilters={handleClearFilters}
         />
 
-        {/* Course Grid */}
         <CourseListGrid
           courses={courses}
           myCourseIds={myCourseIds}
