@@ -20,7 +20,7 @@
 
 ## 🎯 Tầm nhìn
 
-> *"Trao quyền cho cộng đồng với kiến thức, công cụ đánh giá và hướng dẫn chuyên gia để **ngăn chặn lạm dụng ma túy trước khi nó bắt đầu**."*
+> _"Trao quyền cho cộng đồng với kiến thức, công cụ đánh giá và hướng dẫn chuyên gia để **ngăn chặn lạm dụng ma túy trước khi nó bắt đầu**."_
 
 Nền tảng phục vụ nhiều nhóm người dùng: học sinh, phụ huynh, giáo viên, tình nguyện viên y tế — với nội dung thiết kế riêng, đánh giá rủi ro tương tác (ASSIST, CRAFFT...), đặt lịch tư vấn và theo dõi tiến độ.
 
@@ -29,6 +29,7 @@ Nền tảng phục vụ nhiều nhóm người dùng: học sinh, phụ huynh, 
 ## 🧩 Tính năng
 
 ### Trang công khai
+
 - Trang chủ, blog, khóa học, chương trình cộng đồng
 - Đánh giá rủi ro (khảo sát)
 - Đặt lịch tư vấn
@@ -36,39 +37,44 @@ Nền tảng phục vụ nhiều nhóm người dùng: học sinh, phụ huynh, 
 
 ### Theo vai trò
 
-| Vai trò | Tính năng chính |
-|---------|-----------------|
-| **Admin** | Quản lý toàn hệ thống: người dùng, blog, khóa học, phiên học, bài học, danh mục, thống kê |
-| **Manager** | Phân tích, quản lý nhân viên/giảng viên, chương trình, khảo sát, báo cáo |
-| **Staff** | Tổng quan, quản lý bài đăng, quản lý giảng viên, duyệt yêu cầu giảng viên |
-| **Consultant** | Tổng quan, khóa học, khách hàng, lịch hẹn tư vấn, cài đặt |
-| **Customer** | Khóa học của tôi, lịch sử đơn hàng, lịch hẹn, cài đặt |
-| **Instructor** | Khóa học, học viên, doanh thu, đánh giá |
+| Vai trò        | Tính năng chính                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| **Admin**      | Quản lý toàn hệ thống: người dùng, blog, khóa học, phiên học, bài học, danh mục, thống kê |
+| **Manager**    | Phân tích, quản lý nhân viên/giảng viên, chương trình, khảo sát, báo cáo                  |
+| **Staff**      | Tổng quan, quản lý bài đăng, quản lý giảng viên, duyệt yêu cầu giảng viên                 |
+| **Consultant** | Tổng quan, khóa học, khách hàng, lịch hẹn tư vấn, cài đặt                                 |
+| **Customer**   | Khóa học của tôi, lịch sử đơn hàng, lịch hẹn, cài đặt                                     |
+| **Instructor** | Khóa học, học viên, doanh thu, đánh giá                                                   |
 
 ---
 
 ## 🛠️ Công nghệ
 
 ### Frontend
-| Công nghệ | Phiên bản | Mô tả |
-|-----------|-----------|-------|
-| React | 19.x | UI framework |
-| Vite | 6.x | Build tool & dev server |
-| TypeScript | 5.9 | Type safety |
-| Ant Design | 5.x | UI components |
-| React Router | 7.x | Định tuyến |
-| TanStack Query | 5.x | Data fetching & cache |
-| Zustand / Redux | - | State management |
-| Tailwind CSS | 3.x | Styling |
-| TinyMCE | 7.x | Rich text editor |
-| AWS S3 | - | Lưu trữ file |
 
-### Backend (tham chiếu)
-- **.NET 8 (C#)** — REST API
-- **Entity Framework Core** — ORM
-- **JWT** — Xác thực
-- **SQL Server** — Database
-- **PayOS** — Thanh toán (nếu có)
+| Công nghệ       | Phiên bản | Mô tả                   |
+| --------------- | --------- | ----------------------- |
+| React           | 19.x      | UI framework            |
+| Vite            | 6.x       | Build tool & dev server |
+| TypeScript      | 5.9       | Type safety             |
+| Ant Design      | 5.x       | UI components           |
+| React Router    | 7.x       | Định tuyến              |
+| TanStack Query  | 5.x       | Data fetching & cache   |
+| Zustand / Redux | -         | State management        |
+| Tailwind CSS    | 3.x       | Styling                 |
+| TinyMCE         | 7.x       | Rich text editor        |
+| AWS S3          | -         | Lưu trữ file            |
+
+### Backend
+
+- **Node.js + Express.js** — REST API
+- **TypeScript** — Kiểm tra kiểu dữ liệu tĩnh
+- **MongoDB Atlas** — Cơ sở dữ liệu đám mây
+- **JWT** — Xác thực (Access Token & Refresh Token)
+- **Swagger (OpenAPI 3.0)** — Tài liệu API
+- **Bcryptjs** — Mã hóa mật khẩu
+- **Nodemailer** — Gửi email xác thực
+- **Express Validator** — Kiểm tra dữ liệu đầu vào
 
 ---
 
@@ -108,14 +114,15 @@ src/
 ## ⚙️ Cài đặt & Chạy
 
 ### Yêu cầu
+
 - **Node.js** >= 18
 - **pnpm** (khuyến nghị) hoặc npm/yarn
 
 ### Bước 1: Clone & cài đặt
 
 ```bash
-git clone https://github.com/server-craftsman/swp391-web-app-drug-use-prevention-support-system.git
-cd web-app-drug-use-prevention-support-system
+git clone https://github.com/HuuFuoc/sdn302-final-project-fe.git
+cd sdn302-final-project-fe
 pnpm install
 ```
 
@@ -168,12 +175,12 @@ pnpm preview
 
 ### Deploy
 
-| Môi trường | Công nghệ | Ghi chú |
-|------------|-----------|---------|
-| Frontend | Vercel / Netlify / Static Host | Deploy thư mục `dist` |
-| Backend | Azure App Service / Render | .NET 8 API |
+| Môi trường   | Công nghệ | Ghi chú                                        |
+| ------------ | --------- | ---------------------------------------------- |
+| **Frontend** | Vercel    | Deploy thư mục `dist` (React/Vite SPA)         |
+| **Backend**  | Vercel    | Deploy Node.js + Express REST API (Serverless) |
 
-CI/CD có thể thiết lập qua **GitHub Actions** (lint, build, deploy tự động khi push `main`).
+Cả Frontend và Backend đều triển khai trên **Vercel**. CI/CD có thể thiết lập qua **GitHub Actions** (lint, build, deploy tự động khi push `main`).
 
 ---
 
@@ -194,9 +201,9 @@ Dự án phát hành theo giấy phép **MIT**. Xem file `LICENSE` để biết 
 
 ## 📬 Liên hệ
 
-- **Nguyễn Đan Huy** — huyit2003@gmail.com
+- **Trần Hữu Phước** — huufuocdev@gmail.com
 - Vui lòng tạo **GitHub Issue** cho lỗi hoặc đề xuất tính năng.
 
 ---
 
-> *"Chung tay xây dựng tương lai không ma túy."* 🌱
+> _"Chung tay xây dựng tương lai tốt đẹp cho mầm non đất nước."_
