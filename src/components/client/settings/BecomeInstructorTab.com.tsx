@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import { Alert, Button, Card, Form, Input } from "antd";
-import { ReadOutlined, SendOutlined } from "@ant-design/icons";
+import { SendOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import { useAuth } from "../../../contexts/Auth.context";
 import { UserRole } from "../../../app/enums/userRole.enum";
@@ -89,7 +89,7 @@ const BecomeInstructorTab: React.FC<BecomeInstructorTabProps> = ({
               name="jobTitle"
               rules={[{ required: true, message: "Vui lòng nhập chức danh" }]}
             >
-              <Input placeholder="Ví dụ: Giảng viên tư vấn tâm lý" />
+              <Input />
             </Form.Item>
 
             <Form.Item
@@ -98,10 +98,7 @@ const BecomeInstructorTab: React.FC<BecomeInstructorTabProps> = ({
               extra="Nhập nhiều giá trị, phân tách bằng dấu phẩy"
               rules={[{ required: true, message: "Vui lòng nhập bằng cấp/chứng chỉ" }]}
             >
-              <Input.TextArea
-                rows={4}
-                placeholder="Ví dụ: Thạc sĩ Tâm lý học, Chứng chỉ CBT, Chứng chỉ Coaching"
-              />
+              <Input.TextArea rows={4} />
             </Form.Item>
 
             <Form.Item label="Ghi chú" name="note">
@@ -126,14 +123,6 @@ const BecomeInstructorTab: React.FC<BecomeInstructorTabProps> = ({
           </Form>
         )}
 
-        <div className="mt-6 p-4 rounded-lg bg-blue-50 text-blue-700 text-sm">
-          <div className="flex items-start gap-2">
-            <ReadOutlined className="mt-0.5" />
-            <span>
-              Sau khi gửi, yêu cầu của bạn sẽ xuất hiện trong mục quản lý yêu cầu giảng viên để Staff/Admin duyệt.
-            </span>
-          </div>
-        </div>
       </Card>
     </motion.div>
   );
