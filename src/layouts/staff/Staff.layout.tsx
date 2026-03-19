@@ -10,7 +10,7 @@ const StaffLayout: React.FC = () => {
     return (
         <Layout style={{ minHeight: "100vh" }}>
             <SidebarLayout />
-            <Layout style={{ marginLeft: "250px" }} className="lg:ml-[250px] md:ml-0 sm:ml-0">
+            <Layout style={{ marginLeft: 260 }} className="lg:ml-[260px] md:ml-0 sm:ml-0">
                 <Content style={{ margin: "24px 16px", padding: 24, background: "#fff" }}>
                     <Outlet />
                 </Content>

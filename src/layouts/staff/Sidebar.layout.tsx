@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout, Menu, Avatar, Dropdown, Button, message } from "antd";
+import { Layout, Avatar, Dropdown, Button, message } from "antd";
 import type { MenuProps } from "antd";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -10,7 +10,8 @@ import {
   EditOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  AuditOutlined,
+  TeamOutlined,
+  CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/Auth.context";
 import { ROUTER_URL } from "../../consts/router.path.const";
@@ -50,39 +51,21 @@ const SidebarLayout: React.FC = () => {
   };
 
   const menuItems = [
-    {
-      key: ROUTER_URL.STAFF.BASE,
-      icon: <DashboardOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.BASE}>Tổng quan</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.CONTENT,
-      icon: <EditOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.CONTENT}>Quản lý bài đăng</Link>,
-    },
-    {
-      key: ROUTER_URL.STAFF.INSTRUCTORS,
-      icon: <AuditOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.INSTRUCTORS}>Quản lý giảng viên</Link>,
-    },
+    { key: ROUTER_URL.STAFF.BASE, icon: <DashboardOutlined />, label: "Tổng quan" },
+    { key: ROUTER_URL.STAFF.CONTENT, icon: <EditOutlined />, label: "Quản lý bài đăng" },
+    { key: ROUTER_URL.STAFF.INSTRUCTORS, icon: <TeamOutlined />, label: "Quản lý giảng viên" },
     {
       key: ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS,
-      icon: <AuditOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.INSTRUCTOR_REQUESTS}>Duyệt yêu cầu giảng viên</Link>,
+      icon: <CheckCircleOutlined />,
+      label: "Duyệt yêu cầu giảng viên",
     },
-    {
-      key: ROUTER_URL.STAFF.SETTINGS,
-      icon: <SettingOutlined />,
-      label: <Link to={ROUTER_URL.STAFF.SETTINGS}>Cài đặt</Link>,
-    },
+    { key: ROUTER_URL.STAFF.SETTINGS, icon: <SettingOutlined />, label: "Cài đặt" },
   ];
 
   const getSelectedKey = () => {
     const path = location.pathname;
-    return (
-      menuItems.find((item) => path.startsWith(item.key))?.key ||
-      ROUTER_URL.STAFF.BASE
-    );
+    const sorted = [...menuItems].sort((a, b) => b.key.length - a.key.length);
+    return sorted.find((item) => path.startsWith(item.key))?.key ?? ROUTER_URL.STAFF.BASE;
   };
 
   return (
@@ -90,68 +73,101 @@ const SidebarLayout: React.FC = () => {
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={250}
+      width={260}
       style={{
-        background: "#001529",
+        background: "var(--color-sidebar, #1a1a2e)",
         position: "fixed",
         height: "100vh",
         left: 0,
         top: 0,
         bottom: 0,
       }}
+      className="flex flex-col"
     >
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center justify-between">
-          {!collapsed && (
-            <div className="flex items-center space-x-3">
-              <div className="bg-green-500 rounded p-2 text-white font-bold">NV</div>
-              <div className="text-white">
-                <div className="text-sm font-medium">Nhân viên</div>
-                <div className="text-xs text-gray-300">Mỹ thuật thiếu nhi</div>
-              </div>
-            </div>
-          )}
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 32,
-              height: 32,
-              color: "white",
-            }}
-          />
-        </div>
-      </div>
-
-      <Menu
-        theme="dark"
-        mode="inline"
-        selectedKeys={[getSelectedKey()]}
-        items={menuItems}
-        style={{ border: "none", paddingTop: "16px" }}
-      />
-
-      {!collapsed && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700">
-          <Dropdown menu={userMenu} trigger={["click"]} placement="topLeft">
-            <div className="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded">
+      <div className="flex h-full min-h-0 flex-col">
+        {/* Zone 1: Header - Profile/Logo - Clickable → Home */}
+        <div className="shrink-0 px-4 pt-4 pb-3 border-b border-white/10">
+          <div className="flex items-center justify-between gap-2">
+            <Link
+              to={ROUTER_URL.COMMON.HOME}
+              className={`flex flex-1 min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:bg-white/5 active:scale-[0.98] ${collapsed ? "justify-center" : ""}`}
+            >
               <Avatar
                 src={userInfo?.profilePicUrl}
                 icon={!userInfo?.profilePicUrl && <UserOutlined />}
-                size="small"
+                size={collapsed ? "default" : "small"}
+                className="shrink-0 bg-[var(--color-success,#16a34a)] text-white"
               />
-              <div className="text-white flex-1 min-w-0">
-                <div className="text-sm font-medium truncate">
-                  {userInfo?.firstName} {userInfo?.lastName}
+              {!collapsed && (
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-semibold text-white">
+                    {userInfo?.firstName} {userInfo?.lastName}
+                  </div>
+                  <div className="text-xs text-white/60">Nhân viên · Mỹ thuật thiếu nhi</div>
                 </div>
-                <div className="text-xs text-gray-300 truncate">{userInfo?.email}</div>
-              </div>
-            </div>
-          </Dropdown>
+              )}
+            </Link>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              className="shrink-0 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/5"
+              style={{ width: 36, height: 36, fontSize: 16 }}
+            />
+          </div>
         </div>
-      )}
+
+        {/* Zone 2: Menu */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <ul className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = getSelectedKey() === item.key;
+              return (
+                <li key={item.key}>
+                  <Link
+                    to={item.key}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200
+                      ${isActive
+                        ? "bg-[var(--color-success,#16a34a)] text-white shadow-sm"
+                        : "text-white/80 hover:bg-white/5 hover:text-white"
+                      }`}
+                  >
+                    <span
+                      className="flex h-[22px] w-[22px] shrink-0 items-center justify-center text-[15px]"
+                      style={{ opacity: isActive ? 1 : 0.85 }}
+                    >
+                      {item.icon}
+                    </span>
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Zone 3: Footer - Email - Fixed at bottom */}
+        {!collapsed && (
+          <div className="shrink-0 border-t border-white/10 px-4 py-3">
+            <Dropdown menu={userMenu} trigger={["click"]} placement="topLeft">
+              <div className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 transition-colors duration-200 hover:bg-white/5">
+                <Avatar
+                  src={userInfo?.profilePicUrl}
+                  icon={!userInfo?.profilePicUrl && <UserOutlined />}
+                  size={24}
+                  className="shrink-0 bg-white/10 text-white/80"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs text-white/60">Email</div>
+                  <div className="truncate text-xs font-medium text-white/90">
+                    {userInfo?.email || "—"}
+                  </div>
+                </div>
+              </div>
+            </Dropdown>
+          </div>
+        )}
+      </div>
     </Sider>
   );
 };

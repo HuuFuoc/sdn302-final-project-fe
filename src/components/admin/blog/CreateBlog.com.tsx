@@ -20,7 +20,24 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
   const [form] = Form.useForm<CreateBlogFormValues>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+  const getUserIdFromStorage = (): string => {
+    try {
+      const raw = localStorage.getItem("userInfo");
+      if (!raw) return "";
+      const parsed = JSON.parse(raw) as { id?: string; _id?: string };
+      return parsed.id || parsed._id || "";
+    } catch {
+      return "";
+    }
+  };
+
   const handleSubmit = async (values: CreateBlogFormValues) => {
+    const userId = getUserIdFromStorage();
+    if (!userId) {
+      message.error("Không tìm thấy thông tin đăng nhập. Vui lòng đăng nhập lại.");
+      return;
+    }
+
     let imageUrl = values.blogImgUrl?.trim() || "";
 
     if (fileList[0]?.originFileObj) {
@@ -37,6 +54,8 @@ const CreateBlogForm: React.FC<CreateBlogFormProps> = ({ onSuccess }) => {
         title: values.title.trim(),
         content: values.content.trim(),
         blogImgUrl: imageUrl,
+        userId,
+        user_id: userId,
       },
       {
         onSuccess: () => {

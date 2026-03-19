@@ -41,6 +41,9 @@ body,
 
   --color-sidebar: #1a1a2e;
   --color-sidebar-active: #273352;
+  --color-sidebar-staff: #0f172a;
+  --color-sidebar-staff-hover: rgba(22, 163, 74, 0.12);
+  --color-sidebar-staff-active: rgba(22, 163, 74, 0.2);
 
   --color-bg: #f5f7fb;
   --color-surface: #ffffff;

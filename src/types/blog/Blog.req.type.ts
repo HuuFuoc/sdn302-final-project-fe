@@ -7,6 +7,8 @@ export interface CreateBlogRequest {
   content: string;
   blogImgUrl: string;
   title: string;
+  userId?: string;
+  user_id?: string;
 }
 
 export interface UpdateBlogRequest {

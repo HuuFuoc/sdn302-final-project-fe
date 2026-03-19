@@ -1,9 +1,73 @@
 import { useEffect, useState } from "react";
 import { BlogService } from "../../../services/blog/blog.service";
+import { UserService } from "../../../services/user/user.service";
 import type { Blog } from "../../../types/blog/Blog.res.type";
 import type { BlogRequest } from "../../../types/blog/Blog.req.type";
 import CustomPagination from "../../common/Pagiation.com";
 import BlogCard from "./BlogCard.com";
+
+const enrichBlogsWithUserInfo = async (items: Blog[]): Promise<Blog[]> => {
+  const userIds = Array.from(
+    new Set(
+      items
+        .map((blog) => blog.user_id || blog.userId)
+        .filter((id): id is string => Boolean(id && id.trim())),
+    ),
+  );
+
+  if (userIds.length === 0) return items;
+
+  const userMap = new Map<string, { fullName?: string; userAvatar?: string }>();
+
+  const userResults = await Promise.allSettled(
+    userIds.map((id) => UserService.getUserById({ userId: id })),
+  );
+
+  const extractUserPayload = (response: any) => {
+    const data = response?.data;
+    if (!data) return {};
+    return data.data || data.user || data;
+  };
+
+  const extractUserFullName = (rawUser: any) => {
+    const directName = rawUser?.fullName || rawUser?.full_name || rawUser?.name || "";
+    if (directName && String(directName).trim()) return String(directName).trim();
+
+    const firstName = rawUser?.firstName || rawUser?.first_name || "";
+    const lastName = rawUser?.lastName || rawUser?.last_name || "";
+    return `${firstName} ${lastName}`.trim();
+  };
+
+  const extractUserAvatar = (rawUser: any) =>
+    rawUser?.profilePicUrl ||
+    rawUser?.profile_pic_url ||
+    rawUser?.avatar ||
+    rawUser?.avatarUrl ||
+    "";
+
+  userResults.forEach((result, index) => {
+    if (result.status !== "fulfilled") return;
+
+    const userId = userIds[index];
+    const rawUser = extractUserPayload(result.value);
+    const fullName = extractUserFullName(rawUser);
+    const userAvatar = extractUserAvatar(rawUser);
+
+    userMap.set(userId, { fullName, userAvatar });
+  });
+
+  return items.map((blog) => {
+    const blogUserId = blog.user_id || blog.userId;
+    const userInfo = blogUserId ? userMap.get(blogUserId) : undefined;
+
+    return {
+      ...blog,
+      fullName: blog.fullName || userInfo?.fullName || "Tác giả",
+      userAvatar: blog.userAvatar || userInfo?.userAvatar || "",
+    };
+  });
+};
+
 const BlogList = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(false);
@@ -17,8 +81,11 @@ const BlogList = () => {
     try {
       const res = await BlogService.getAllBlogs(params);
       const data = res.data as any;
-      setBlogs(Array.isArray(data?.data) ? data.data : []);
+      const rawBlogs = Array.isArray(data?.data) ? data.data : [];
       setTotal(data?.totalCount || 0);
+
+      const enrichedBlogs = await enrichBlogsWithUserInfo(rawBlogs);
+      setBlogs(enrichedBlogs);
     } catch (err) {
       setBlogs([]);
       console.error("Lỗi khi lấy bài đăng:", err);

@@ -82,9 +82,15 @@ export const BlogService = {
     }).then(normalizeBlogListResponse as any);
   },
   createBlog(params: CreateBlogRequest) {
+    const payload: Record<string, unknown> = {
+      title: params.title,
+      content: params.content,
+      blogImgUrl: params.blogImgUrl,
+      user_id: params.user_id ?? params.userId ?? "",
+    };
     return BaseService.post<ResponseSuccess<Blog>>({
       url: API_PATH.BLOG.CREATE_BLOG,
-      payload: params,
+      payload,
     }).then(normalizeSingleBlogResponse as any);
   },
   deleteBlog(params: DeleteBlogRequest) {

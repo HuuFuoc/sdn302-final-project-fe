@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import type { Course } from "../../../types/course/Course.res.type";
 import { useUpdateCourse } from "../../../hooks/useCourse";
 import { BaseService } from "../../../app/api/base.service";
@@ -25,7 +25,6 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   const [videoUrls, setVideoUrls] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState("");
-  const [targetAudience, setTargetAudience] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [status, setStatus] = useState<CourseStatus>(CourseStatus.DRAFT);
@@ -36,7 +35,6 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
       setContent(course.content || "");
       setImageUrls(course.imageUrls || []);
       setVideoUrls(course.videoUrls || []);
-      setTargetAudience(course.targetAudience || "");
       setPrice(course.price || 0);
       setDiscount(course.discount || 0);
       setPreviewImage(course.imageUrls?.[0] || "");
@@ -58,7 +56,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !content.trim() || !targetAudience || !status) {
+    if (!title.trim() || !content.trim() || !status) {
       message.warning("Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
@@ -82,7 +80,7 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
         name: title,
         content,
         categoryId: course.categoryId,
-        targetAudience: targetAudience as CourseTargetAudience,
+        targetAudience: (course.targetAudience || CourseTargetAudience.GENERAL_PUBLIC) as CourseTargetAudience,
         riskLevel: (course.riskLevel || RiskLevel.LOW) as RiskLevel,
         imageUrls: updatedImageUrls,
         videoUrls,
@@ -168,22 +166,6 @@ const UpdateCourseForm: React.FC<UpdateCourseFormProps> = ({
             />
           )}
         </div>
-      </div>
-
-      <div>
-        <label className="block mb-2 font-semibold text-gray-700">Đối tượng</label>
-        <select
-          value={targetAudience}
-          onChange={(e) => setTargetAudience(e.target.value)}
-          className="border border-gray-300 px-4 py-2 rounded-lg w-full"
-          required
-        >
-          <option value="">-- Chọn đối tượng --</option>
-          <option value={CourseTargetAudience.STUDENT}>Học sinh</option>
-          <option value={CourseTargetAudience.UNIVERSITY_STUDENT}>Sinh viên</option>
-          <option value={CourseTargetAudience.PARENT}>Phụ huynh</option>
-          <option value={CourseTargetAudience.GENERAL_PUBLIC}>Cộng đồng</option>
-        </select>
       </div>
 
       <div>
