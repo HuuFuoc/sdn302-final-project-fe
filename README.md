@@ -9,7 +9,7 @@
 | -------------- | ----------------------------------------------------------------------------------------- |
 | **Admin**      | Quản lý toàn hệ thống: người dùng, blog, khóa học, phiên học, bài học, danh mục, thống kê |
 | **Staff**      | Tổng quan, quản lý bài đăng, quản lý giảng viên, duyệt yêu cầu giảng viên                 |
-| **Customer**   | Khóa học của tôi, lịch sử đơn hàng, lịch hẹn, cài đặt                                     |
+| **Customer**   | Khóa học của tôi, lịch sử đơn hàng, cài đặt                                     |
 | **Instructor** | Khóa học, học viên, doanh thu, đánh giá                                                   |
 
 ---
@@ -51,7 +51,7 @@ src/
 ├── app/              # Cấu hình app, store, enums
 ├── components/       # Components theo module
 │   ├── admin/        # Giao diện Admin
-│   ├── client/       # Trang công khai (khóa học, blog, tư vấn...)
+│   ├── client/       # Trang công khai (khóa học, blog,...)
 │   ├── common/       # Components dùng chung
 │   ├── customer/     # Giao diện Customer
 │   ├── home/         # Trang chủ
